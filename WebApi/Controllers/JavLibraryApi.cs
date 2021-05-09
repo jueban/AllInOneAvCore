@@ -22,13 +22,13 @@ namespace WebApi.Controllers
         }
 
         [HttpPost]
-        public async Task<ApiViewModel> SaveJavlibraryCookie(string cookie)
+        public async Task<ApiViewModel> SaveJavlibraryCookie(string cookie, string userAgent)
         {
             ApiViewModel ret = new ApiViewModel();         
             
             try
             {
-                await JavLibraryService.SaveJavLibraryCookie(cookie);
+                await JavLibraryService.SaveJavLibraryCookie(cookie, userAgent);
             }
             catch(Exception ee)
             {
