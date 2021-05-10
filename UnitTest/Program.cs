@@ -13,7 +13,8 @@ namespace UnitTest
     {
         static void Main(string[] args)
         {
-            JavLibraryService.GetJavLibraryCookie().Wait();
+            //JavLibraryService.GetJavLibraryCookie().Wait();
+            var res = JavLibraryService.GetRankActressLinks().Result;
 
             //DoScanAllJavLibraryFromCategory();
             //DoScanJavLibraryDetail();

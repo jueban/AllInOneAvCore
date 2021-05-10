@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
+using Microsoft.Extensions.Options;
 
 namespace WebApi.Controllers
 {
@@ -16,45 +17,18 @@ namespace WebApi.Controllers
     public class ConfigController : ControllerBase
     {
         public readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IOptions<Settings> _settings;
 
-        public ConfigController(IWebHostEnvironment webHostEnvironment)
+        public ConfigController(IWebHostEnvironment webHostEnvironment, IOptions<Settings> settings)
         {
             _webHostEnvironment = webHostEnvironment;
+            _settings = settings;
         }
 
         [HttpGet]
-        public ConfigModel GetConfigModel(string site, string key)
+        public Settings GetConfig()
         {
-            ConfigModel ret = new ConfigModel();
-            var folder = _webHostEnvironment.ContentRootPath;
-            var settingFile = folder + "\\setting.json";
-
-            if (System.IO.File.Exists(settingFile))
-            {
-                var content = new StreamReader(settingFile).ReadToEnd();
-                var json = JObject.Parse(content);
-                if (json.ContainsKey(site))
-                {
-                    if (((JObject)json[site]).ContainsKey(key))
-                    {
-                        ret.status = ApiViewModelStatus.Success;
-                        ret.Value = ((JObject)json[site])[key].ToString();
-                    }
-                    {
-                        ret.status = ApiViewModelStatus.NotExists;
-                    }
-                }
-                else
-                {
-                    ret.status = ApiViewModelStatus.NotExists;
-                }
-            }
-            else
-            {
-                ret.status = ApiViewModelStatus.NotExists;
-            }
-
-            return ret;
+            return _settings.Value;
         }
     }
 }

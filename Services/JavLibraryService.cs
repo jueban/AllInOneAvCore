@@ -21,7 +21,6 @@ namespace Services
     {
         #region 全局变量
         private static readonly string DefaultUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36";
-        private static readonly string ChromeLocation = @"C:\Program Files (x86)\Google\Chrome\Application\Chrome.exe";
         private static readonly string JavLibraryCookieDomain = ".javlibrary.com";
         private static readonly string JavLibraryIndexUrl = "http://www.javlibrary.com/cn/";
         private static readonly string JavLibraryCategoryUrl = "http://www.javlibrary.com/cn/genres.php";
@@ -31,23 +30,10 @@ namespace Services
         //获取JavLibraryCookie
         public async static Task<ValueTuple<CookieContainer, string>> GetJavLibraryCookie()
         {
-            string content = "";
             string userAgent = "";
             CookieContainer ret = null;
 
-            using (HttpClient client = new())
-            {
-                content = await client.GetStringAsync("http://localhost:20001/api/config/GetConfigModel?site=JavLibrarySetting&key=CookieMode");
-            }
-            
-            var jsonObj = JsonSerializer.Deserialize<ConfigModel>(content, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
-
-            var mode = JavLibraryGetCookieMode.Easy;
-
-            if(jsonObj != null)
-            {
-                mode = (JavLibraryGetCookieMode)Enum.Parse(typeof(JavLibraryGetCookieMode), jsonObj.Value, true);
-            }
+            var mode = SettingService.GetJavLibrarySetting().Result.JavLibrarySettings.CookieMode;
             
             if(mode == JavLibraryGetCookieMode.MockBroswer)
             {
@@ -289,6 +275,43 @@ namespace Services
         {
             return await new JavLibraryDAL().GetWebScanUrlModel(onlyNotDownload);
         }
+
+        //获取JavLibrary排行榜女优链接
+        public async static Task<List<(string name, string url)>> GetRankActressLinks()
+        {
+            List<(string, string)> ret = new();
+            var url = GetJavLibraryEntryUrl(JavLibraryEntryPointType.Rank, "", 1);
+
+            var content = await GetJavLibraryContent(url);
+
+            if (content.exception == null && !string.IsNullOrEmpty(content.content))
+            {
+                HtmlDocument detailHtmlDocument = new();
+                detailHtmlDocument.LoadHtml(content.content);
+
+                var actressListPath = "//div[@class='searchitem']";
+
+                var actressListNodes = detailHtmlDocument.DocumentNode.SelectNodes(actressListPath);
+
+                if (actressListNodes != null)
+                {
+                    foreach (var node in actressListNodes)
+                    {
+                        var aHref = node.ChildNodes[1].Attributes["href"].Value.Trim();
+                        var name = node.ChildNodes[1].InnerText;
+
+                        (string, string) temp = new();
+
+                        temp.Item1 = name;
+                        temp.Item2 = JavLibraryIndexUrl + aHref;
+
+                        ret.Add(temp);
+                    }
+                }
+            }
+
+            return ret;
+        }
         #endregion
 
         #region 内部使用
@@ -381,11 +404,13 @@ namespace Services
         //打开Chrome浏览器等待油猴脚本调用API存入Cookie，并退出（有bug）
         private async static Task<(CookieContainer cc, string userAgent)> GetJavCookieChromeProcess()
         {
-            if(File.Exists(ChromeLocation))
+            var chromeLocation = SettingService.GetJavLibrarySetting().Result.CommonSettings.ChromeLocation;
+
+            if (File.Exists(chromeLocation))
             {
                 using(HttpClient client = new ())
                 {
-                    await client.GetAsync($"http://localhost:20002/job/openbroswer?location={ChromeLocation}&url={JavLibraryIndexUrl}");
+                    await client.GetAsync($"http://localhost:20002/job/openbroswer?location={chromeLocation}&url={JavLibraryIndexUrl}");
                 }
 
                 await Task.Delay(15 * 1000);
