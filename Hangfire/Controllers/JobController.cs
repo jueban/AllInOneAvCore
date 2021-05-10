@@ -12,16 +12,28 @@ namespace Hangfire.Controllers
     public class JobController : ControllerBase
     {
         [HttpGet]
-        public string OpenBroswer(string url)
+        public string OpenBroswer(string location, string url)
         {
-            BackgroundJob.Enqueue(() => OpenBroswerJob());
+            BackgroundJob.Enqueue(() => OpenBroswerJob(location, url));
 
             return "success";
         }
 
-        public void OpenBroswerJob()
+        public void OpenBroswerJob(string location, string url)
         {
-            System.Diagnostics.Process.Start(@"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe", "https://www.baidu.com");
+            var process = System.Diagnostics.Process.Start(location, url);
+        }
+
+        //没想好怎么搞processId
+        public void CloseBroswerJob(int processId)
+        {
+            var process = System.Diagnostics.Process.GetProcessById(processId);
+
+            if (process != null && process.HasExited != true)
+            {
+                process.Kill();
+                process.Dispose();
+            }
         }
     }
 }

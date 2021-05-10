@@ -20,7 +20,7 @@ namespace WebApi
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<Startup>().UseUrls("http://*:10001");
+                    webBuilder.UseStartup<Startup>().UseUrls("http://*:20001");
                 });
     }
 }

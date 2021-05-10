@@ -13,8 +13,10 @@ namespace UnitTest
     {
         static void Main(string[] args)
         {
-            DoScanAllJavLibraryFromCategory();
-            DoScanJavLibraryDetail();
+            JavLibraryService.GetJavLibraryCookie().Wait();
+
+            //DoScanAllJavLibraryFromCategory();
+            //DoScanJavLibraryDetail();
 
             Console.WriteLine("按任意键退出");
             Console.ReadKey();

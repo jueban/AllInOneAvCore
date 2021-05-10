@@ -21,7 +21,7 @@ namespace Services
     {
         #region 全局变量
         private static readonly string DefaultUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36";
-        private static readonly string ChromeLocation = @"C:\Program Files\Google\Chrome\Application\Chrome.exe";
+        private static readonly string ChromeLocation = @"C:\Program Files (x86)\Google\Chrome\Application\Chrome.exe";
         private static readonly string JavLibraryCookieDomain = ".javlibrary.com";
         private static readonly string JavLibraryIndexUrl = "http://www.javlibrary.com/cn/";
         private static readonly string JavLibraryCategoryUrl = "http://www.javlibrary.com/cn/genres.php";
@@ -37,7 +37,7 @@ namespace Services
 
             using (HttpClient client = new())
             {
-                content = await client.GetStringAsync("http://localhost:10001/api/config/GetConfigModel?site=JavLibrarySetting&key=CookieMode");
+                content = await client.GetStringAsync("http://localhost:20001/api/config/GetConfigModel?site=JavLibrarySetting&key=CookieMode");
             }
             
             var jsonObj = JsonSerializer.Deserialize<ConfigModel>(content, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
@@ -383,14 +383,12 @@ namespace Services
         {
             if(File.Exists(ChromeLocation))
             {
-                var process = System.Diagnostics.Process.Start(ChromeLocation, JavLibraryIndexUrl);
-
-                await Task.Delay(10 * 1000);
-
-                if(process != null)
+                using(HttpClient client = new ())
                 {
-                    process.Kill();
+                    await client.GetAsync($"http://localhost:20002/job/openbroswer?location={ChromeLocation}&url={JavLibraryIndexUrl}");
                 }
+
+                await Task.Delay(15 * 1000);
 
                 return await GetJavChromeCookieFromDB();
             }
