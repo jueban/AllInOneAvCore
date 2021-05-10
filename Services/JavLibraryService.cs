@@ -4,6 +4,7 @@ using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Text.Json;
+using System.Text.Unicode;
 using System.Threading;
 using System.Threading.Tasks;
 using DAL;
@@ -34,7 +35,7 @@ namespace Services
             string userAgent = "";
             CookieContainer ret = null;
 
-            using (HttpClient client = new HttpClient())
+            using (HttpClient client = new())
             {
                 content = await client.GetStringAsync("http://localhost:10001/api/config/GetConfigModel?site=JavLibrarySetting&key=CookieMode");
             }
@@ -55,20 +56,20 @@ namespace Services
                 {
                     var res = await GetJavChromeCookieFromDB();
 
-                    if(res.Item1 != null && !string.IsNullOrEmpty(res.Item2))
+                    if(res.cc != null && !string.IsNullOrEmpty(res.userAgent))
                     {
-                        ret = res.Item1;
-                        userAgent = res.Item2;
+                        ret = res.cc;
+                        userAgent = res.userAgent;
                     }
                 }
                 else
                 {
                     var res = await GetJavCookieChromeProcess();
 
-                    if(res.Item1 != null && !string.IsNullOrEmpty(res.Item2))
+                    if(res.cc != null && !string.IsNullOrEmpty(res.userAgent))
                     {
-                        ret = res.Item1;
-                        userAgent = res.Item2;
+                        ret = res.cc;
+                        userAgent = res.userAgent;
                     }
                 }
             }
@@ -85,7 +86,7 @@ namespace Services
         //读取从油猴脚本传过来的Cookie再结合上从本地Chrome读取到的HttpOnly的Cookie
         public async static Task<int> SaveJavLibraryCookie(string cookie, string userAgent)
         {
-            List<CookieItem> items = new List<CookieItem>();        
+            List<CookieItem> items = new();        
             int res = 0;
 
             if (!string.IsNullOrEmpty(cookie))
@@ -112,7 +113,7 @@ namespace Services
 
                     await business.DeleteJavLibraryCookie();
 
-                    JavLibraryCookieJson entity = new JavLibraryCookieJson()
+                    JavLibraryCookieJson entity = new()
                     {
                         CookieJson = JsonSerializer.Serialize(items),
                         UserAgent = userAgent
@@ -140,6 +141,18 @@ namespace Services
             return ret;
         }
 
+        //保存JavLibrary的AvModel
+        public async static Task<int> SaveJavLibraryAvModel(AvModel avModel)
+        {
+            return await new JavLibraryDAL().InsertAvModel(avModel);
+        }
+
+        //更新JavLibrary扫描结果的下载状态
+        public async static Task<int> UpdateJavLibraryScanDownloadState(int id, bool state)
+        {
+            return await new JavLibraryDAL().UpdateWebScanUrlModel(id, state);
+        }
+
         //获取JavLibrary的分类，用做全站扫描的入口
         public async static Task<List<CommonJavLibraryModel>> GetJavLibraryCategory()
         {
@@ -147,10 +160,10 @@ namespace Services
             
             var content = await GetJavLibraryContent(JavLibraryCategoryUrl);
 
-            if (content.Item1 == null && !string.IsNullOrEmpty(content.Item2))
+            if (content.exception == null && !string.IsNullOrEmpty(content.content))
             {
                 HtmlDocument htmlDocument = new();
-                htmlDocument.LoadHtml(content.Item2);
+                htmlDocument.LoadHtml(content.content);
 
                 var genrePath = "//div[@class='genreitem']";
 
@@ -174,22 +187,26 @@ namespace Services
         }
 
         //获取JavLibrary的列表页信息
-        public async static Task<ValueTuple<int, List<WebScanUrlModel>>> GetJavLibraryListPageInfo(JavLibraryEntryPointType type, string url, int page)
+        public async static Task<(int pageCount, List<WebScanUrlModel> successList, string fail)> GetJavLibraryListPageInfo(JavLibraryEntryPointType type, string url, int page)
         {
-            ValueTuple<int, List<WebScanUrlModel>> ret = new();
-            List<WebScanUrlModel> list = new(); 
+            (int, List<WebScanUrlModel>, string) ret = new();
+            List<WebScanUrlModel> list = new();
+            string fail = "";
             int lastPage = -1;
-            var content = await GetJavLibraryContent(GetJavLibraryEntryUrl(type, url, page));
 
-            if(content.Item1 == null && !string.IsNullOrEmpty(content.Item2))
+            var realUrl = GetJavLibraryEntryUrl(type, url, page);
+
+            var content = await GetJavLibraryContent(realUrl);
+
+            if (content.exception == null && !string.IsNullOrEmpty(content.content))
             {
                 HtmlDocument detailHtmlDocument = new();
-                detailHtmlDocument.LoadHtml(content.Item2);
+                detailHtmlDocument.LoadHtml(content.content);
 
                 var lastPagePath = "//a[@class='page last']";
                 var videoPath = "//div[@class='video']";
 
-                var videoNodes = detailHtmlDocument.DocumentNode.SelectNodes(videoPath);                                                                                                                                                                                                                                                                                                                                                                                                                
+                var videoNodes = detailHtmlDocument.DocumentNode.SelectNodes(videoPath);
                 var lastPageNode = detailHtmlDocument.DocumentNode.SelectSingleNode(lastPagePath);
 
                 if (lastPageNode != null)
@@ -219,7 +236,7 @@ namespace Services
                             {
                                 WebScanUrlModel scan = new WebScanUrlModel
                                 {
-                                    Id = id,
+                                    AvId = id,
                                     IsDownload = false,
                                     Name = name,
                                     URL = avUrl,
@@ -232,11 +249,45 @@ namespace Services
                     }
                 }
             }
+            else
+            {
+                fail = realUrl;
+            }
 
             ret.Item1 = lastPage;
             ret.Item2 = list;
+            ret.Item3 = fail;
 
             return ret;
+        }
+
+        //获取JavLibrary的详情页信息
+        public async static Task<(Exception exception, AvModel avModel, List<CommonJavLibraryModel> infos)> GetJavLibraryDetailPageInfo(string url)
+        {
+            (Exception exception, AvModel avModel, List<CommonJavLibraryModel> infos) ret = new();
+            Exception exception = null;
+            AvModel avModel = new();
+            List<CommonJavLibraryModel> infos = new();
+
+            var content = await GetJavLibraryContent(url);
+
+            if (content.exception == null && !string.IsNullOrEmpty(content.content))
+            {
+                avModel = GenerateAVModel(content.content, url, infos);
+                avModel.Infos = JsonHelper.SerializeWithUtf8(infos);
+            }
+
+            ret.exception = exception;
+            ret.avModel = avModel;
+            ret.infos = infos;
+
+            return ret;
+        }
+
+        //获取JavLibrary未下载的Url信息
+        public async static Task<List<WebScanUrlModel>> GetJavLibraryWebScanUrlModel(bool onlyNotDownload = true)
+        {
+            return await new JavLibraryDAL().GetWebScanUrlModel(onlyNotDownload);
         }
         #endregion
 
@@ -289,9 +340,9 @@ namespace Services
         }
 
         //通用获取JavLibrary的网页内容
-        private async static Task<ValueTuple<Exception, string>> GetJavLibraryContent(string url)
+        private async static Task<(Exception exception, string content)> GetJavLibraryContent(string url)
         {
-            ValueTuple<Exception, string> ret = new();
+            (Exception, string) ret = new();
             var cookie = await GetJavLibraryCookie();
             Exception exception = null;
             string content = "";
@@ -328,7 +379,7 @@ namespace Services
         }
 
         //打开Chrome浏览器等待油猴脚本调用API存入Cookie，并退出（有bug）
-        private async static Task<ValueTuple<CookieContainer, string>> GetJavCookieChromeProcess()
+        private async static Task<(CookieContainer cc, string userAgent)> GetJavCookieChromeProcess()
         {
             if(File.Exists(ChromeLocation))
             {
@@ -348,9 +399,9 @@ namespace Services
         }
 
         //使用油猴脚本存入数据库中的Cookie反序列化
-        private async static Task<ValueTuple<CookieContainer, string>> GetJavChromeCookieFromDB()
+        private async static Task<(CookieContainer cc, string userAgent)> GetJavChromeCookieFromDB()
         {
-            CookieContainer cc = new CookieContainer();
+            CookieContainer cc = new();
             string userAgent = "";
             var dbCookieItem = await new JavLibraryDAL().GetJavLibraryCookie();
 
@@ -368,6 +419,149 @@ namespace Services
             }
 
             return new (cc, userAgent);
+        }
+
+        private static AvModel GenerateAVModel(string html, string avUrl, List<CommonJavLibraryModel> infos)
+        {
+            AvModel av = new();
+
+            HtmlDocument htmlDocument = new();
+            htmlDocument.LoadHtml(html);
+
+            var titlePath = "//h3[@class='post-title text']";
+            var picPath = "//img[@id='video_jacket_img']";
+
+            var releasdPath = "//div[@id='video_date']//td[@class='text']";
+            var lengthPath = "//div[@id='video_length']//span[@class='text']";
+
+            var dirPath = "//span[@class='director']//a";
+            var comPath = "//span[@class='maker']//a";
+            var pubPath = "//span[@class='label']//a";
+
+            var catPath = "//span[@class='genre']//a";
+            var staPath = "//span[@class='star']//a";
+
+            var titleNode = htmlDocument.DocumentNode.SelectSingleNode(titlePath);
+            var title = titleNode.InnerText.Trim();
+            var id = title.Substring(0, title.IndexOf(" "));
+            title = FileUtility.ReplaceInvalidChar(title.Substring(title.IndexOf(" ") + 1));
+            var picUrl = htmlDocument.DocumentNode.SelectSingleNode(picPath);
+
+            av.Url = avUrl;
+            av.PicUrl = picUrl.Attributes["src"].Value;
+            av.PicUrl = av.PicUrl.StartsWith("http") ? av.PicUrl : "http:" + av.PicUrl;
+
+            av.Name = title;
+            av.AvId = id;
+            av.FileNameWithoutExtension = id + "-" + title;
+
+            var release = htmlDocument.DocumentNode.SelectSingleNode(releasdPath);
+            DateTime rDate = new DateTime(2050, 1, 1);
+
+            if (release != null && !string.IsNullOrEmpty(release.InnerText))
+            {
+                DateTime.TryParse(release.InnerText.Trim(), out rDate);
+
+                if (rDate <= DateTime.MinValue)
+                {
+                    rDate = new DateTime(2050, 1, 1);
+                }
+            }
+
+            av.ReleaseDate = rDate;
+
+            var length = htmlDocument.DocumentNode.SelectSingleNode(lengthPath);
+            if (length != null && !string.IsNullOrEmpty(length.InnerText))
+            {
+                av.AvLength = int.Parse(length.InnerText.Trim());
+            }
+
+            var dirNode = htmlDocument.DocumentNode.SelectNodes(dirPath);
+            if (dirNode != null)
+            {
+                foreach (var dir in dirNode)
+                {
+                    var name = dir.InnerHtml.Trim();
+                    var url = JavLibraryIndexUrl + dir.Attributes["href"].Value;
+
+                    infos.Add(new CommonJavLibraryModel()
+                    {
+                        Name = name,
+                        Type = CommonJavLibraryModelType.Director,
+                        Url = url
+                    });
+                }
+            }
+
+            var comNode = htmlDocument.DocumentNode.SelectNodes(comPath);
+            if (comNode != null)
+            {
+                foreach (var com in comNode)
+                {
+                    var name = com.InnerHtml.Trim();
+                    var url = JavLibraryIndexUrl + com.Attributes["href"].Value;
+
+                    infos.Add(new CommonJavLibraryModel()
+                    {
+                        Name = name,
+                        Type = CommonJavLibraryModelType.Company,
+                        Url = url
+                    });
+                }
+            }
+
+            var pubNode = htmlDocument.DocumentNode.SelectNodes(pubPath);
+            if (pubNode != null)
+            {
+                foreach (var pub in pubNode)
+                {
+                    var name = pub.InnerHtml.Trim();
+                    var url = JavLibraryIndexUrl + pub.Attributes["href"].Value;
+
+                    infos.Add(new CommonJavLibraryModel()
+                    {
+                        Name = name,
+                        Type = CommonJavLibraryModelType.Company,
+                        Url = url
+                    });
+                }
+            }
+
+            var catNodes = htmlDocument.DocumentNode.SelectNodes(catPath);
+            if (catNodes != null)
+            {
+                foreach (var cat in catNodes)
+                {
+                    var name = cat.InnerHtml.Trim();
+                    var url = JavLibraryIndexUrl + cat.Attributes["href"].Value;
+
+                    infos.Add(new CommonJavLibraryModel()
+                    {
+                        Name = name,
+                        Type = CommonJavLibraryModelType.Category,
+                        Url = url
+                    });
+                }
+            }
+
+            var starNodes = htmlDocument.DocumentNode.SelectNodes(staPath);
+            if (starNodes != null)
+            {
+                foreach (var star in starNodes)
+                {
+                    var name = star.InnerHtml.Trim();
+                    var url = JavLibraryIndexUrl + star.Attributes["href"].Value;
+
+                    infos.Add(new CommonJavLibraryModel()
+                    {
+                        Name = name,
+                        Type = CommonJavLibraryModelType.Actress,
+                        Url = url
+                    });
+                }
+            }
+
+            return av;
         }
         #endregion
     }

@@ -67,12 +67,12 @@ namespace DAL
         public async Task<int> InsertWebScanUrlModel(WebScanUrlModel entity)
         {
             var sql = @"IF NOT EXISTS (SELECT * FROM ScanUrl WITH(NOLOCK) WHERE Url = @Url)
-                            INSERT INTO ScanUrl (Name, Url, IsDownload, CreateTime, UpdateTime) VALUES (@Name, @Url, @IsDownload, GETDATE(), GETDATE())";
+                            INSERT INTO ScanUrl (AvId, Name, Url, IsDownload, CreateTime, UpdateTime) VALUES (@AvId, @Name, @Url, @IsDownload, GETDATE(), GETDATE())";
 
             return await ExecuteAsync(sql, entity);
         }
 
-        public async Task<List<WebScanUrlModel>> GetWebScanUrlModel(bool onlyNotDownload = true)
+        public async Task<List<WebScanUrlModel>> GetWebScanUrlModel(bool onlyNotDownload)
         {
             string where = "";
 
@@ -91,6 +91,29 @@ namespace DAL
             var sql = @"UPDATE ScanUrl SET IsDownload = @state WHERE Id = @id";
 
             return await ExecuteAsync(sql, new { id, state });
+        }
+
+        public async Task<int> InsertAvModel(AvModel entity)
+        {
+            var sql = @"IF NOT EXISTS (SELECT * FROM AvModel WHERE Url = @Url)
+                            INSERT INTO AvModel (AvId, Name, Url, PicUrl, Infos, FileNameWithoutExtension, AvLength, ReleaseDate, CreateTime, UpdateTime)
+                                VALUES(@AvId, @Name, @Url, @PicUrl, @Infos, @FileNameWithoutExtension, @AvLength, @ReleaseDate, GETDATE(), GETDATE())";
+
+            return await ExecuteAsync(sql, entity);
+        }
+
+        public async Task<AvModel> GetAvModelById(int id)
+        {
+            var sql = @"SELECT * FROM AvModel WHERE Id = @id";
+
+            return await QuerySingleAsync<AvModel>(sql, new { id });
+        }
+
+        public async Task<List<AvModel>> GetAvModelByWhere(string where)
+        {
+            var sql = @"SELECT * FROM AvModel WHERE 1 = 1 " + where;
+
+            return await QueryAsync<AvModel>(sql);
         }
         #endregion
     }
