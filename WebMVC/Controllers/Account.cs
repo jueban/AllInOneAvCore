@@ -34,6 +34,10 @@ namespace WebMVC.Controllers
         //    //将user和密码绑定入库
         //    var result = await _userManager.CreateAsync(user, model.Password);
 
+        //    await _signInManager.SignInAsync(user, true);
+        //    if (result.Succeeded)
+        //        return Redirect("/Home/Index");
+
         //    return Json(result);
         //}
 
