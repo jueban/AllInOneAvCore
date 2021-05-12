@@ -1,0 +1,31 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="../static/css/bootstrap.min.css">
+    <script src="../static/js/bootstrap.min.js"></script>
+
+    <title>注册</title>
+</head>
+<body>
+    <div style="border: solid 3px darkgrey;width: 500px;height: 400px;position: relative;top: 133px" class="mx-auto">
+        <form action="/account/register" method="post" class="mx-auto" style="width: 800px;position: relative;left: 120px;top: 41px">
+            <div class="form-group">
+                <label for="email">用户名</label>
+                <input type="text" class="form-control col-4 " id="userName" name="UserName">
+            </div>
+
+            <div class="form-group">
+                <label for="password">密码</label>
+                <input type="password" class="form-control col-4" id="password" name="Password">
+            </div>
+
+            <button type="submit" class="btn btn-primary">注册</button>
+        </form>
+    </div>
+</body>
+</html>

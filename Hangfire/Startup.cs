@@ -50,7 +50,10 @@ namespace Hangfire
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseHangfireServer();
-            app.UseHangfireDashboard();
+            app.UseHangfireDashboard("/hangfire", new DashboardOptions()
+            {
+                Authorization = new[] { new CustomAuthorizeFilter() }
+            });
 
             if (env.IsDevelopment())
             {
