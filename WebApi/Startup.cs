@@ -36,6 +36,18 @@ namespace WebApi
                     options.RequireHttpsMetadata = false;
                 });
 
+            services.AddCors(options =>
+            {
+                options.AddPolicy("CustomCorsPolicy", policy =>
+                {
+                    // 设定允许跨域的来源，有多个可以用','隔开
+                    policy.WithOrigins("http://localhost:20003")
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowCredentials();
+                });
+            });
+
             services.AddSingleton(new LogHelper());
             services.AddControllers();
             services.AddSwaggerGen(c =>
@@ -53,6 +65,8 @@ namespace WebApi
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "WebApi v1"));
             }
+
+            app.UseCors("CustomCorsPolicy");
 
             app.UseHttpsRedirection();
 
