@@ -1,27 +1,29 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26124.0
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31129.286
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTest", "UnitTest\UnitTest.csproj", "{0DAE6686-6D8E-4E15-9D13-9CA96607A05B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTest", "UnitTest\UnitTest.csproj", "{0DAE6686-6D8E-4E15-9D13-9CA96607A05B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Services", "Services\Services.csproj", "{B5E32E84-9045-42F3-A283-70C8756DCA04}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Services", "Services\Services.csproj", "{B5E32E84-9045-42F3-A283-70C8756DCA04}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Models", "Models\Models.csproj", "{F9511038-EBD0-4C7F-AB33-5BC1C4E670B7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Models", "Models\Models.csproj", "{F9511038-EBD0-4C7F-AB33-5BC1C4E670B7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DAL", "DAL\DAL.csproj", "{F8FE7E32-AAB4-4C9E-91EB-19430D26A6D9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DAL", "DAL\DAL.csproj", "{F8FE7E32-AAB4-4C9E-91EB-19430D26A6D9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utils", "Utils\Utils.csproj", "{83FBAAD2-2DB8-4E31-B1E3-6808EB91547D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Utils", "Utils\Utils.csproj", "{83FBAAD2-2DB8-4E31-B1E3-6808EB91547D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Schedules", "Schedules", "{49A0CC90-AFAD-11EB-B335-0F48EE2548B7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobHub", "JobHub\JobHub.csproj", "{64E7D456-1374-4585-9809-EE1FC2A62232}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JobHub", "JobHub\JobHub.csproj", "{64E7D456-1374-4585-9809-EE1FC2A62232}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApi", "WebApi\WebApi.csproj", "{8A676907-EFFC-4220-82DB-C2C429536807}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApi", "WebApi\WebApi.csproj", "{8A676907-EFFC-4220-82DB-C2C429536807}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebMVC", "WebMVC\WebMVC.csproj", "{CF4AE27D-BBA3-4663-9BAA-C656B2A0ADAA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebMVC", "WebMVC\WebMVC.csproj", "{CF4AE27D-BBA3-4663-9BAA-C656B2A0ADAA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hangfire", "Hangfire\Hangfire.csproj", "{FB593930-8843-4C43-A4F4-071BB76863F1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hangfire", "Hangfire\Hangfire.csproj", "{FB593930-8843-4C43-A4F4-071BB76863F1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InitProject", "InitProject\InitProject.csproj", "{3A0FBCEE-0E2F-4723-901F-C37462954D02}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,9 +33,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{0DAE6686-6D8E-4E15-9D13-9CA96607A05B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -144,5 +143,23 @@ Global
 		{FB593930-8843-4C43-A4F4-071BB76863F1}.Release|x64.Build.0 = Release|Any CPU
 		{FB593930-8843-4C43-A4F4-071BB76863F1}.Release|x86.ActiveCfg = Release|Any CPU
 		{FB593930-8843-4C43-A4F4-071BB76863F1}.Release|x86.Build.0 = Release|Any CPU
+		{3A0FBCEE-0E2F-4723-901F-C37462954D02}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A0FBCEE-0E2F-4723-901F-C37462954D02}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A0FBCEE-0E2F-4723-901F-C37462954D02}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3A0FBCEE-0E2F-4723-901F-C37462954D02}.Debug|x64.Build.0 = Debug|Any CPU
+		{3A0FBCEE-0E2F-4723-901F-C37462954D02}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3A0FBCEE-0E2F-4723-901F-C37462954D02}.Debug|x86.Build.0 = Debug|Any CPU
+		{3A0FBCEE-0E2F-4723-901F-C37462954D02}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A0FBCEE-0E2F-4723-901F-C37462954D02}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A0FBCEE-0E2F-4723-901F-C37462954D02}.Release|x64.ActiveCfg = Release|Any CPU
+		{3A0FBCEE-0E2F-4723-901F-C37462954D02}.Release|x64.Build.0 = Release|Any CPU
+		{3A0FBCEE-0E2F-4723-901F-C37462954D02}.Release|x86.ActiveCfg = Release|Any CPU
+		{3A0FBCEE-0E2F-4723-901F-C37462954D02}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7A1111C6-D175-4CD3-97CF-E5871AFA7AA6}
 	EndGlobalSection
 EndGlobal

@@ -40,6 +40,7 @@ namespace Models
         BestRate = 6,
         MostWanted = 7,
         Update = 8,
-        Rank = 9
+        Rank = 9,
+        Other = 10,
     }
 }

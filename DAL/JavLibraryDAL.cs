@@ -67,9 +67,17 @@ namespace DAL
         public async Task<int> InsertWebScanUrlModel(WebScanUrlModel entity)
         {
             var sql = @"IF NOT EXISTS (SELECT * FROM ScanUrl WITH(NOLOCK) WHERE Url = @Url)
-                            INSERT INTO ScanUrl (AvId, Name, Url, IsDownload, CreateTime, UpdateTime) VALUES (@AvId, @Name, @Url, @IsDownload, GETDATE(), GETDATE())";
+                            BEGIN
+                                INSERT INTO ScanUrl (AvId, Name, Url, IsDownload, CreateTime, UpdateTime) 
+                                    VALUES (@AvId, @Name, @Url, @IsDownload, GETDATE(), GETDATE());
+                                SELECT @@IDENTITY;
+                            END
+                        ELSE
+                            BEGIN
+                                SELECT 0;
+                            END";
 
-            return await ExecuteAsync(sql, entity);
+            return await QuerySingleOrDefaultAsync<int>(sql, entity);
         }
 
         public async Task<List<WebScanUrlModel>> GetWebScanUrlModel(bool onlyNotDownload)
@@ -96,10 +104,17 @@ namespace DAL
         public async Task<int> InsertAvModel(AvModel entity)
         {
             var sql = @"IF NOT EXISTS (SELECT * FROM AvModel WHERE Url = @Url)
-                            INSERT INTO AvModel (AvId, Name, Url, PicUrl, Infos, FileNameWithoutExtension, AvLength, ReleaseDate, CreateTime, UpdateTime)
-                                VALUES(@AvId, @Name, @Url, @PicUrl, @Infos, @FileNameWithoutExtension, @AvLength, @ReleaseDate, GETDATE(), GETDATE())";
+                            BEGIN
+                                INSERT INTO AvModel (AvId, Name, Url, PicUrl, Infos, FileNameWithoutExtension, AvLength, ReleaseDate, CreateTime, UpdateTime)
+                                    VALUES(@AvId, @Name, @Url, @PicUrl, @Infos, @FileNameWithoutExtension, @AvLength, @ReleaseDate, GETDATE(), GETDATE());
+                                SELECT @@IDENTITY;
+                            END
+                        ELSE
+                            BEGIN
+                                SELECT 0;
+                            END";
 
-            return await ExecuteAsync(sql, entity);
+            return await QuerySingleOrDefaultAsync<int>(sql, entity);
         }
 
         public async Task<AvModel> GetAvModelById(int id)
@@ -114,6 +129,20 @@ namespace DAL
             var sql = @"SELECT * FROM AvModel WHERE 1 = 1 " + where;
 
             return await QueryAsync<AvModel>(sql);
+        }
+
+        public async Task<int> DeleteAvMapping(int avId)
+        {
+            var sql = @"DELETE FROM AvMapping WHERE AvId = @avId";
+
+            return await ExecuteAsync(sql, new { avId });
+        }
+
+        public async Task<int> InsertAvMapping(int avId, int commonId, CommonJavLibraryModelType typeId)
+        {
+            var sql = @"INSERT INTO AvMapping (AvId, CommonId, CommonType) VALUES (@avId, @commonId, @typeId)";
+
+            return await ExecuteAsync(sql, new { avId, commonId, typeId });
         }
         #endregion
     }

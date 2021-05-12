@@ -10,6 +10,8 @@ namespace Models
     {
         public JavLibrarySettings JavLibrarySettings { get; set; }
         public CommonSettings CommonSettings { get; set; }
+        public string BarkId { get; set; }
+        public string ImageFolder { get; set; }
     }
 
     public class JavLibrarySettings
@@ -20,5 +22,10 @@ namespace Models
     public class CommonSettings
     {
         public string ChromeLocation { get; set; }
+    }
+
+    public enum SettingType
+    { 
+        WebConfig = 1,
     }
 }

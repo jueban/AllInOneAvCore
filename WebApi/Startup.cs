@@ -12,6 +12,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Models;
+using Utils;
 
 namespace WebApi
 {
@@ -27,7 +28,7 @@ namespace WebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.Configure<Settings>(Configuration.GetSection("Settings"));
+            services.AddSingleton(new LogHelper());
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {

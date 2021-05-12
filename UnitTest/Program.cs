@@ -14,10 +14,12 @@ namespace UnitTest
         static void Main(string[] args)
         {
             //JavLibraryService.GetJavLibraryCookie().Wait();
-            var res = JavLibraryService.GetRankActressLinks().Result;
+            //var res = JavLibraryService.GetRankActressLinks().Result;
 
             //DoScanAllJavLibraryFromCategory();
             //DoScanJavLibraryDetail();
+
+            GetJavLibraryWebScanUrlMode(JavLibraryEntryPointType.Update, 3, "", false);
 
             Console.WriteLine("按任意键退出");
             Console.ReadKey();
@@ -89,29 +91,78 @@ namespace UnitTest
             int currentIndex = 1;
             int totalIndex = waitForDownload.Count;
 
-            foreach (var toBeDownload in waitForDownload)
+            Parallel.ForEach(waitForDownload, new ParallelOptions { MaxDegreeOfParallelism = 10 }, toBeDownload =>
+             {
+                 var avModelScan = JavLibraryService.GetJavLibraryDetailPageInfo(toBeDownload.URL).Result;
+
+                 if (avModelScan.exception == null && avModelScan.avModel != null)
+                 {
+                     Console.WriteLine($"正在处理 {toBeDownload.AvId} 一共 {currentIndex} / {totalIndex} ==> {Math.Round((((decimal)currentIndex / totalIndex) * 100), 1) + " %"}");
+                     var result = 0;
+                     try
+                     {
+                         result = JavLibraryService.SaveJavLibraryAvModel(avModelScan.avModel).Result;
+                         JavLibraryService.SaveCommonJavLibraryModel(avModelScan.infos).Wait();
+                     }
+                     catch (Exception e)
+                     {
+                         Console.WriteLine(e.ToString());
+                     }
+
+                     if (result > 0)
+                     {
+                         JavLibraryService.UpdateJavLibraryScanDownloadState(toBeDownload.Id, true).Wait();
+                     }
+
+                     currentIndex++;
+                 }
+                 else
+                 {
+                     Console.WriteLine($"<=====获取 {toBeDownload.AvId} 失败=====>");
+                 }
+             });
+        }
+
+        static List<WebScanUrlModel> GetJavLibraryWebScanUrlMode(JavLibraryEntryPointType entry, int pages, string url, bool useExactPassin)
+        {
+            List<WebScanUrlModel> scans = new();
+
+            var firstPageResult = JavLibraryService.GetJavLibraryListPageInfo(entry, url, 1, useExactPassin).Result;
+            var totalPage = firstPageResult.pageCount;
+
+            List<int> pageRange = new();
+
+            for (int i = 1; i <= pages && i <= totalPage; i++)
             {
-                var avModelScan = JavLibraryService.GetJavLibraryDetailPageInfo(toBeDownload.URL).Result;
-
-                if (avModelScan.exception == null && avModelScan.avModel != null)
-                {
-                    Console.WriteLine($"正在处理 {toBeDownload.AvId} 一共 {currentIndex} / {totalIndex} ==> {Math.Round((((decimal)currentIndex / totalIndex) * 100), 1) + " %"}");
-                    var result = 0;
-                    result = JavLibraryService.SaveJavLibraryAvModel(avModelScan.avModel).Result;
-                    JavLibraryService.SaveCommonJavLibraryModel(avModelScan.infos).Wait();
-
-                    if (result > 0)
-                    {
-                        JavLibraryService.UpdateJavLibraryScanDownloadState(toBeDownload.Id, true).Wait();
-                    }
-
-                    currentIndex++;
-                }
-                else
-                {
-                    Console.WriteLine($"<=====获取 {toBeDownload.AvId} 失败=====>");
-                }
+                pageRange.Add(i);
             }
+
+            Task.Run(() => Parallel.ForEach(pageRange, new ParallelOptions { MaxDegreeOfParallelism = 10 }, i =>
+            {
+                var currentResult = JavLibraryService.GetJavLibraryListPageInfo(entry, url, i, useExactPassin).Result;
+
+                if (!string.IsNullOrEmpty(currentResult.fail))
+                {
+                    LogHelper.Info($"<=======有失败的URL -> {currentResult.fail}=======>");
+                }
+
+                if (totalPage > 0 && currentResult.successList != null && currentResult.successList.Count > 0)
+                {
+                    foreach (var scan in currentResult.successList)
+                    {
+                        var id = WebScanCommonService.SaveWebScanUrlModel(scan).Result;
+
+                        if (id > 0)
+                        {
+                            scan.Id = id;
+
+                            scans.Add(scan);
+                        }
+                    }
+                }
+            })).Wait();
+
+            return scans;
         }
     }
 }

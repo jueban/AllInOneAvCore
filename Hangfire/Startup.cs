@@ -1,7 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using log4net;
+using log4net.Config;
+using log4net.Repository;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -11,11 +15,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using Utils;
 
 namespace Hangfire
 {
     public class Startup
     {
+        public static ILoggerRepository LogRepository { get; set; }
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -29,6 +36,8 @@ namespace Hangfire
             services.AddHangfire(configuration => {
                 configuration.UseSqlServerStorage("Server=localhost\\SQLEXPRESS;Database=Hangfire;User=sa;password=pa$$w0rd;");
             });
+
+            services.AddSingleton(new LogHelper());
 
             services.AddControllers();
             services.AddSwaggerGen(c =>

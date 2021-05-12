@@ -26,7 +26,7 @@ public class AvModel
     public string FileNameWithoutExtension { get; set; }
     public int AvLength { get; set; }
     public WebScanUrlSite Site { get; set; }
-    public DateTime ReleaseDate { get; set; }
+    public DateTime? ReleaseDate { get; set; }
     public DateTime CreateTime { get; set; }
     public DateTime UpdateTime { get; set; }
     public List<CommonJavLibraryModel> InfoObj

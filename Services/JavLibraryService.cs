@@ -33,7 +33,7 @@ namespace Services
             string userAgent = "";
             CookieContainer ret = null;
 
-            var mode = SettingService.GetJavLibrarySetting().Result.JavLibrarySettings.CookieMode;
+            var mode = SettingService.GetSetting().Result.JavLibrarySettings.CookieMode;
             
             if(mode == JavLibraryGetCookieMode.MockBroswer)
             {
@@ -173,14 +173,23 @@ namespace Services
         }
 
         //获取JavLibrary的列表页信息
-        public async static Task<(int pageCount, List<WebScanUrlModel> successList, string fail)> GetJavLibraryListPageInfo(JavLibraryEntryPointType type, string url, int page)
+        public async static Task<(int pageCount, List<WebScanUrlModel> successList, string fail)> GetJavLibraryListPageInfo(JavLibraryEntryPointType type, string url, int page, bool useExactUrlPassin = false)
         {
             (int, List<WebScanUrlModel>, string) ret = new();
             List<WebScanUrlModel> list = new();
             string fail = "";
             int lastPage = -1;
 
-            var realUrl = GetJavLibraryEntryUrl(type, url, page);
+            var realUrl = "";
+
+            if (useExactUrlPassin)
+            {
+                realUrl = url;
+            }
+            else
+            {
+                realUrl = GetJavLibraryEntryUrl(type, url, page);
+            }
 
             var content = await GetJavLibraryContent(realUrl);
 
@@ -312,6 +321,18 @@ namespace Services
 
             return ret;
         }
+
+        ////删除JavLibrary AV的映射关系
+        //public async static Task<int> DeleteJavLibraryAvMapping(int avId)
+        //{
+        //    return await new JavLibraryDAL().DeleteAvMapping(avId);
+        //}
+
+        ////插入JavLibrary AV的映射关系
+        //public async static Task<int> InsertJavLibraryAvMapping(int avId, CommonJavLibraryModel model)
+        //{
+        //    return await new JavLibraryDAL().InsertAvMapping(avId, model.Id, model.Type);
+        //}
         #endregion
 
         #region 内部使用
@@ -404,7 +425,7 @@ namespace Services
         //打开Chrome浏览器等待油猴脚本调用API存入Cookie，并退出（有bug）
         private async static Task<(CookieContainer cc, string userAgent)> GetJavCookieChromeProcess()
         {
-            var chromeLocation = SettingService.GetJavLibrarySetting().Result.CommonSettings.ChromeLocation;
+            var chromeLocation = SettingService.GetSetting().Result.CommonSettings.ChromeLocation;
 
             if (File.Exists(chromeLocation))
             {
@@ -464,11 +485,14 @@ namespace Services
             var catPath = "//span[@class='genre']//a";
             var staPath = "//span[@class='star']//a";
 
+            //var reviewPath = "//input[@name='reviewscore' and @checked]";
+
             var titleNode = htmlDocument.DocumentNode.SelectSingleNode(titlePath);
             var title = titleNode.InnerText.Trim();
             var id = title.Substring(0, title.IndexOf(" "));
             title = FileUtility.ReplaceInvalidChar(title.Substring(title.IndexOf(" ") + 1));
             var picUrl = htmlDocument.DocumentNode.SelectSingleNode(picPath);
+            //var reviewNde = htmlDocument.DocumentNode.SelectSingleNode(reviewPath);
 
             av.Url = avUrl;
             av.PicUrl = picUrl.Attributes["src"].Value;
@@ -479,15 +503,15 @@ namespace Services
             av.FileNameWithoutExtension = id + "-" + title;
 
             var release = htmlDocument.DocumentNode.SelectSingleNode(releasdPath);
-            DateTime rDate = new DateTime(2050, 1, 1);
+            DateTime rDate = new(2050, 1, 1);
 
             if (release != null && !string.IsNullOrEmpty(release.InnerText))
             {
                 DateTime.TryParse(release.InnerText.Trim(), out rDate);
 
-                if (rDate <= DateTime.MinValue)
+                if (rDate <= DateTime.MinValue || rDate >= DateTime.MaxValue)
                 {
-                    rDate = new DateTime(2050, 1, 1);
+                    rDate = new(2050, 1, 1);
                 }
             }
 

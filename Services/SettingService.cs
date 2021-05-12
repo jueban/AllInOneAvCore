@@ -11,10 +11,9 @@ namespace Services
 {
     public class SettingService
     {
-        //获取配置
-        public async static Task<Settings> GetJavLibrarySetting()
+        //从WebAPI获取配置
+        public async static Task<Settings> GetSetting()
         {
-            Settings ret = new();
             string content = "";
 
             using (HttpClient client = new())
