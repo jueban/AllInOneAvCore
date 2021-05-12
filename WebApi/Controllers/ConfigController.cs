@@ -10,11 +10,13 @@ using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Microsoft.Extensions.Options;
 using DAL;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebApi.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
+    //[Authorize]
     public class ConfigController : ControllerBase
     {
         public readonly IWebHostEnvironment _webHostEnvironment;
