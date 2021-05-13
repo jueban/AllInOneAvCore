@@ -11,7 +11,9 @@ namespace Models
         public JavLibrarySettings JavLibrarySettings { get; set; }
         public CommonSettings CommonSettings { get; set; }
         public string BarkId { get; set; }
-        public string ImageFolder { get; set; }
+        public string JavLibraryImageFolder { get; set; }
+        public string JavBusImageFolder { get; set; }
+        public string AvatorImageFolder { get; set; }
     }
 
     public class JavLibrarySettings

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using DAL;
@@ -19,7 +21,29 @@ namespace UnitTest
             //DoScanAllJavLibraryFromCategory();
             //DoScanJavLibraryDetail();
 
-            GetJavLibraryWebScanUrlMode(JavLibraryEntryPointType.Update, 3, "", false);
+            //GetJavLibraryWebScanUrlMode(JavLibraryEntryPointType.Update, 3, "", false);
+
+            //var category = JavbusService.GetJavBusCategory().Result;
+
+            //JavbusService.SaveCommonJavLibraryModel(category).Wait();
+
+            var actress = JavbusService.GetJavBusActress().Result;
+            JavbusService.SaveCommonJavLibraryModel(actress.actress).Wait();
+
+            Parallel.ForEach(actress.pics, new ParallelOptions { MaxDegreeOfParallelism = 10 }, pic =>
+            {
+                if (!File.Exists(pic.file))
+                {
+                    try
+                    {
+                        new System.Net.WebClient().DownloadFile(pic.url, pic.file);
+                    }
+                    catch (Exception)
+                    {
+                        LogHelper.Info($"<=====下载图片 {pic.url} 失败=====>");
+                    }
+                }
+            });
 
             Console.WriteLine("按任意键退出");
             Console.ReadKey();

@@ -17,7 +17,7 @@ namespace Hangfire
 
             var random = new Random();
 
-            var imageFolder = SettingService.GetSetting().Result.ImageFolder;
+            var imageFolder = SettingService.GetSetting().Result.JavLibraryImageFolder;
 
             if (!Directory.Exists(imageFolder))
             {

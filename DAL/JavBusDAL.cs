@@ -1,44 +1,23 @@
+﻿using Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
-using Models;
 
 namespace DAL
 {
-    public class JavLibraryDAL : BaseRepository
+    public class JavBusDAL : BaseRepository
     {
-        public JavLibraryDAL() : base("JavLibrary")
+        public JavBusDAL() : base("JavBus")
         {
         }
-
-        #region Cookie
-        public async Task<JavLibraryCookieJson> GetJavLibraryCookie()
-        {
-            var sql = @"SELECT TOP 1 * FROM JavLibraryCookie WITH(NOLOCK) ORDER BY CreateTime DESC";
-
-            return await QuerySingleOrDefaultAsync<JavLibraryCookieJson>(sql);
-        }
-
-        public async Task<int> DeleteJavLibraryCookie()
-        {
-            var sql = @"DELETE FROM JavLibraryCookie";
-
-            return await ExecuteAsync(sql);
-        }
-
-        public async Task<int> InsertJavLibraryCookie(JavLibraryCookieJson entity)
-        {
-            var sql = @"INSERT INTO JavLibraryCookie (CookieJson, UserAgent, CreateTime) VALUES (@CookieJson, @UserAgent, GETDATE())";
-
-            return await ExecuteAsync(sql, entity);
-        }
-        #endregion
 
         #region 网页
-        public async Task<int> InsertCommonJavLibraryModel(CommonModel entity)
+        public async Task<int> InsertCommonJavBusModel(CommonModel entity)
         {
-            var sql = @"IF NOT EXISTS (SELECT * FROM CommonJavLibraryModel WITH(NOLOCK) WHERE Name = @Name AND Url = @Url AND Type = @Type)
-                            INSERT INTO CommonJavLibraryModel (Name, Url, Type) VALUES (@Name, @url, @Type)";
+            var sql = @"IF NOT EXISTS (SELECT * FROM CommonJavBusModel WITH(NOLOCK) WHERE Name = @Name AND Url = @Url AND Type = @Type)
+                            INSERT INTO CommonJavBusModel (Name, Url, Type) VALUES (@Name, @url, @Type)";
 
             return await ExecuteAsync(sql, entity);
         }
@@ -47,7 +26,7 @@ namespace DAL
         {
             var sql = @"SELECT * FROM CommonJavLibraryModel WITH(NOLOCK) WHERE Id = @id";
 
-            return await QuerySingleOrDefaultAsync<CommonModel>(sql,  new { id });
+            return await QuerySingleOrDefaultAsync<CommonModel>(sql, new { id });
         }
 
         public async Task<List<CommonModel>> GetCommonJavLibraryModelByType(CommonModelType type)
@@ -144,6 +123,6 @@ namespace DAL
 
             return await ExecuteAsync(sql, new { avId, commonId, typeId });
         }
-        #endregion
     }
+    #endregion
 }

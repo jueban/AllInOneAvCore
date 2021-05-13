@@ -28,7 +28,7 @@ namespace Services
 
         #region Cookie
         //获取JavLibraryCookie
-        public async static Task<ValueTuple<CookieContainer, string>> GetJavLibraryCookie()
+        public async static Task<(CookieContainer, string)> GetJavLibraryCookie()
         {
             string userAgent = "";
             CookieContainer ret = null;
@@ -115,7 +115,7 @@ namespace Services
 
         #region 网页
         //保存JavLibray的通用格式数据，女优，导演，类型，发行商和公司
-        public async static Task<int> SaveCommonJavLibraryModel(List<CommonJavLibraryModel> list)
+        public async static Task<int> SaveCommonJavLibraryModel(List<CommonModel> list)
         {
             int ret = 0;
 
@@ -140,9 +140,9 @@ namespace Services
         }
 
         //获取JavLibrary的分类，用做全站扫描的入口
-        public async static Task<List<CommonJavLibraryModel>> GetJavLibraryCategory()
+        public async static Task<List<CommonModel>> GetJavLibraryCategory()
         {
-            List<CommonJavLibraryModel> ret = new List<CommonJavLibraryModel>();
+            List<CommonModel> ret = new List<CommonModel>();
             
             var content = await GetJavLibraryContent(JavLibraryCategoryUrl);
 
@@ -160,10 +160,10 @@ namespace Services
                     var aTagHref = JavLibraryIndexUrl + node.ChildNodes[0].Attributes["href"].Value.Trim();
                     var aTagTitle = node.ChildNodes[0].InnerText.Trim();
 
-                    ret.Add(new CommonJavLibraryModel()
+                    ret.Add(new CommonModel()
                     {
                         Name = aTagTitle,
-                        Type = CommonJavLibraryModelType.Category,
+                        Type = CommonModelType.Category,
                         Url = aTagHref
                     });
                 }
@@ -257,12 +257,12 @@ namespace Services
         }
 
         //获取JavLibrary的详情页信息
-        public async static Task<(Exception exception, AvModel avModel, List<CommonJavLibraryModel> infos)> GetJavLibraryDetailPageInfo(string url)
+        public async static Task<(Exception exception, AvModel avModel, List<CommonModel> infos)> GetJavLibraryDetailPageInfo(string url)
         {
-            (Exception exception, AvModel avModel, List<CommonJavLibraryModel> infos) ret = new();
+            (Exception exception, AvModel avModel, List<CommonModel> infos) ret = new();
             Exception exception = null;
             AvModel avModel = new();
-            List<CommonJavLibraryModel> infos = new();
+            List<CommonModel> infos = new();
 
             var content = await GetJavLibraryContent(url);
 
@@ -409,9 +409,12 @@ namespace Services
                     {
                         content = await client.GetStringAsync(url);
                     }
-                    catch (Exception ee)
+                    catch (HttpRequestException ee)
                     {
-                        exception = ee;
+                        if (ee.StatusCode == HttpStatusCode.Forbidden)
+                        {
+                            await new JavLibraryDAL().DeleteJavLibraryCookie();
+                        }
                     }
                 }
             }
@@ -465,7 +468,7 @@ namespace Services
             return new (cc, userAgent);
         }
 
-        private static AvModel GenerateAVModel(string html, string avUrl, List<CommonJavLibraryModel> infos)
+        private static AvModel GenerateAVModel(string html, string avUrl, List<CommonModel> infos)
         {
             AvModel av = new();
 
@@ -531,10 +534,10 @@ namespace Services
                     var name = dir.InnerHtml.Trim();
                     var url = JavLibraryIndexUrl + dir.Attributes["href"].Value;
 
-                    infos.Add(new CommonJavLibraryModel()
+                    infos.Add(new CommonModel()
                     {
                         Name = name,
-                        Type = CommonJavLibraryModelType.Director,
+                        Type = CommonModelType.Director,
                         Url = url
                     });
                 }
@@ -548,10 +551,10 @@ namespace Services
                     var name = com.InnerHtml.Trim();
                     var url = JavLibraryIndexUrl + com.Attributes["href"].Value;
 
-                    infos.Add(new CommonJavLibraryModel()
+                    infos.Add(new CommonModel()
                     {
                         Name = name,
-                        Type = CommonJavLibraryModelType.Company,
+                        Type = CommonModelType.Company,
                         Url = url
                     });
                 }
@@ -565,10 +568,10 @@ namespace Services
                     var name = pub.InnerHtml.Trim();
                     var url = JavLibraryIndexUrl + pub.Attributes["href"].Value;
 
-                    infos.Add(new CommonJavLibraryModel()
+                    infos.Add(new CommonModel()
                     {
                         Name = name,
-                        Type = CommonJavLibraryModelType.Company,
+                        Type = CommonModelType.Company,
                         Url = url
                     });
                 }
@@ -582,10 +585,10 @@ namespace Services
                     var name = cat.InnerHtml.Trim();
                     var url = JavLibraryIndexUrl + cat.Attributes["href"].Value;
 
-                    infos.Add(new CommonJavLibraryModel()
+                    infos.Add(new CommonModel()
                     {
                         Name = name,
-                        Type = CommonJavLibraryModelType.Category,
+                        Type = CommonModelType.Category,
                         Url = url
                     });
                 }
@@ -599,10 +602,10 @@ namespace Services
                     var name = star.InnerHtml.Trim();
                     var url = JavLibraryIndexUrl + star.Attributes["href"].Value;
 
-                    infos.Add(new CommonJavLibraryModel()
+                    infos.Add(new CommonModel()
                     {
                         Name = name,
-                        Type = CommonJavLibraryModelType.Actress,
+                        Type = CommonModelType.Actress,
                         Url = url
                     });
                 }

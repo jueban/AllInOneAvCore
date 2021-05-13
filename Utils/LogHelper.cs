@@ -60,5 +60,18 @@ namespace Utils
             else
                 logger.Error(message, exception);
         }
+
+        /// <summary>
+        ///调试日志
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="exception"></param>
+        public static void Debug(string message, Exception exception = null)
+        {
+            if (exception == null)
+                logger.Debug(message);
+            else
+                logger.Debug(message, exception);
+        }
     }
 }

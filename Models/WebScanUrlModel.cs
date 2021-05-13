@@ -15,6 +15,23 @@ public class WebScanUrlModel
     public DateTime UpdateTime { get; set; }
 }
 
+public class CommonModel
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public string Url { get; set; }
+    public CommonModelType Type { get; set; }
+}
+
+public enum CommonModelType
+{
+    Category = 1,
+    Actress = 2,
+    Director = 3,
+    Publisher = 4,
+    Company = 5
+}
+
 public class AvModel
 {
     public int Id { get; set; }
@@ -29,11 +46,11 @@ public class AvModel
     public DateTime? ReleaseDate { get; set; }
     public DateTime CreateTime { get; set; }
     public DateTime UpdateTime { get; set; }
-    public List<CommonJavLibraryModel> InfoObj
+    public List<CommonModel> InfoObj
     {
         get
         {
-            return !string.IsNullOrEmpty(this.Infos) ? JsonSerializer.Deserialize<List<CommonJavLibraryModel>>(this.Infos) : new List<CommonJavLibraryModel>();
+            return !string.IsNullOrEmpty(this.Infos) ? JsonSerializer.Deserialize<List<CommonModel>>(this.Infos) : new List<CommonModel>();
         }
     }
 

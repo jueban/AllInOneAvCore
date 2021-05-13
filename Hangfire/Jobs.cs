@@ -16,7 +16,8 @@ namespace Hangfire
         public static void OpenBroswerJob(string location, string url)
         {
             NoticeService.SendBarkNotice(SettingService.GetSetting().Result.BarkId, "开始打开浏览器获取Cookie");
-            System.Diagnostics.Process.Start(location, url);
+
+            ScheduleService.RunScheduler("OpenJavLibraryToGetCookie");
         }
 
         //没想好怎么搞processId
