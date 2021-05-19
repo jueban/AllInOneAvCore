@@ -14,6 +14,8 @@ namespace Models
         public string JavLibraryImageFolder { get; set; }
         public string JavBusImageFolder { get; set; }
         public string AvatorImageFolder { get; set; }
+        public string ExcludeFolder { get; set; }
+        public string AvNameFilter { get; set; }
     }
 
     public class JavLibrarySettings

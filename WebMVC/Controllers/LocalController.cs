@@ -13,6 +13,25 @@ namespace WebMVC.Controllers
     {
         public IActionResult Index()
         {
+            ViewData.Add("Title", "本地-浏览");
+            return View();
+        }
+
+        public IActionResult RemoveFolder()
+        {
+            ViewData.Add("Title", "本地-去子文件夹");
+            return View();
+        }
+
+        public IActionResult Rename()
+        {
+            ViewData.Add("Title", "本地-重命名");
+            return View();
+        }
+
+        public IActionResult Move()
+        {
+            ViewData.Add("Title", "本地-移动");
             return View();
         }
 

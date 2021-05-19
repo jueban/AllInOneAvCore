@@ -1,0 +1,42 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - AllInOneAv</title>
+
+    <script src="~/js/lib/signalr.js"></script>
+    <script src="~/js/localremovefolder.js"></script>
+</head>
+
+<body>
+    <textarea name="message" id="message"></textarea>
+    <input type="button" id="sendButton" value="Send" />
+
+    <div id="messages"></div>
+
+    <script>
+        var connection = new signalR.HubConnectionBuilder()
+            .withUrl("http://localhost:20004/jobs")
+            .build();
+
+        connection.on("ReceivedMessage", function (message) {
+            var msg = message.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+            $("#messages").append(msg + '<hr/>');
+        });
+
+        connection.start().catch(function (err) {
+            return console.error(err.toString());
+        });
+
+        $("body").on("click", '#sendButton', function (event) {
+            var message = $("#message").val();
+            connection.invoke("SendMessageToAll", message).catch(function (err) {
+                return console.error(err.toString());
+            });
+            event.preventDefault();
+        });
+    </script>
+</body>
+</html>

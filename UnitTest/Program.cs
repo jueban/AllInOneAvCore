@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -47,12 +48,10 @@ namespace UnitTest
 
             //var av = JavbusService.GetJavBusDetail("https://www.javbus.com/vdd-100").Result;
 
-            var di = new DirectoryInfo(@"c:\setting");
-            var bread = di;
-            while (bread != null)
-            {
-                bread = bread.Parent;
-            }
+            var list = new List<FileInfo>();
+            var setting = SettingService.GetSetting().Result;
+
+            FileUtility.GetFilesRecursive("p:\\Downloads", setting.ExcludeFolder, /*new List<string>()*/setting.AvNameFilter.Split(',').ToList(), FileUtility.VideoExtensions, list, 500);
 
             Console.WriteLine("按任意键退出");
             Console.ReadKey();
