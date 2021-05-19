@@ -48,11 +48,9 @@ namespace UnitTest
 
             //var av = JavbusService.GetJavBusDetail("https://www.javbus.com/vdd-100").Result;
 
-            var list = new List<FileInfo>();
-            var setting = SettingService.GetSetting().Result;
-
-            FileUtility.GetFilesRecursive("p:\\Downloads", setting.ExcludeFolder, /*new List<string>()*/setting.AvNameFilter.Split(',').ToList(), FileUtility.VideoExtensions, list, 500);
-
+            var di = new DirectoryInfo(@"n:/download");
+            Console.WriteLine(di.Name);
+            
             Console.WriteLine("按任意键退出");
             Console.ReadKey();
         }

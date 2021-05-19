@@ -20,7 +20,7 @@ namespace JobHub.Hubs
 
         private void ReportProgress(object sender, string e)
         {
-            Clients.Caller.SendAsync("ReceivedMessage", e);
+            Clients.Caller.SendAsync("RemoveFolder", e);
         }
     }
 }

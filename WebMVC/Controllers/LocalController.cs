@@ -17,9 +17,12 @@ namespace WebMVC.Controllers
             return View();
         }
 
-        public IActionResult RemoveFolder()
+        public IActionResult RemoveFolder(string folder)
         {
             ViewData.Add("Title", "本地-去子文件夹");
+            ViewData.Add("Folder", folder);
+            ViewData.Add("Infos", LocalService.GetFolderInfo(folder));
+
             return View();
         }
 

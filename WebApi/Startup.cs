@@ -68,7 +68,7 @@ namespace WebApi
 
             app.UseCors("CustomCorsPolicy");
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
 
             app.UseRouting();
 

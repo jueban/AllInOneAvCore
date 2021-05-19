@@ -44,7 +44,7 @@
                 $("#bread").empty();
 
                 $(content.dirs).each(function () {
-                    $("#fileList").append('<li class="list-group-item list-group-item-dark d-flex justify-content-between align-items-center content-list" data-dir=' + this.fullName + '>' + this.name + '</li>');
+                    $("#fileList").append('<li class="list-group-item list-group-item-dark d-flex justify-content-between align-items-center content-list" data-dir=' + this.fullName + '>' + this.name + '<a type="button" href="/Local/RemoveFolder?folder=' + this.fullName + '" class="btn btn-info">去文件夹</button></li>');
                 });
 
                 $(content.files).each(function () {

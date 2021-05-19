@@ -86,55 +86,51 @@ namespace Services
                 Dictionary<string, string> remainSize = new Dictionary<string, string>();
                 Dictionary<string, int> moveRecord = new Dictionary<string, int>();
 
-                var moveFolder = folder + "/movefiles/";
+                var moveSubFolder = @"\movefiles\";
+                var moveFolder = folder + moveSubFolder;
 
                 if (!Directory.Exists(moveFolder))
                 {
                     Directory.CreateDirectory(moveFolder);
                 }
 
-                progress.Report("初始化移动到的文件夹为 -> " + moveFolder);
+                progress.Report($"初始化移动到的文件夹为 -> {moveFolder}");
 
-                progress.Report("把 " + moveFolder + " 添加到忽略列表");
                 var setting = await SettingService.GetSetting();
-                var exclude = setting.ExcludeFolder + "," + moveFolder;
+                var exclude = setting.ExcludeFolder + "," + moveSubFolder;
                 var filters = setting.AvNameFilter.Split(',').ToList();
 
                 int limitSize = 200;
                 List<FileInfo> fis = new List<FileInfo>();
 
-                progress.Report("获取所有 >= " + limitSize + "mb 的在子文件夹内的文件");
-
                 var status = FileUtility.GetFilesRecursive(folder, exclude, filters, FileUtility.VideoExtensions, fis, limitSize);
 
                 if (string.IsNullOrEmpty(status))
                 {
-                    progress.Report("一共获取了 >= " + fis.Count + " 个文件");
+                    progress.Report($"一共获取了 => {fis.Count} 个 大于等于 {limitSize}MB 的文件");
                 }
                 else
                 {
-                    progress.Report("异常 >= " + status);
+                    progress.Report($"获取文件异常 >= {status}");
                 }
 
                 foreach (var fi in fis)
                 {
-                    progress.Report("开始移动 " + fi.FullName);
-
                     var n = fi.Name.Replace(fi.Extension, "");
                     var e = fi.Extension;
 
-                    progress.Report("\t文件名 >= " + n + " 扩展名 => " + e);
+                    progress.Report($"开始处理 {fi.FullName}, 文件名 >= {n} 扩展名 => {e}");
 
                     if (fi.Name.Contains("-5" + fi.Extension) && fi.Length < 1 * 1024 * 1024 * 1024)
                     {
-                        progress.Report("删除dummy文件");
+                        progress.Report("\t删除dummy文件");
                         continue;
                     }
 
                     if (moveRecord.ContainsKey(fi.Name))
                     {
                         moveRecord[fi.Name]++;
-                        progress.Report("\t存在移动记录,添加后缀 >= " + moveRecord[fi.Name]);
+                        progress.Report($"\t存在移动记录,添加后缀 >= {moveRecord[fi.Name]}");
                     }
                     else
                     {
@@ -147,7 +143,7 @@ namespace Services
 
                         n += "_" + moveRecord[fi.Name];
 
-                        progress.Report("\t存在重名文件,修改文件名 >= " + (n + "_" + moveRecord[fi.Name]));
+                        progress.Report($"\t存在重名文件,修改文件名 >= {(n + "_" + moveRecord[fi.Name])}");
 
                         if (moveRecord[fi.Name] == 2)
                         {
@@ -155,7 +151,7 @@ namespace Services
                         }
                     }
 
-                    progress.Report("\t移动文件 >= " + fi.FullName + " 到 => " + moveFolder + n + e);
+                    progress.Report($"\t移动文件 >= {fi.FullName} 到 => {moveFolder + n + e}");
                     File.Move(fi.FullName, moveFolder + n + e);
                 }
 
@@ -165,33 +161,48 @@ namespace Services
 
                 foreach (var sub in subFolders)
                 {
-                    progress.Report("\t开始计算子文件夹 " + sub + " 的大小");
-
-                    List<FileInfo> tempFi = new();
-
-                    string tempStatus = FileUtility.GetFilesRecursive(sub, exclude, filters, FileUtility.VideoExtensions + ";!qB", tempFi);
-                    double tempSize = 0D;
-
-                    if (string.IsNullOrEmpty(tempStatus))
+                    if (!exclude.Contains(Path.GetFileName(sub), StringComparison.OrdinalIgnoreCase))
                     {
-                        foreach (var fi in tempFi)
-                        {
-                            tempSize += fi.Length;
-                        }
+                        List<FileInfo> tempFi = new();
 
-                        remainSize.Add(sub, FileUtility.GetAutoSizeString(tempSize, 2));
+                        string tempStatus = FileUtility.GetFilesRecursive(sub, exclude, filters, FileUtility.VideoExtensions + ";!qB", tempFi);
+                        double tempSize = 0D;
 
-                        if (tempSize >= 500 * 1024 * 1024)
+                        if (string.IsNullOrEmpty(tempStatus))
                         {
-                            progress.Report("\t" + sub + "的大小为 = > " + FileUtility.GetAutoSizeString(tempSize, 2));
-                        }
-                        else
-                        {
-                            progress.Report("\t" + sub + "的大小为 = > " + FileUtility.GetAutoSizeString(tempSize, 2));
+                            foreach (var fi in tempFi)
+                            {
+                                tempSize += fi.Length;
+                            }
+
+                            remainSize.Add(sub, FileUtility.GetAutoSizeString(tempSize, 1));
+
+                            if (tempSize >= 500 * 1024 * 1024)
+                            {
+                                progress.Report($"\t =============={sub} 的大小为 = > {FileUtility.GetAutoSizeString(tempSize, 1)}==============");
+                            }
+                            else
+                            {
+                                progress.Report($"\t {sub} 的大小为 = > {FileUtility.GetAutoSizeString(tempSize, 1)}");
+                            }
                         }
                     }
                 }
             }
+        }
+
+        public static string GetFolderInfo(string folder)
+        {
+            string ret = "";
+            if (Directory.Exists(folder))
+            {
+                var di = new DirectoryInfo(folder);
+                var files = di.GetFiles();
+
+                ret = $"{folder} 共有 {di.GetDirectories().Length} 个文件夹，以及 {files.Length} 个独立文件，总计大小 {FileUtility.GetAutoSizeString(files.Sum(x => x.Length), 1)}";
+            }
+
+            return ret;
         }
     }
 }
