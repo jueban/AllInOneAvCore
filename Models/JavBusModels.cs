@@ -17,5 +17,6 @@ namespace Models
         Category = 3,
         Actress = 4,
         Detail = 5,
+        Passin = 6,
     }
 }

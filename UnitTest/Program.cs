@@ -27,23 +27,32 @@ namespace UnitTest
 
             //JavbusService.SaveCommonJavLibraryModel(category).Wait();
 
-            var actress = JavbusService.GetJavBusActress().Result;
-            JavbusService.SaveCommonJavLibraryModel(actress.actress).Wait();
+            //var actress = JavbusService.GetJavBusActress().Result;
+            //JavbusService.SaveCommonJavLibraryModel(actress.actress).Wait();
 
-            Parallel.ForEach(actress.pics, new ParallelOptions { MaxDegreeOfParallelism = 10 }, pic =>
+            //Parallel.ForEach(actress.pics, new ParallelOptions { MaxDegreeOfParallelism = 10 }, pic =>
+            //{
+            //    if (!File.Exists(pic.file))
+            //    {
+            //        try
+            //        {
+            //            new System.Net.WebClient().DownloadFile(pic.url, pic.file);
+            //        }
+            //        catch (Exception)
+            //        {
+            //            LogHelper.Info($"<=====下载图片 {pic.url} 失败=====>");
+            //        }
+            //    }
+            //});
+
+            //var av = JavbusService.GetJavBusDetail("https://www.javbus.com/vdd-100").Result;
+
+            var di = new DirectoryInfo(@"c:\setting");
+            var bread = di;
+            while (bread != null)
             {
-                if (!File.Exists(pic.file))
-                {
-                    try
-                    {
-                        new System.Net.WebClient().DownloadFile(pic.url, pic.file);
-                    }
-                    catch (Exception)
-                    {
-                        LogHelper.Info($"<=====下载图片 {pic.url} 失败=====>");
-                    }
-                }
-            });
+                bread = bread.Parent;
+            }
 
             Console.WriteLine("按任意键退出");
             Console.ReadKey();

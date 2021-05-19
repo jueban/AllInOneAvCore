@@ -6,17 +6,15 @@
     <title>@ViewData["Title"] - AllInOneAv</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
-    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap-fileinput/5.0.6/css/fileinput.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-    <script src="https://cdn.bootcss.com/bootstrap-fileinput/5.0.6/js/fileinput.min.js"></script>
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark border-bottom box-shadow mb-3">
             <div class="container">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">AllInOneAv</a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
@@ -25,26 +23,34 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Local" asp-action="Index">本地</a>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link text-white dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">
+                                本地
+                            </a>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" asp-controller="Local" asp-action="Index">浏览</a>
+                                <a class="dropdown-item" asp-controller="Local" asp-action="RemoveFolder">去文件夹</a>
+                                <a class="dropdown-item" asp-controller="Local" asp-action="Rename">重命名</a>
+                                <a class="dropdown-item" asp-controller="Local" asp-action="Move">移动</a>
+                            </div>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Wangpan" asp-action="Index">网盘</a>
+                            <a class="nav-link text-white" asp-area="" asp-controller="Wangpan" asp-action="Index">网盘</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Scan" asp-action="Index">扫描</a>
+                            <a class="nav-link text-white" asp-area="" asp-controller="Scan" asp-action="Index">扫描</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Report" asp-action="Index">报表</a>
+                            <a class="nav-link text-white" asp-area="" asp-controller="Report" asp-action="Index">报表</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Play" asp-action="Index">播放</a>
+                            <a class="nav-link text-white" asp-area="" asp-controller="Play" asp-action="Index">播放</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Upload" asp-action="Index">上传</a>
+                            <a class="nav-link text-white" asp-area="" asp-controller="Upload" asp-action="Index">上传</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Setting" asp-action="Index">设置</a>
+                            <a class="nav-link text-white" asp-area="" asp-controller="Setting" asp-action="Index">设置</a>
                         </li>
                     </ul>
                 </div>
@@ -57,7 +63,7 @@
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <footer class="border-top footer text-muted" style="background-color:#343a40!important;">
         <div class="container">
             &copy; 2021 - AllInOneAv
         </div>

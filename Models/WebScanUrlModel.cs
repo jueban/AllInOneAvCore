@@ -29,7 +29,8 @@ public enum CommonModelType
     Actress = 2,
     Director = 3,
     Publisher = 4,
-    Company = 5
+    Company = 5,
+    Series = 6,
 }
 
 public class AvModel

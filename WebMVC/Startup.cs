@@ -66,6 +66,11 @@ namespace WebMVC
                 options.SlidingExpiration = true;
             });
 
+            services.AddControllersWithViews()
+                .AddNewtonsoftJson(options =>
+                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+            );
+
             services.AddSingleton(new LogHelper());
             services.AddControllersWithViews();
         }
