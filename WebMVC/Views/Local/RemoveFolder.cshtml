@@ -6,7 +6,6 @@
     <title>@ViewData["Title"] - AllInOneAv</title>
 
     <script src="~/js/lib/signalr.js"></script>
-    <script src="~/js/localremovefolder.js"></script>
 </head>
 
 <body>
@@ -32,7 +31,7 @@
 
         $("body").on("click", '#sendButton', function (event) {
             var message = $("#message").val();
-            connection.invoke("SendMessageToAll", message).catch(function (err) {
+            connection.invoke("RemoveFolder", message).catch(function (err) {
                 return console.error(err.toString());
             });
             event.preventDefault();
