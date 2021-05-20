@@ -45,5 +45,26 @@ namespace DAL
 
             return await ExecuteAsync(sql, new { settings });
         }
+
+        public async Task<int> InsertPrefix(string prefix)
+        {
+            var sql = @"INSERT INTO Prefix (Prefix) VALUES (@prefix)";
+
+            return await ExecuteAsync(sql, new { prefix });
+        }
+
+        public async Task<int> TruncatePrefix()
+        {
+            var sql = @"TRUNCATE TABLE Prefix ";
+
+            return await ExecuteAsync(sql);
+        }
+
+        public async Task<List<string>> GetPrefix()
+        {
+            var sql = "SELECT * FROM Prefix";
+
+            return await QueryAsync<string>(sql);
+        }
     }
 }

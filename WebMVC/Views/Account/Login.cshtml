@@ -1,4 +1,6 @@
-﻿<!doctype html>
+﻿@model WebMVC.Models.LoginViewModel
+
+<!doctype html>
 <html lang="en">
 <head>
 
@@ -8,16 +10,19 @@
         <form action="/account/login" method="post" class="mx-auto" style="width: 800px;position: relative;left: 120px;top: 41px">
             <div class="form-group">
                 <label for="email">用户名</label>
-                <input type="text" class="form-control col-4 " id="userName" name="UserName">
+                @Html.TextBoxFor(x => x.UserName, new { @class = "form-control col-4" })
+                @*<input type="text" class="form-control col-4 " id="userName" name="UserName">*@
             </div>
 
             <div class="form-group">
                 <label for="password">密码</label>
-                <input type="password" class="form-control col-4" id="password" name="Password">
+                @Html.PasswordFor(x => x.Password, new { @class = "form-control col-4" })
+                @*<input type="password" class="form-control col-4" id="password" name="Password">*@
             </div>
 
             <div class="form-group form-check">
-                <input type="checkbox" class="form-check-input" id="check">
+                @Html.CheckBoxFor(x => x.RememberMe, new { @class = "form-check-input" })
+                @*<input type="checkbox" class="form-check-input" id="rememberMe" name="RememberMe">*@
                 <label class="form-check-label" for="check">保持登录</label>
             </div>
 

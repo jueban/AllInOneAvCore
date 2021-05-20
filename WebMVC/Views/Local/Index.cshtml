@@ -44,7 +44,7 @@
                 $("#bread").empty();
 
                 $(content.dirs).each(function () {
-                    $("#fileList").append('<li class="list-group-item list-group-item-dark d-flex justify-content-between align-items-center content-list" data-dir=' + this.fullName + '>' + this.name + '<a type="button" href="/Local/RemoveFolder?folder=' + this.fullName + '" class="btn btn-info">去文件夹</button></li>');
+                    $("#fileList").append('<div class="input-group"><input readonly type="text" data-dir=' + this.fullName + ' class="form-control content-list" value=' + this.name + '><div class="input-group-append"><a href="/Local/RemoveFolder?folder=' + this.fullName + '" class="btn btn-info" type="button">去文件夹</a><a href="/Local/Rename?folder=' + this.fullName + '" class="btn btn-warning" type="button">重命名</a><a href="/Local/ManualRename?folder=' + this.fullName + '" class="btn btn-light" type="button">手动重命名</a></div></div>');
                 });
 
                 $(content.files).each(function () {
@@ -65,7 +65,7 @@
                 $("#bread").empty();
 
                 $(content.dirs).each(function () {
-                    $("#fileList").append('<li class="list-group-item list-group-item-dark d-flex justify-content-between align-items-center content-list" data-dir=' + this.fullName + '>' + this.name + '</li>');
+                    $("#fileList").append('<div class="input-group"><input readonly type="text" data-dir=' + this.fullName + ' class="form-control content-list" value=' + this.name + '><div class="input-group-append"><a href="/Local/Rename?folder=' + this.fullName + '" class="btn btn-warning" type="button">重命名</a><a href="/Local/ManualRename?folder=' + this.fullName + '" class="btn btn-light" type="button">手动重命名</a></div></div>');
                 });
 
                 $(content.files).each(function () {
@@ -86,7 +86,7 @@
                 $("#bread").empty();
 
                 $(content.dirs).each(function () {
-                    $("#fileList").append('<li class="list-group-item list-group-item-dark d-flex justify-content-between align-items-center content-list" data-dir=' + this.fullName + '>' + this.name + '</li>');
+                    $("#fileList").append('<div class="input-group"><input readonly type="text" data-dir=' + this.fullName + ' class="form-control content-list" value=' + this.name + '><div class="input-group-append"><a href="/Local/Rename?folder=' + this.fullName + '" class="btn btn-warning" type="button">重命名</a><a href="/Local/ManualRename?folder=' + this.fullName + '" class="btn btn-light" type="button">手动重命名</a></div></div>');
                 });
 
                 $(content.files).each(function () {

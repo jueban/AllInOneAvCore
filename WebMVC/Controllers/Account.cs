@@ -45,7 +45,10 @@ namespace WebMVC.Controllers
         {
             ViewData["Title"] = "登录";
             ViewData["ReturnUrl"] = returnUrl;
-            return View();
+
+            LoginViewModel loginViewModel = new();
+
+            return View(loginViewModel);
         }
 
         [HttpPost]

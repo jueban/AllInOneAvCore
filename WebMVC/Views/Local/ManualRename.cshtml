@@ -1,0 +1,146 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - AllInOneAv</title>
+
+    <link rel="stylesheet" href="~/css/localindex.css" />
+</head>
+
+<body>
+    <span style="display:none" id="url">/Local/GetFilesInFolder?folder=@ViewData["Folder"]</span>
+    <span style="display:none" id="language">0</span>
+    <span style="display:none" id="episode">0</span>
+    <span style="display:none" id="location">0</span>
+
+    <div class="sideNav">
+        <ul class="list-group" id="files">
+        </ul>
+    </div>
+
+    <div class="content" id="content">
+        <div class="input-group mb-3" style="position:absolute;margin-top:0px">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="currentFileName"></span>
+            </div>
+            <input type="text" class="form-control" id="finalFileName">
+        </div>
+
+        <div class="input-group" style="position:absolute;margin-top:39px">
+            <div class="input-group-append">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-sm btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false" id="languageDrop">
+                        语言
+                    </button>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item language" href="#" data-value="0">日语</a>
+                        <a class="dropdown-item language" href="#" data-value="1">中文</a>
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-toggle="dropdown" aria-expanded="false" id="episodeDrop">
+                        序号
+                    </button>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item episode" href="#" data-value="0">无</a>
+                        <a class="dropdown-item episode" href="#" data-value="1">1</a>
+                        <a class="dropdown-item episode" href="#" data-value="2">2</a>
+                        <a class="dropdown-item episode" href="#" data-value="3">3</a>
+                        <a class="dropdown-item episode" href="#" data-value="4">4</a>
+                        <a class="dropdown-item episode" href="#" data-value="5">5</a>
+                        <a class="dropdown-item episode" href="#" data-value="6">6</a>
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-sm btn-warning dropdown-toggle" data-toggle="dropdown" aria-expanded="false" id="locationDrop">
+                        位置
+                    </button>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item location" href="#" data-value="0">Fin</a>
+                        <a class="dropdown-item location" href="#" data-value="1">未找到</a>
+                        <a class="dropdown-item location" href="#" data-value="2">欧美</a>
+                        <a class="dropdown-item location" href="#" data-value="3">VR</a>
+                        <a class="dropdown-item location" href="#" data-value="4">无码</a>
+                    </div>
+                </div>
+                <a href="javascript:refresh();" class="btn btn-info" type="button">刷新</a>
+                <a href="#" class="btn btn-success" type="button">移动</a>
+            </div>
+            <input type="text" class="form-control content-list" value="">
+            <div class="input-group-append">
+                <a href="Local/RemoveFolder?folder=" class="btn btn-info" type="button">搜索</a>
+            </div>
+        </div>
+
+        <div class="container-fluid" style="position:absolute;margin-top:78px">
+            <div class="row row-cols-5" id="avs">
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        $(document).ready(function () {
+            showRoots();
+        });
+
+        function showRoots() {
+            var roots = $.ajax({ url: $("#url").text(), async: false });
+            $("#files").empty();
+
+            $(roots.responseJSON).each(function () {
+                $("#files").append('<li class="list-group-item d-flex justify-content-between align-items-center renameFile" data-name="' + this.name + '" data-fullname="' + this.fullName + '">' + this.name + '<span class="badge badge-primary badge-pill">' + this.lengthStr + '</span></li>')
+            });
+        }
+
+        function showAv(avs) {
+            $("#avs").empty();
+            $(avs).each(function () {
+                $("#avs").append('<div class="col"><div class= "card border-info mb-3" style="max-width: 18rem;"><img src="' + this.picUrl + '" class="card-img-top" alt="..."><div class="card-header">' + (this.avId + "-" + this.name) + '</div></div></div>')
+            });
+        }
+
+        //TODO
+        function refresh(name) {
+            $.ajax({
+                url: "/Local/GetPossibleAvNameAndInfo",
+                type: 'post',
+                dataType: 'json',
+                contentType: 'application/json',
+                data: JSON.stringify(name),
+                async: true,
+                success: function (data) {
+                    $("#finalFileName").val(data.result.item1);
+                    showAv(data.result.item2);
+                }
+            });
+        }
+
+        $(".location").on("click", function () {
+            $("#locationDrop").text($(this).html());
+            $("#location").text($(this).data("value"));
+        });
+
+        $(".episode").on("click", function () {
+            $("#episodeDrop").text($(this).html());
+            $("#episode").text($(this).data("value"));
+        });
+
+        $(".language").on("click", function () {
+            $("#languageDrop").text($(this).html());
+            $("#language").text($(this).data("value"));
+        });
+
+        $("body").on("click", ".renameFile", function () {
+            $("#currentFileName").text($(this).data("fullname"));
+
+            $(this).siblings().removeClass("active");
+            $(this).addClass("active");
+
+            refresh($(this).data("fullname"));
+        });
+    </script>
+</body>
+</html>

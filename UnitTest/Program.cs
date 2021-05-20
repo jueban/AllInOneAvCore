@@ -48,8 +48,7 @@ namespace UnitTest
 
             //var av = JavbusService.GetJavBusDetail("https://www.javbus.com/vdd-100").Result;
 
-            var di = new DirectoryInfo(@"n:/download");
-            Console.WriteLine(di.Name);
+            var av = new JavLibraryDAL().GetAvModelByWhere($" AND AvId='{"vdd-100"}'").Result;
             
             Console.WriteLine("按任意键退出");
             Console.ReadKey();

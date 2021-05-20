@@ -1,5 +1,79 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - AllInOneAv</title>
+
+    <script src="~/js/lib/signalr.js"></script>
+</head>
+
+<body>
+    <div style="background-color:#e9ecef">
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" value="@ViewData["Folder"]" id="folder" style="background-color: #343a40 !important; color: white">
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="button" id="popAlert">开始</button>
+            </div>
+        </div>
+
+        <div class="alert alert-dark" role="alert">
+            @ViewData["Infos"]
+        </div>
+
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text">操作日志</span>
+            </div>
+            <textarea class="form-control" aria-label="With textarea" id="messages" style="height:750px;resize:none;background-color:#343a40!important;color:white"></textarea>
+        </div>
+    </div>
+
+    <div class="modal fade" id="alert" data-backdrop="static" data-keyboard="false" tabindex="-1" style="display:none">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">提示</h5>
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    是否确认重命名
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="start">确认</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        var connection = new signalR.HubConnectionBuilder()
+            .withUrl("http://localhost:20004/jobs")
+            .build();
+
+        connection.on("Rename", function (message) {
+            $("#messages").append(message + "\n");
+            $("#messages").scrollTop($("#messages")[0].scrollHeight);
+        });
+
+        connection.start().catch(function (err) {
+            return console.error(err.toString());
+        });
+
+        $("body").on("click", "#popAlert", function () {
+            $('#alert').modal('show')
+        });
+
+        $("body").on("click", '#start', function (event) {
+            var message = $("#folder").val();
+            connection.invoke("Rename", message).catch(function (err) {
+                return console.error(err.toString());
+            });
+            $('#alert').modal('hide')
+            event.preventDefault();
+        });
+    </script>
+</body>
+</html>
