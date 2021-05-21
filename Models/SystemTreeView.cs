@@ -32,6 +32,7 @@ namespace Models
         public long Length { get; set; }
         public string Name { get; set; }
         public string LengthStr { get; set; }
+        public bool IsChinese { get; set; }
     }
 
     public class MyDirectoryInfo

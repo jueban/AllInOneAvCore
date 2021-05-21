@@ -17,6 +17,8 @@ namespace Models
         public string ExcludeFolder { get; set; }
         public string AvNameFilter { get; set; }
         public string Win10Duplicate { get; set; }
+        public string LocalSearchFolder { get; set; }
+        public string CannotMergeFileTag { get; set; }
     }
 
     public class JavLibrarySettings

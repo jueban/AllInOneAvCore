@@ -53,6 +53,12 @@ namespace WebMVC.Controllers
             return View();
         }
 
+        public IActionResult RemoveDuplicate()
+        {
+            ViewData.Add("Title", "本地-去重");
+            return View();
+        }
+
         public JsonResult GetRoots()
         {
             var ret = LocalService.GetSystemTreeView();
@@ -111,6 +117,34 @@ namespace WebMVC.Controllers
             var res = LocalService.ManualRemove(model);
 
             ret.status = res ? Status.Ok : Status.Error;
+
+            return ret;
+        }
+
+        [HttpGet]
+        public async Task<Dictionary<string, List<MyFileInfo>>> GetDuplicateAvFile()
+        {
+            var ret = await LocalService.GetDuplicateAvFile();
+
+            return ret;
+        }
+
+        [HttpPost]
+        public WebResult DeleteFile([FromBody] List<string> files)
+        {
+            WebResult ret = new();
+            var res = LocalService.DeleteFiles(files);
+
+            if (res == 0)
+            {
+                ret.status = Status.Ok;
+                ret.msg = "成功";
+            }
+            else
+            {
+                ret.status = Status.Exception;
+                ret.msg = "失败" + res + "个";
+            }
 
             return ret;
         }

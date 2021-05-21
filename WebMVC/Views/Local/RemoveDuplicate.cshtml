@@ -1,0 +1,179 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - AllInOneAv</title>
+
+    <script src="~/js/fileutility.js"></script>
+</head>
+
+<body>
+    <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+        <div class="btn-group mr-2" role="group" aria-label="First group">
+            <button type="button" class="btn btn-primary" id="refresh">刷新</button>
+        </div>
+        <div class="btn-group mr-2" role="group" aria-label="Second group">
+            <button type="button" class="btn btn-info" id="selectAll" data-type="all">全选/取消</button>
+            <button type="button" class="btn btn-success" id="intel">智能</button>
+        </div>
+        <div class="btn-group" role="group" aria-label="Third group">
+            <button type="button" class="btn btn-danger" id="delete">删除</button>
+        </div>
+    </div>
+
+    <ul class="list-group">
+        <li class="list-group-item" id="content">
+
+        </li>
+    </ul>
+
+    <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style="display:none">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">提示</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="deleteContent">
+                    
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="realDelete">删除</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            reset();
+        });
+
+        function showDuplicate(files) {
+            for (var i in files) {
+                var firstPart = `<div class="card"><div class="card-header">` + i + `</div><div class="card-body"><ul class="list-group">`;
+
+                var middlePart = ``;
+
+                for (var j in files[i]) {
+                    middlePart += `<li class="list-group-item" data-file="` + files[i][j].fullName + `" data-size=` + files[i][j].length + ` data-chinese=` + files[i][j].isChinese + `>
+                                            <div class="input-group input-group-sm mb-3">
+                                                <div class="input-group-prepend">
+                                                    <div class="input-group-text">
+                                                        <input type="checkbox" class="check" data-size=` + files[i][j].length + ` data-file="` + files[i][j].fullName + `">
+                                                    </div>
+                                                </div>
+                                                <input type="text" readonly class="form-control" value="` + files[i][j].fullName + `">
+                                                <div class="input-group-prepend">
+                                                    <div class="input-group-text">
+                                                        <span class="badge badge-secondary">` + files[i][j].lengthStr + `</span>`
+
+                    if (files[i][j].isChinese) {
+                        middlePart += `<span class="badge badge-success">中文</span>`
+                    }
+
+                    middlePart += `</div></div></div></li>`;
+                }
+
+                var lastPart = `</ul></div>`;
+                $("#content").append(firstPart + middlePart + lastPart);
+            };
+        }
+
+        function reset() {
+            $("#content").empty();
+
+            $.ajax({
+                url: "/Local/GetDuplicateAvFile",
+                type: 'get',
+                async: true,
+                success: function (data) {
+                    showDuplicate(data);
+                }
+            });
+        }
+
+        $("#refresh").click(function () {
+            reset();
+        })
+
+        $("#selectAll").click(function () {
+            if ($(this).data("type") == 'all') {
+                $(".check").prop("checked", true);
+                $(this).data("type", "none");
+            } else {
+                $(".check").prop("checked", false);
+                $(this).data("type", "all");
+            }
+        });
+
+        $("#intel").click(function () {
+            $(".card").each(function () {
+                var items = $(this).find(".list-group-item");
+                items.find(".check").prop("checked", true);
+
+                var biggestSize = 0;
+
+                items.each(function () {
+                    if ($(this).data("size") >= biggestSize) {
+                        biggestSize = $(this).data("size");
+                    }
+                });
+
+                items.each(function () {
+                    if ($(this).data("size") >= biggestSize) {
+                        $(this).find(".check").prop("checked", false);
+                    }
+
+                    if ($(this).data("chinese") == true) {
+                        $(this).find(".check").prop("checked", false);
+                    }
+                })
+            });
+        });
+
+        $("#delete").click(function () {
+            var count = 0;
+            var size = 0;
+
+            $(":checked").each(function () {
+                count++;
+                size += $(this).data("size");
+            })
+
+            $("#deleteContent").empty();
+            $("#deleteContent").append("将要删除 " + count + "个文件，共计" + getFileSize(size));
+
+            $('#modal').modal('show')
+        });
+
+        $("#realDelete").click(function () {
+            var deleteList =[];
+
+            $(":checked").each(function (index, element) {
+                deleteList.push($(this).data("file"));
+            });
+
+            $.ajax({
+                type: 'post',
+                url: '/Local/DeleteFile',
+                dataType: 'json',
+                contentType: 'application/json',
+                data: JSON.stringify(deleteList),
+                success: function (result) {
+                    if (result.status != 0) {
+                        alert(result.msg);
+                    }
+                }
+            });
+
+            $('#modal').modal('hide');
+            reset();
+        })
+    </script>
+</body>
+</html>

@@ -510,6 +510,7 @@ namespace Services
 
             return ret;
         }
+
         public static string GenerateTagetFileName(string targetFolder, string extension, AvModel av, ManualRenameModel model)
         {
             var ret = targetFolder + av.AvId + "-" + av.Name;
@@ -552,6 +553,96 @@ namespace Services
             }
 
             return ret;
+        }
+
+        public static async Task<Dictionary<string, List<MyFileInfo>>> GetDuplicateAvFile()
+        {
+            var ignore = SettingService.GetSetting().Result.CannotMergeFileTag;
+            Dictionary<string, List<MyFileInfo>> ret = new();
+
+            var files = await GetAllLocalMyFile();
+
+            foreach (var file in files)
+            {
+                var nameArray = file.Name.Split('-');
+
+                if (nameArray.Length >= 3 && !file.Name.Contains(ignore))
+                {
+                    var key = nameArray[0] + "-" + nameArray[1];
+
+                    if (ret.ContainsKey(key))
+                    {
+                        ret[key].Add(file);
+                    }
+                    else
+                    {
+                        ret.Add(key, new List<MyFileInfo> { file });
+                    }
+                }
+            }
+
+            return ret.Where(x => x.Value.Count > 1).ToDictionary(x => x.Key, x => x.Value);
+        }
+
+        public static async Task<List<MyFileInfo>> GetAllLocalMyFile()
+        {
+            List<MyFileInfo> ret = new();
+
+            var oris = await GetAllLocalFile();
+
+            foreach (var ori in oris)
+            {
+                ret.Add(new MyFileInfo()
+                {
+                    Extension = ori.Extension,
+                    FullName = ori.FullName,
+                    Length = ori.Length,
+                    LengthStr = FileUtility.GetAutoSizeString(ori.Length, 1),
+                    Name = ori.Name,
+                    IsChinese = ori.Name.Contains("-C" + ori.Extension, StringComparison.OrdinalIgnoreCase)
+                });
+            }
+
+            return ret;
+        }
+
+        public async static Task<List<FileInfo>> GetAllLocalFile()
+        {
+            List<FileInfo> ret = new();
+            var searchFolder = await SettingService.GetSetting();
+            var drives = Environment.GetLogicalDrives();
+
+            foreach (var drive in drives)
+            {
+                foreach (var folder in searchFolder.LocalSearchFolder.Split(','))
+                {
+                    if (Directory.Exists(drive + folder))
+                    {
+                        ret.AddRange(new DirectoryInfo(drive + folder).GetFiles().ToList());
+                    }
+                }
+            }
+
+            return ret;
+        }
+
+        public static int DeleteFiles(List<string> files)
+        {
+            int count = 0;
+
+            foreach (var file in files)
+            {
+                try
+                {
+                    File.Delete(file);
+                }
+                catch (Exception)
+                {
+                    count++;
+                }
+            }
+
+            return count;
         }
 
         private static string CreateFolder(string folder)
