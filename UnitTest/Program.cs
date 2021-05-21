@@ -55,14 +55,9 @@ namespace UnitTest
 
             //FileUtility.RenameAndTransferUsingSystem(@"N:\Download\movefiles\fin\DMAT-192-眠る義母 息子に夜●いされて (2).mp4", @"N:\Download\movefiles\DMAT-192-眠る義母 息子に夜●いされて (2).mp4", true);
 
-            LocalService.ManualRemove(new ManualRenameModel() { 
-                avDbId = 268409,
-                episode = 3,
-                language = RenamneLanguage.Chinese,
-                location = RenameLocation.Notfound,
-                moveFile = @"N:\Download\movefiles\hhd800.com@KSBJ-136.mp4",
-                rootFolder = @"N:\Download\movefiles\"
-            });
+            var ret1 = MagnetUrlService.SaveFaviUrl("http://www.javlibrary.com/cn/vl_star.php?&mode=&s=aelqc&page=4");
+
+            new ScanDAL().InsertFavi(ret1.site, ret1.type, ret1.url).Wait();
 
             Console.WriteLine("按任意键退出");
             Console.ReadKey();

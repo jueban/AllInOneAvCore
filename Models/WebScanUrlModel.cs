@@ -63,6 +63,7 @@ public class AvModel
 
 public enum WebScanUrlSite
 {
+    None = 0,
     JavLibrary = 1,
     JavBus = 2,
 }

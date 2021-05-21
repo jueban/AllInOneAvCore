@@ -1,0 +1,16 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - AllInOneAv</title>
+
+    <link rel="stylesheet" href="~/css/localindex.css" />
+</head>
+
+<body>
+    <video width="638" height="493" controls muted preload="auto" poster="~/videologo.png">
+        <source src="/Play/PlayLocalVideo?file=@ViewData["Video"]" type="video/mp4">
+    </video>
+</body>
+</html>

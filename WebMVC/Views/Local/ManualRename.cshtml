@@ -115,7 +115,7 @@
             $("#files").empty();
 
             $(roots.responseJSON).each(function () {
-                $("#files").append('<li class="list-group-item d-flex justify-content-between align-items-center renameFile" data-name="' + this.name + '" data-fullname="' + this.fullName + '">' + this.name + '<span class="badge badge-primary badge-pill">' + this.lengthStr + '</span></li>')
+                $("#files").append('<li class="list-group-item d-flex justify-content-between align-items-center renameFile" data-name="' + this.name + '" data-fullname="' + this.fullName + '">' + this.name + '<span class="badge badge-primary badge-pill file-badge" data-file="' + this.fullName + '">' + this.lengthStr + '</span></li>')
             });
         }
 
@@ -164,6 +164,10 @@
                 });
             }
         }
+
+        $("body").on("dblclick", ".file-badge", function () {
+            window.open("/play/playlocal?file=" + $(this).data("file"));
+        });
 
         $("body").on('click', ".card", function () {
             $(".card").css('background-color', '');

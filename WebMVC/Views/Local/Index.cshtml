@@ -48,7 +48,7 @@
                 });
 
                 $(content.files).each(function () {
-                    $("#fileList").append('<li class="list-group-item list-group-item-secondary d-flex justify-content-between align-items-center">' + this.name + '<span class="badge badge-primary badge-pill">' + this.lengthStr + '</span></li>');
+                    $("#fileList").append('<li class="list-group-item list-group-item-secondary d-flex justify-content-between align-items-center">' + this.name + '<span class="badge badge-primary badge-pill file-badge" data-file="' + this.fullName + '">' + "播放" + this.lengthStr + '</span></li>');
                 });
 
                 for (var i in content.breadCrumb) {
@@ -69,7 +69,7 @@
                 });
 
                 $(content.files).each(function () {
-                    $("#fileList").append('<li class="list-group-item list-group-item-secondary d-flex justify-content-between align-items-center">' + this.name + '<span class="badge badge-primary badge-pill">' + this.lengthStr + '</span></li>');
+                    $("#fileList").append('<li class="list-group-item list-group-item-secondary d-flex justify-content-between align-items-center">' + this.name + '<span class="badge badge-primary badge-pill file-badge" data-file="' + this.fullName + '">' + "播放" +  this.lengthStr + '</span></li>');
                 });
 
                 for (var i in content.breadCrumb) {
@@ -90,7 +90,7 @@
                 });
 
                 $(content.files).each(function () {
-                    $("#fileList").append('<li class="list-group-item list-group-item-secondary d-flex justify-content-between align-items-center">' + this.name + '<span class="badge badge-primary badge-pill">' + this.lengthStr + '</span></li>');
+                    $("#fileList").append('<li class="list-group-item list-group-item-secondary d-flex justify-content-between align-items-center">' + this.name + '<span class="badge badge-primary badge-pill file-badge" data-file="' + this.fullName + '">' + "播放" +  this.lengthStr + '</span></li>');
                 });
 
                 for (var i in content.breadCrumb) {
@@ -98,6 +98,10 @@
                 }
 
                 $(".progress-bar").text(content.currentInfo);
+            });
+
+            $("body").on("dblclick", ".file-badge", function () {
+                window.open("/play/playlocal?file=" + $(this).data("file"));  
             });
         });
 
