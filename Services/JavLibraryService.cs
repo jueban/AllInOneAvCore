@@ -327,7 +327,7 @@ namespace Services
         }
 
         //搜索JavLibrary
-        public async static Task<List<AvModel>> GetSearchJavLibrary(string content)
+        public async static Task<List<AvModel>> GetSearchJavLibrary(string content, IProgress<string> progress)
         {
             List<AvModel> ret = new();
 
@@ -355,7 +355,7 @@ namespace Services
 
                         if (!string.IsNullOrEmpty(currentResult.fail))
                         {
-                            LogHelper.Info($"<=======有失败的URL -> {currentResult.fail}=======>");
+                            progress.Report($"<=======有失败的URL -> {currentResult.fail}=======>");
                         }
 
                         if (totalPage > 0 && currentResult.successList != null && currentResult.successList.Count > 0)
@@ -407,6 +407,196 @@ namespace Services
         //{
         //    return await new JavLibraryDAL().InsertAvMapping(avId, model.Id, model.Type);
         //}
+
+        public static void ScanJavLibraryAllUrlsAndSave(IProgress<string> progress)
+        {
+            Random ran = new();
+
+            var javLibraryCategories = JavLibraryService.GetJavLibraryCategory().Result;
+
+            Parallel.ForEach(javLibraryCategories, new ParallelOptions { MaxDegreeOfParallelism = 10 }, category =>
+            {
+                var firstPageResult = JavLibraryService.GetJavLibraryListPageInfo(JavLibraryEntryPointType.Category, category.Url, 1).Result;
+
+                var totalPage = firstPageResult.pageCount;
+
+                if (!string.IsNullOrEmpty(firstPageResult.fail))
+                {
+                    progress.Report($"<=======有失败的URL -> {firstPageResult.fail}=======>");
+                }
+
+                if (totalPage > 0 && firstPageResult.successList != null && firstPageResult.successList.Count > 0)
+                {
+                    foreach (var scan in firstPageResult.successList)
+                    {
+                        WebScanCommonService.SaveWebScanUrlModel(scan).Wait();
+                    }
+
+                    for (int i = 2; i <= totalPage; i++)
+                    {
+                        var tempScanResult = JavLibraryService.GetJavLibraryListPageInfo(JavLibraryEntryPointType.Category, category.Url, i).Result;
+
+                        if (!string.IsNullOrEmpty(tempScanResult.fail))
+                        {
+                            progress.Report($"<=======有失败的URL -> {tempScanResult.fail}=======>");
+                        }
+
+                        foreach (var scan in tempScanResult.successList)
+                        {
+                            WebScanCommonService.SaveWebScanUrlModel(scan).Wait();
+                        }
+
+                        Task.Delay(ran.Next(50)).Wait();
+                    }
+                }
+            });
+        }
+
+        public static void ScanUrlsOccursError(string file, IProgress<string> progress)
+        {
+            if (File.Exists(file))
+            {
+                StreamReader sr = new(file);
+
+                while (!sr.EndOfStream)
+                {
+                    var temp = sr.ReadLine();
+
+                    if (temp.StartsWith(" -- <=======有失败的URL -> "))
+                    {
+                        temp = temp.Replace(" -- <=======有失败的URL -> ", "").Replace("=======>", "").Trim();
+
+                        var tempScanResult = JavLibraryService.GetJavLibraryListPageInfo(JavLibraryEntryPointType.Other, temp, 0, true).Result;
+
+                        if (!string.IsNullOrEmpty(tempScanResult.fail))
+                        {
+                            progress.Report($"<=======有失败的URL -> {tempScanResult.fail}=======>");
+                        }
+
+                        foreach (var scan in tempScanResult.successList)
+                        {
+                            WebScanCommonService.SaveWebScanUrlModel(scan).Wait();
+                        }
+                    }
+                }
+
+                sr.Close();
+            }
+        }
+
+        public async static Task<int> DownloadJavLibraryDetailAndSavePictureFromWebScanUrl(List<WebScanUrlModel> waitForDownload, IProgress<string> progress)
+        {
+            int ret = 0;
+
+            var random = new Random();
+
+            var imageFolder = SettingService.GetSetting().Result.JavLibraryImageFolder;
+
+            if (!Directory.Exists(imageFolder))
+            {
+                Directory.CreateDirectory(imageFolder);
+            }
+
+            await Task.Run(() => Parallel.ForEach(waitForDownload, new ParallelOptions { MaxDegreeOfParallelism = 10 }, toBeDownload =>
+            {
+                var avModelScan = JavLibraryService.GetJavLibraryDetailPageInfo(toBeDownload.URL).Result;
+
+                if (avModelScan.exception == null && avModelScan.avModel != null)
+                {
+                    var result = 0;
+                    try
+                    {
+                        result = JavLibraryService.SaveJavLibraryAvModel(avModelScan.avModel).Result;
+                    }
+                    catch (Exception)
+                    {
+                        progress.Report($"<=====获取 {toBeDownload.URL} 失败=====>");
+                    }
+
+                    JavLibraryService.SaveCommonJavLibraryModel(avModelScan.infos).Wait();
+
+                    if (result > 0)
+                    {
+                        ret++;
+                        JavLibraryService.UpdateJavLibraryScanDownloadState(toBeDownload.Id, true).Wait();
+                    }
+
+                    var picFile = imageFolder + "\\" + avModelScan.avModel.FileNameWithoutExtension + ".jpg";
+
+                    if (!string.IsNullOrWhiteSpace(avModelScan.avModel.PicUrl) && !File.Exists(picFile))
+                    {
+                        try
+                        {
+                            new WebClient().DownloadFile(avModelScan.avModel.PicUrl, picFile);
+                        }
+                        catch (Exception)
+                        {
+                            progress.Report($"<=====下载图片 {avModelScan.avModel.PicUrl} 失败=====>");
+                        }
+                    }
+                }
+                else
+                {
+                    progress.Report($"<=====获取 {toBeDownload.URL} 失败=====>");
+                }
+
+                Task.Delay(random.Next(50)).Wait();
+            }));
+
+            return ret;
+        }
+
+        public async static Task<List<WebScanUrlModel>> GetJavLibraryWebScanUrlMode(JavLibraryEntryPointType entry, int pages, string url, bool useExactPassin, IProgress<string> progress)
+        {
+            List<WebScanUrlModel> scans = new();
+
+            var firstPageResult = JavLibraryService.GetJavLibraryListPageInfo(entry, url, 1, useExactPassin).Result;
+            var totalPage = firstPageResult.pageCount;
+
+            List<int> pageRange = new();
+
+            if (pages <= -1)
+            {
+                for (int i = 1; i <= totalPage; i++)
+                {
+                    pageRange.Add(i);
+                }
+            }
+            else
+            {
+                for (int i = 1; i <= pages && i <= totalPage; i++)
+                {
+                    pageRange.Add(i);
+                }
+            }
+
+            await Task.Run(() => Parallel.ForEach(pageRange, new ParallelOptions { MaxDegreeOfParallelism = 10 }, i =>
+            {
+                var currentResult = JavLibraryService.GetJavLibraryListPageInfo(entry, url, i, useExactPassin).Result;
+
+                if (!string.IsNullOrEmpty(currentResult.fail))
+                {
+                    progress.Report($"<=======有失败的URL -> {currentResult.fail}=======>");
+                }
+
+                if (totalPage > 0 && currentResult.successList != null && currentResult.successList.Count > 0)
+                {
+                    foreach (var scan in currentResult.successList)
+                    {
+                        var id = WebScanCommonService.SaveWebScanUrlModel(scan).Result;
+
+                        if (id > 0)
+                        {
+                            scan.Id = id;
+
+                            scans.Add(scan);
+                        }
+                    }
+                }
+            }));
+
+            return scans;
+        }
         #endregion
 
         #region 内部使用

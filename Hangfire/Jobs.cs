@@ -33,46 +33,9 @@ namespace Hangfire
             DateTime startTime = DateTime.Now;
             NoticeService.SendBarkNotice(SettingService.GetSetting().Result.BarkId, "开始处理扫描全部Urls");
 
-            Random ran = new();
-
-            var javLibraryCategories = JavLibraryService.GetJavLibraryCategory().Result;
-
-            Parallel.ForEach(javLibraryCategories, new ParallelOptions { MaxDegreeOfParallelism = 10 }, category =>
-            {
-                var firstPageResult = JavLibraryService.GetJavLibraryListPageInfo(JavLibraryEntryPointType.Category, category.Url, 1).Result;
-
-                var totalPage = firstPageResult.pageCount;
-
-                if (!string.IsNullOrEmpty(firstPageResult.fail))
-                {
-                    LogHelper.Info($"<=======有失败的URL -> {firstPageResult.fail}=======>");
-                }
-
-                if (totalPage > 0 && firstPageResult.successList != null && firstPageResult.successList.Count > 0)
-                {
-                    foreach (var scan in firstPageResult.successList)
-                    {
-                        WebScanCommonService.SaveWebScanUrlModel(scan).Wait();
-                    }
-
-                    for (int i = 2; i <= totalPage; i++)
-                    {
-                        var tempScanResult = JavLibraryService.GetJavLibraryListPageInfo(JavLibraryEntryPointType.Category, category.Url, i).Result;
-
-                        if (!string.IsNullOrEmpty(tempScanResult.fail))
-                        {
-                            LogHelper.Info($"<=======有失败的URL -> {tempScanResult.fail}=======>");
-                        }
-
-                        foreach (var scan in tempScanResult.successList)
-                        {
-                            WebScanCommonService.SaveWebScanUrlModel(scan).Wait();
-                        }
-
-                        Task.Delay(ran.Next(50)).Wait();
-                    }
-                }
-            });
+            Progress<string> progress = new();
+            progress.ProgressChanged += LogInfo;
+            JavLibraryService.ScanJavLibraryAllUrlsAndSave(progress);
 
             NoticeService.SendBarkNotice(SettingService.GetSetting().Result.BarkId, $"处理扫描全部Urls完成，耗时 {(DateTime.Now - startTime).TotalSeconds} 秒");
         }
@@ -84,7 +47,9 @@ namespace Hangfire
             DateTime startTime = DateTime.Now;
             NoticeService.SendBarkNotice(SettingService.GetSetting().Result.BarkId, $"开始处理扫描全部未扫描的AV，共计{waitForDownload.Count}");
 
-            var ret = Helper.DownloadJavLibraryDetailAndSavePicture(waitForDownload).Result;
+            Progress<string> progress = new();
+            progress.ProgressChanged += LogInfo;
+            var ret = JavLibraryService.DownloadJavLibraryDetailAndSavePictureFromWebScanUrl(waitForDownload, progress).Result;
 
             NoticeService.SendBarkNotice(SettingService.GetSetting().Result.BarkId, $"扫描全部未扫描的AV完成，共下载{ret}, 耗时 {(DateTime.Now - startTime).TotalSeconds} 秒");
         }
@@ -94,34 +59,9 @@ namespace Hangfire
             DateTime startTime = DateTime.Now;
             NoticeService.SendBarkNotice(SettingService.GetSetting().Result.BarkId, "开始处理错误丢失URL");
 
-            if (File.Exists(file))
-            {
-                StreamReader sr = new StreamReader(file);
-
-                while (!sr.EndOfStream)
-                {
-                    var temp = sr.ReadLine();
-
-                    if (temp.StartsWith(" -- <=======有失败的URL -> "))
-                    {
-                        temp = temp.Replace(" -- <=======有失败的URL -> ", "").Replace("=======>", "").Trim();
-
-                        var tempScanResult = JavLibraryService.GetJavLibraryListPageInfo(JavLibraryEntryPointType.Other, temp, 0, true).Result;
-
-                        if (!string.IsNullOrEmpty(tempScanResult.fail))
-                        {
-                            LogHelper.Info($"<=======有失败的URL -> {tempScanResult.fail}=======>");
-                        }
-
-                        foreach (var scan in tempScanResult.successList)
-                        {
-                            WebScanCommonService.SaveWebScanUrlModel(scan).Wait();
-                        }
-                    }
-                }
-
-                sr.Close();
-            }
+            Progress<string> progress = new();
+            progress.ProgressChanged += LogInfo;
+            JavLibraryService.ScanUrlsOccursError(file, progress);
 
             NoticeService.SendBarkNotice(SettingService.GetSetting().Result.BarkId, $"处理错误丢失URL完成，耗时 {(DateTime.Now - startTime).TotalSeconds} 秒");
         }
@@ -131,11 +71,20 @@ namespace Hangfire
             DateTime startTime = DateTime.Now;
             NoticeService.SendBarkNotice(SettingService.GetSetting().Result.BarkId, $"开始处理最新更新Urls {pages} 页");
 
-            var scans = Helper.GetJavLibraryWebScanUrlMode(entry, pages, url, useExactPassin).Result;
+            Progress<string> progress = new();
+            progress.ProgressChanged += LogInfo;
 
-            var ret = Helper.DownloadJavLibraryDetailAndSavePicture(scans).Result;
+            var scans = JavLibraryService.GetJavLibraryWebScanUrlMode(entry, pages, url, useExactPassin, progress).Result;
+
+            var ret = JavLibraryService.DownloadJavLibraryDetailAndSavePictureFromWebScanUrl(scans, progress).Result;
 
             NoticeService.SendBarkNotice(SettingService.GetSetting().Result.BarkId, $"开始处理最新更新Urls完成 {pages} 页，共下载{ret}, 耗时 {(DateTime.Now - startTime).TotalSeconds} 秒");
         }
+
+        private static void LogInfo(object sender, string e)
+        {
+            LogHelper.Info(e);
+        }
+
     }
 }

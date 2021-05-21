@@ -89,7 +89,8 @@ namespace WebMVC.Controllers
         [HttpPost]
         public async Task<JsonResult> GetJavLibrarySearchResult([FromBody] string content)
         {
-            var ret = await JavLibraryService.GetSearchJavLibrary(content);
+            Progress<string> progress = new();
+            var ret = await JavLibraryService.GetSearchJavLibrary(content, progress);
 
             foreach (var av in ret)
             {
