@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using DAL;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Models;
 using Services;
 using System;
 using System.Collections.Generic;
@@ -76,6 +78,41 @@ namespace WebMVC.Controllers
             var ret = LocalService.GetPossibleAvNameAndInfo(fileName);
 
             return Json(ret);
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> GetJavLibrarySearchResult([FromBody] string content)
+        {
+            var ret = await JavLibraryService.GetSearchJavLibrary(content);
+
+            foreach (var av in ret)
+            {
+                JavLibraryService.SaveCommonJavLibraryModel(JsonHelper.Deserialize<List<CommonModel>>(av.Infos)).Wait();
+                var id = await JavLibraryService.SaveJavLibraryAvModel(av);
+
+                if (id > 0)
+                {
+                    av.Id = id;
+                }
+                else
+                {
+                    av.Id = new JavLibraryDAL().GetAvModelByWhere($" AND Url = '{av.Url}'").Result.FirstOrDefault().Id;
+                }
+            }
+
+            return Json(ret);
+        }
+
+        [HttpPost]
+        public ManualRenameResultModel ManualRename([FromBody] ManualRenameModel model)
+        {
+            ManualRenameResultModel ret = new();
+
+            var res = LocalService.ManualRemove(model);
+
+            ret.status = res ? Status.Ok : Status.Error;
+
+            return ret;
         }
     }
 }

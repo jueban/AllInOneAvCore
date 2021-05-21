@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using static Utils.Win32;
 
 namespace Utils
 {
@@ -166,6 +167,119 @@ namespace Utils
             }
 
             return "";
+        }
+
+        public static int TransferFileUsingSystem(List<string> from, string to, bool isMove = false, bool showAlert = true)
+        {
+            if (from == null || from.Count <= 0 || to == null || string.IsNullOrEmpty(to))
+            {
+                return -1;
+            }
+
+            string fromStr = "";
+            string toStr = "";
+
+            foreach (var file in from)
+            {
+                fromStr += file + "\0";
+            }
+
+            toStr = to + "\0";
+
+            if (string.IsNullOrEmpty(fromStr) || string.IsNullOrEmpty(toStr))
+            {
+                return -2;
+            }
+
+            FILEOP_FLAGS flags = Win32.FILEOP_FLAGS.FOF_FILESONLY | Win32.FILEOP_FLAGS.FOF_ALLOWUNDO;
+            if (!showAlert)
+            {
+                flags |= Win32.FILEOP_FLAGS.FOF_RENAMEONCOLLISION;
+                flags |= Win32.FILEOP_FLAGS.FOF_NOCONFIRMATION;
+            }
+
+            Win32.SHFILEOPSTRUCT op = new Win32.SHFILEOPSTRUCT();
+            op.hwnd = IntPtr.Zero;
+            op.wFunc = isMove ? FileFuncFlags.FO_MOVE : FileFuncFlags.FO_COPY;
+            op.pFrom = fromStr;
+            op.pTo = toStr;
+            op.hNameMappings = IntPtr.Zero;
+            op.fFlags = flags;
+            op.fAnyOperationsAborted = false;
+            int ret = Win32.SHFileOperation(ref op);
+
+            return ret;
+        }
+
+        public static int RenameAndTransferUsingSystem(string from, string to, bool isMove = false, bool showAlert = true)
+        {
+            if (string.IsNullOrEmpty(from) || string.IsNullOrEmpty(to))
+            {
+                return -1;
+            }
+
+            string fromStr = "";
+            string toStr = "";
+
+            fromStr = from + "\0";
+
+            toStr = to + "\0";
+
+            if (string.IsNullOrEmpty(fromStr) || string.IsNullOrEmpty(toStr))
+            {
+                return -2;
+            }
+
+            FILEOP_FLAGS flags = Win32.FILEOP_FLAGS.FOF_FILESONLY | Win32.FILEOP_FLAGS.FOF_ALLOWUNDO;
+            if (!showAlert)
+            {
+                flags |= Win32.FILEOP_FLAGS.FOF_RENAMEONCOLLISION;
+                flags |= Win32.FILEOP_FLAGS.FOF_NOCONFIRMATION;
+            }
+
+            Win32.SHFILEOPSTRUCT op = new Win32.SHFILEOPSTRUCT();
+            op.hwnd = IntPtr.Zero;
+            op.wFunc = isMove ? FileFuncFlags.FO_MOVE : FileFuncFlags.FO_COPY;
+            op.pFrom = fromStr;
+            op.pTo = toStr;
+            op.hNameMappings = IntPtr.Zero;
+            op.fFlags = flags;
+            op.fAnyOperationsAborted = false;
+            int ret = Win32.SHFileOperation(ref op);
+
+            return ret;
+        }
+
+        public static int FileRenameUsingSystem(string from, string to)
+        {
+            if (string.IsNullOrEmpty(from) || string.IsNullOrEmpty(to))
+            {
+                return -1;
+            }
+
+            string fromStr = "";
+            string toStr = "";
+
+            fromStr = from + "\0";
+
+            toStr = to + "\0";
+
+            if (string.IsNullOrEmpty(fromStr) || string.IsNullOrEmpty(toStr))
+            {
+                return -2;
+            }
+
+            Win32.SHFILEOPSTRUCT op = new Win32.SHFILEOPSTRUCT();
+            op.hwnd = IntPtr.Zero;
+            op.wFunc = FileFuncFlags.FO_RENAME;
+            op.pFrom = fromStr;
+            op.pTo = toStr;
+            op.hNameMappings = IntPtr.Zero;
+            op.fFlags = Win32.FILEOP_FLAGS.FOF_RENAMEONCOLLISION | Win32.FILEOP_FLAGS.FOF_FILESONLY | Win32.FILEOP_FLAGS.FOF_ALLOWUNDO | Win32.FILEOP_FLAGS.FOF_NOCONFIRMATION;
+            op.fAnyOperationsAborted = false;
+            int ret = Win32.SHFileOperation(ref op);
+
+            return ret;
         }
     }
 

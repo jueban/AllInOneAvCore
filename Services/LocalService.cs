@@ -484,5 +484,86 @@ namespace Services
 
             return ret;
         }
+
+        public static bool ManualRemove(ManualRenameModel model)
+        {
+            bool ret = false;
+
+            var di = new FileInfo(model.moveFile);
+
+            var targetFolder = CreateNeededFolder(model.rootFolder, model.location);
+            targetFolder = targetFolder.EndsWith("\\") ? targetFolder : targetFolder + "\\";
+
+            var av = new JavLibraryDAL().GetAvModelById(model.avDbId).Result;
+
+            if (av != null)
+            {
+                var targetfile = GenerateTagetFileName(targetFolder, di.Extension, av, model);
+
+                var res = FileUtility.RenameAndTransferUsingSystem(model.moveFile, targetfile, true, false);
+
+                if (res == 0)
+                {
+                    ret = true;
+                }
+            }
+
+            return ret;
+        }
+        public static string GenerateTagetFileName(string targetFolder, string extension, AvModel av, ManualRenameModel model)
+        {
+            var ret = targetFolder + av.AvId + "-" + av.Name;
+
+            if (model.episode > 0)
+            {
+                ret += "-" + model.episode;
+            }
+
+            if (model.language == RenamneLanguage.Chinese)
+            {
+                ret += "-C";
+            }
+
+            return ret + extension;
+        }
+
+        public static string CreateNeededFolder(string currentFolder, RenameLocation location)
+        {
+            currentFolder = (currentFolder.EndsWith("\\") || currentFolder.EndsWith("/")) ? currentFolder : currentFolder + "\\";
+            var ret = "";
+
+            switch (location)
+            {
+                case RenameLocation.Fin:
+                    ret = CreateFolder(currentFolder + @"fin\");
+                    break;
+                case RenameLocation.Notfound:
+                    ret = CreateFolder(currentFolder + @"未找到\");
+                    break;
+                case RenameLocation.Uncensor:
+                    ret = CreateFolder(currentFolder + @"无码\");
+                    break;
+                case RenameLocation.US:
+                    ret = CreateFolder(currentFolder + @"欧美\");
+                    break;
+                case RenameLocation.VR:
+                    ret = CreateFolder(currentFolder + @"VR\");
+                    break;
+            }
+
+            return ret;
+        }
+
+        private static string CreateFolder(string folder)
+        {
+            if (!Directory.Exists(folder))
+            {
+                return Directory.CreateDirectory(folder).FullName;
+            }
+            else
+            {
+                return folder;
+            }
+        }
     }
 }

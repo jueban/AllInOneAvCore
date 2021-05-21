@@ -9,6 +9,7 @@
 </head>
 
 <body>
+    <span style="display:none" id="folder">@ViewData["Folder"]</span>
     <span style="display:none" id="url">/Local/GetFilesInFolder?folder=@ViewData["Folder"]</span>
     <span style="display:none" id="language">0</span>
     <span style="display:none" id="episode">0</span>
@@ -65,17 +66,40 @@
                     </div>
                 </div>
                 <a href="javascript:refresh();" class="btn btn-info" type="button">刷新</a>
-                <a href="#" class="btn btn-success" type="button">移动</a>
+                <a href="javascript:confirm();" class="btn btn-success" type="button">移动</a>
             </div>
-            <input type="text" class="form-control content-list" value="">
+            <input type="text" class="form-control content-list" value="" id="searchContent">
             <div class="input-group-append">
-                <a href="Local/RemoveFolder?folder=" class="btn btn-info" type="button">搜索</a>
+                <a href="javascript:search();" class="btn btn-info" type="button">搜索</a>
             </div>
         </div>
 
         <div class="container-fluid" style="position:absolute;margin-top:78px">
             <div class="row row-cols-5" id="avs">
 
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style="display:none"> 
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">搜索列表</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="row row-cols-3" id="modalContent">
+
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">确认</button>
+                </div>
             </div>
         </div>
     </div>
@@ -98,24 +122,109 @@
         function showAv(avs) {
             $("#avs").empty();
             $(avs).each(function () {
-                $("#avs").append('<div class="col"><div class= "card border-info mb-3" style="max-width: 18rem;"><img src="' + this.picUrl + '" class="card-img-top" alt="..."><div class="card-header">' + (this.avId + "-" + this.name) + '</div></div></div>')
+                $("#avs").append('<div class="col"><div class= "card border-info mb-3" style="max-width: 18rem;" data-id=' + this.id + '><img src="' + this.picUrl + '" class="card-img-top" alt="..."><div class="card-header">' + (this.avId + "-" + this.name) + '</div></div></div>')
             });
         }
 
-        //TODO
-        function refresh(name) {
-            $.ajax({
-                url: "/Local/GetPossibleAvNameAndInfo",
-                type: 'post',
-                dataType: 'json',
-                contentType: 'application/json',
-                data: JSON.stringify(name),
-                async: true,
-                success: function (data) {
-                    $("#finalFileName").val(data.result.item1);
-                    showAv(data.result.item2);
-                }
+        function addSearch(avs) {
+            $("#modalContent").empty();
+            $(avs).each(function () {
+                $("#modalContent").append('<div class="col"><div class= "card border-info mb-3" style="max-width: 18rem;" data-id=' + this.id + '><img src="' + this.picUrl + '" class="card-img-top" alt="..."><div class="card-header">' + (this.avId + "-" + this.name) + '</div></div></div>')
             });
+        }
+
+        function confirm() {
+            var language = $("#language").text();
+            var episode = $("#episode").text();
+            var location = $("#location").text();
+
+            var selectedAv = $(".activeAv:first").data("id");
+            var currentFolder = $("#folder").text();
+            var currentFile = $("#currentFileName").text();
+
+            if (language == '' || episode == '' || location == '' || selectedAv == '' || currentFolder == '' || currentFile == '') {
+                alert("有信息错误!");
+                return
+            } else {
+
+                var model = { "location": location, "episode": episode, "language": language, "rootFolder": currentFolder, "moveFile": currentFile, "avDbId": selectedAv }
+
+                $.ajax({
+                    url: "/Local/ManualRename",
+                    type: 'post',
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    data: JSON.stringify(model),
+                    async: true,
+                    success: function (data) {
+                        if (data.status == 0) {
+                            moveToNext();
+                        }
+                    }
+                });
+            }
+        }
+
+        $("body").on('click', ".card", function () {
+            $(".card").css('background-color', '');
+            $(".card").removeClass('activeAv');
+            $(this).css('background-color', 'grey');
+            $(this).addClass('activeAv');
+        });
+
+        function moveToNext() {
+            var current = $(".renameFile.active:first");
+            var next = current.next();
+            current.remove();
+            next.click();
+        }
+
+        function search() {
+            var content = $("#searchContent").val();
+
+            if (content != undefined && content != "") {
+                $.ajax({
+                    url: "/Local/GetJavLibrarySearchResult",
+                    type: 'post',
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    data: JSON.stringify(content),
+                    async: true,
+                    success: function (data) {
+                        addSearch(data);
+                        $('#modal').modal('show');
+                    }
+                });
+            }
+
+
+        }
+
+        function refresh() {
+            var name = $("#currentFileName").text();
+
+            $("#localtion").text("0");
+            $("#episode").text("0");
+            $("#language").text("0");
+
+            $("#localtionDrop").text("位置");
+            $("#episodeDrop").text("序号");
+            $("#languageDrop").text("语言");
+
+            if (name != undefined && name != "") {
+                $.ajax({
+                    url: "/Local/GetPossibleAvNameAndInfo",
+                    type: 'post',
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    data: JSON.stringify(name),
+                    async: true,
+                    success: function (data) {
+                        $("#finalFileName").val(data.result.item1);
+                        showAv(data.result.item2);
+                    }
+                });
+            }
         }
 
         $(".location").on("click", function () {
@@ -139,7 +248,7 @@
             $(this).siblings().removeClass("active");
             $(this).addClass("active");
 
-            refresh($(this).data("fullname"));
+            refresh();
         });
     </script>
 </body>

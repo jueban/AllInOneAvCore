@@ -43,7 +43,8 @@ namespace InitProject
                 JavBusImageFolder = "E:\\JavBusAvPic\\",
                 AvatorImageFolder = "E:\\AvatorPic\\",
                 AvNameFilter = "国产大片,苍老师强力推荐,有趣的小视频,美女荷官,台湾uu祼聊室,社区最新情报,精彩直播,澳门威尼斯人,澳门银河赌场,在精彩表演,AV在线观看,真人线上百家乐,有趣台妹小视频,裸聊直播,有趣的台湾妹妹直播,美女直播,美女教你搏一搏，单车变摩托,可以指揮表演,美女裸聊,激情裸聊视频,奔驰宝马娱乐城,免费手机看片,乐播传媒,博彩场一,注册免费送,牛逼,超高清手機影城APP快來下載喔,線上影片每天火熱更新中,辣妹裸聊,免费试看",
-                ExcludeFolder = "FIN,TEMPFIN,MoveFiles,New,Keep"
+                ExcludeFolder = "FIN,TEMPFIN,MoveFiles,New,Keep",
+                Win10Duplicate = "Duplicate "
             };
 
             if (!Directory.Exists(settings.JavLibraryImageFolder))

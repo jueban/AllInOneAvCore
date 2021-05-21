@@ -48,8 +48,22 @@ namespace UnitTest
 
             //var av = JavbusService.GetJavBusDetail("https://www.javbus.com/vdd-100").Result;
 
-            var av = new JavLibraryDAL().GetAvModelByWhere($" AND AvId='{"vdd-100"}'").Result;
-            
+            //var av = new JavLibraryDAL().GetAvModelByWhere($" AND AvId='{"vdd-100"}'").Result;
+
+            //var avs = JavLibraryService.GetSearchJavLibrary("vdd-10").Result;
+
+
+            //FileUtility.RenameAndTransferUsingSystem(@"N:\Download\movefiles\fin\DMAT-192-眠る義母 息子に夜●いされて (2).mp4", @"N:\Download\movefiles\DMAT-192-眠る義母 息子に夜●いされて (2).mp4", true);
+
+            LocalService.ManualRemove(new ManualRenameModel() { 
+                avDbId = 268409,
+                episode = 3,
+                language = RenamneLanguage.Chinese,
+                location = RenameLocation.Notfound,
+                moveFile = @"N:\Download\movefiles\hhd800.com@KSBJ-136.mp4",
+                rootFolder = @"N:\Download\movefiles\"
+            });
+
             Console.WriteLine("按任意键退出");
             Console.ReadKey();
         }

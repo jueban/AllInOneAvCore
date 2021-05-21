@@ -16,6 +16,7 @@ namespace Models
         public string AvatorImageFolder { get; set; }
         public string ExcludeFolder { get; set; }
         public string AvNameFilter { get; set; }
+        public string Win10Duplicate { get; set; }
     }
 
     public class JavLibrarySettings

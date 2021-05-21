@@ -215,6 +215,10 @@ namespace Services
                         int.TryParse(pageStr, out lastPage);
                     }
                 }
+                else
+                {
+                    lastPage = 1;
+                }
 
                 if (videoNodes != null)
                 {
@@ -322,6 +326,76 @@ namespace Services
             return ret;
         }
 
+        //搜索JavLibrary
+        public async static Task<List<AvModel>> GetSearchJavLibrary(string content)
+        {
+            List<AvModel> ret = new();
+
+            var url = GetJavLibraryEntryUrl(JavLibraryEntryPointType.Search, content, 1);
+
+            var res = await GetJavLibraryContent(url);
+
+            if (res.exception == null && !string.IsNullOrEmpty(res.content))
+            {
+                if (res.content.Contains("识别码搜寻结果"))
+                {
+                    var firstPageResult = JavLibraryService.GetJavLibraryListPageInfo(JavLibraryEntryPointType.Search, content, 1, false).Result;
+                    var totalPage = firstPageResult.pageCount;
+
+                    List<int> pageRange = new();
+
+                    for (int i = 1; i <= totalPage; i++)
+                    {
+                        pageRange.Add(i);
+                    }
+
+                    await Task.Run(() => Parallel.ForEach(pageRange, new ParallelOptions { MaxDegreeOfParallelism = 10 }, i =>
+                    {
+                        var currentResult = JavLibraryService.GetJavLibraryListPageInfo(JavLibraryEntryPointType.Search, content, i, false).Result;
+
+                        if (!string.IsNullOrEmpty(currentResult.fail))
+                        {
+                            LogHelper.Info($"<=======有失败的URL -> {currentResult.fail}=======>");
+                        }
+
+                        if (totalPage > 0 && currentResult.successList != null && currentResult.successList.Count > 0)
+                        {
+                            foreach (var scan in currentResult.successList)
+                            {
+                                var tempRes = GetJavLibraryContent(scan.URL).Result;
+
+                                if (tempRes.exception == null && !string.IsNullOrEmpty(tempRes.content))
+                                {
+                                    List<CommonModel> infos = new();
+                                    var avModel = GenerateAVModel(tempRes.content, scan.URL, infos);
+                                    avModel.Infos = JsonHelper.SerializeWithUtf8(infos);
+                                    ret.Add(avModel);
+                                }
+                            }
+                        }
+                    }));
+                }
+                else
+                {
+                    HtmlDocument document = new();
+                    document.LoadHtml(res.content);
+
+                    var urlPath = "//link[@rel='shortlink']";
+                    var urlNode = document.DocumentNode.SelectSingleNode(urlPath);
+
+                    if (urlNode != null)
+                    {
+                        List<CommonModel> infos = new();
+                        var avModel = GenerateAVModel(res.content, urlNode.Attributes["href"].Value.Trim(), infos);
+                        avModel.Infos = JsonHelper.SerializeWithUtf8(infos);
+                        ret.Add(avModel);
+                    }
+                }
+            }
+
+            return ret;
+        }
+
         ////删除JavLibrary AV的映射关系
         //public async static Task<int> DeleteJavLibraryAvMapping(int avId)
         //{
@@ -377,6 +451,10 @@ namespace Services
 
                 case JavLibraryEntryPointType.Update:
                     ret = "http://www.javlibrary.com/cn/vl_update.php?&mode=&page=" + page;
+                    break;
+
+                case JavLibraryEntryPointType.Search:
+                    ret = "http://www.javlibrary.com/cn/vl_searchbyid.php?keyword=" + url + "&page=" + page;
                     break;
             }
 
