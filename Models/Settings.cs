@@ -19,6 +19,9 @@ namespace Models
         public string Win10Duplicate { get; set; }
         public string LocalSearchFolder { get; set; }
         public string CannotMergeFileTag { get; set; }
+
+        //Not in setting table
+        public string Prefix { get; set; }
     }
 
     public class JavLibrarySettings
@@ -29,10 +32,5 @@ namespace Models
     public class CommonSettings
     {
         public string ChromeLocation { get; set; }
-    }
-
-    public enum SettingType
-    { 
-        WebConfig = 1,
     }
 }

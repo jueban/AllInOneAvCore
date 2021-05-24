@@ -64,7 +64,9 @@ namespace DAL
         {
             var sql = "SELECT * FROM Prefix";
 
-            return await QueryAsync<string>(sql);
+            var str = await QuerySingleAsync<string>(sql);
+
+            return str.Split(',').ToList();
         }
     }
 }

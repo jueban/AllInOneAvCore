@@ -1,0 +1,177 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - AllInOneAv</title>
+</head>
+
+<body>
+
+    <div id="app">
+        <div class="btn-toolbar mb-3" role="toolbar" aria-label="Toolbar with button groups">
+            <div class="btn-group mr-2" role="group" aria-label="First group">
+                <button type="button" class="btn btn-success" v-on:click="saveSetting">保存</button>
+            </div>
+            <div class="btn-group" role="group" aria-label="Third group">
+                <button type="button" class="btn btn-info" v-on:click="getDefault">默认</button>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header bg-info">
+                通用设置
+            </div>
+            <div class="card-body">
+                <div class="input-group">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Chrome位置</span>
+                        </div>
+                        <input type="text" class="form-control" v-model="settings.commonSettings.chromeLocation">
+                    </div>
+
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Bark通知Id</span>
+                        </div>
+                        <input type="text" class="form-control" v-model="settings.barkId">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header bg-info">
+                JavLibrary设置
+            </div>
+            <div class="card-body">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text">Cookie获取模式</label>
+                    </div>
+                    <select class="custom-select" v-model="settings.javLibrarySettings.cookieMode">
+                        <option value="0">Easy</option>
+                        <option value="1">MockBroswer</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header bg-info">
+                本地相关设置
+            </div>
+            <div class="card-body">
+                <div class="input-group">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">JavLibrary封面文件夹</span>
+                        </div>
+                        <input type="text" class="form-control" v-model="settings.javLibraryImageFolder">
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">JavBus封面文件夹</span>
+                        </div>
+                        <input type="text" class="form-control" v-model="settings.javBusImageFolder">
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">女优头像文件夹</span>
+                        </div>
+                        <input type="text" class="form-control" v-model="settings.avatorImageFolder">
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">扫描排除文件夹</span>
+                        </div>
+                        <input type="text" class="form-control" v-model="settings.excludeFolder">
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">扫描文件名黑名单</span>
+                        </div>
+                        <textarea class="form-control" v-model="settings.avNameFilter"></textarea>
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">系统重命名重复模板</span>
+                        </div>
+                        <input type="text" class="form-control" v-model="settings.win10Duplicate">
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">本地扫描文件夹模板</span>
+                        </div>
+                        <input type="text" class="form-control" v-model="settings.localSearchFolder">
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">不能合并文件后缀</span>
+                        </div>
+                        <input type="text" class="form-control" v-model="settings.cannotMergeFileTag">
+                    </div>
+
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">AV前缀设置</span>
+                        </div>
+                        <textarea class="form-control" v-model="settings.prefix"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data: {
+                settings: {}
+            },
+            mounted: function () {
+                this.getSetting();
+            },
+            methods: {
+                getSetting: function () {
+                    var vm = this;
+
+                    $.ajax({ url: "/Setting/GetSettingData", method: "GET", async: true })
+                        .done(function (data) {
+                            vm.settings = data;
+                        });
+                },
+                getDefault: function () {
+                    var vm = this;
+
+                    $.ajax({ url: "/Setting/GetDefaultSetting", method: "GET", async: false })
+                        .done(function (data) {
+                            vm.settings = data;
+                        });
+                },
+                saveSetting: function () {
+                    var vm = this;
+
+                    $.ajax({ url: "/Setting/SaveSettingData", method: "POST", async: false, contentType: "application/json", dataType:"json", data: JSON.stringify(vm.settings) })
+                        .done(function (data) {
+                            if (data.status == 0) {
+                                alert(data.msg);
+                                window.location.reload();
+                            } else {
+                                alert('保存失败');
+                            }
+                        });
+                }
+            }
+        })
+    </script>
+</body>
+</html>
