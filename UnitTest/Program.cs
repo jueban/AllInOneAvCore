@@ -55,7 +55,9 @@ namespace UnitTest
 
             //FileUtility.RenameAndTransferUsingSystem(@"N:\Download\movefiles\fin\DMAT-192-眠る義母 息子に夜●いされて (2).mp4", @"N:\Download\movefiles\DMAT-192-眠る義母 息子に夜●いされて (2).mp4", true);
 
-            var ret = JavbusService.GetListPageName("https://www.javbus.com/search/vdd&type=&parent=ce").Result;
+            var res = MagnetUrlService.GetFaviUrl("http://www.javlibrary.com/cn/vl_star.php?&mode=&s=ae3so&page=4").Result;
+
+            MagnetUrlService.SaveFaviUrl(res).Wait();
 
             Console.WriteLine("按任意键退出");
             Console.ReadKey();

@@ -35,12 +35,14 @@
         });
 
         function save() {
-            $.ajax({ url: "/Scan/SaveFaviUrl?url=" + $("#url").val(), method: "GET", async: true })
+            $.ajax({ url: "/Scan/SaveFaviUrl?url=" + encodeURIComponent($("#url").val()), method: "GET", async: true })
                 .done(function (data) {
                     if (data.status == 0) {
                         $("#content").empty();
                         $("#content").append("添加" + data.msg + "成功");
                         $('#liveToast').toast('show');
+
+                        $("#url").val("");
                     } else {
                         alert("保存失败");
                     }
