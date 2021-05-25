@@ -1,0 +1,34 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Utils;
+
+namespace Models
+{
+    public class ScanResult
+    {
+        public int Id { get; set; }
+        public SearchSeedSiteEnum Site { get; set; }
+        public DateTime StartTime { get; set; }
+        public string Url { get; set; }
+        public string MagUrl { get; set; }
+        public string Name { get; set; }
+
+        public List<SeedMagnetSearchModel> MagUrlObj
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(this.MagUrl))
+                {
+                    return JsonHelper.Deserialize<List<SeedMagnetSearchModel>>(this.MagUrl);
+                }
+                else
+                {
+                    return new List<SeedMagnetSearchModel>();
+                }
+            }
+        }
+    }
+}

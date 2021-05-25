@@ -18,5 +18,9 @@ namespace Models
         Actress = 4,
         Detail = 5,
         Passin = 6,
+        Director = 7,
+        Company = 8,
+        publisher = 9,
+        Series = 10
     }
 }

@@ -550,8 +550,12 @@ namespace Services
         {
             List<WebScanUrlModel> scans = new();
 
+            Random ran = new();
+
             var firstPageResult = JavLibraryService.GetJavLibraryListPageInfo(entry, url, 1, useExactPassin).Result;
             var totalPage = firstPageResult.pageCount;
+
+            progress.Report($"一共有 {totalPage} 页");
 
             List<int> pageRange = new();
 
@@ -572,6 +576,8 @@ namespace Services
 
             await Task.Run(() => Parallel.ForEach(pageRange, new ParallelOptions { MaxDegreeOfParallelism = 10 }, i =>
             {
+                progress.Report($"正在扫描第 {i} 页");
+
                 var currentResult = JavLibraryService.GetJavLibraryListPageInfo(entry, url, i, useExactPassin).Result;
 
                 if (!string.IsNullOrEmpty(currentResult.fail))
@@ -593,6 +599,8 @@ namespace Services
                         }
                     }
                 }
+
+                Task.Delay(ran.Next(50));
             }));
 
             return scans;
@@ -645,6 +653,10 @@ namespace Services
 
                 case JavLibraryEntryPointType.Search:
                     ret = "http://www.javlibrary.com/cn/vl_searchbyid.php?keyword=" + url + "&page=" + page;
+                    break;
+
+                case JavLibraryEntryPointType.Scan:
+                    ret = url + "&page=" + page;
                     break;
             }
 

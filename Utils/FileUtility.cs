@@ -281,6 +281,65 @@ namespace Utils
 
             return ret;
         }
+
+        public static double GetFileSizeFromString(string str)
+        {
+            double ret = 0;
+            str = str.ToLower();
+
+            if (str.Contains("mb") || str.Contains("mib"))
+            {
+                str = str.Replace("mb", "").Replace("mib", "");
+
+                if (str.Contains("."))
+                {
+                    var strArray = str.Split('.');
+
+                    ret += double.Parse(strArray[0]) * 1024 * 1024;
+
+                    var littleAttar = strArray[1].Trim().ToCharArray();
+                    int index = 100;
+
+                    foreach (var c in littleAttar)
+                    {
+                        ret += double.Parse(c.ToString()) * index * 1024;
+
+                        index /= 10;
+                    }
+                }
+                else
+                {
+                    ret += double.Parse(str) * 1024 * 1024;
+                }
+            }
+            else if (str.Contains("gb") || str.Contains("gib"))
+            {
+                str = str.Replace("gb", "").Replace("gib", "");
+
+                if (str.Contains("."))
+                {
+                    var strArray = str.Split('.');
+
+                    ret += double.Parse(strArray[0]) * 1024 * 1024 * 1024;
+
+                    var littleAttar = strArray[1].Trim().ToCharArray();
+                    int index = 100;
+
+                    foreach (var c in littleAttar)
+                    {
+                        ret += double.Parse(c.ToString()) * index * 1024 * 1024;
+
+                        index /= 10;
+                    }
+                }
+                else
+                {
+                    ret += double.Parse(str) * 1024 * 1024 * 1024;
+                }
+            }
+
+            return ret;
+        }
     }
 
     public static class ProcessExtensions

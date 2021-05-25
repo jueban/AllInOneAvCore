@@ -18,7 +18,7 @@ namespace Services
         private static readonly string DefaultUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36";
         private static readonly string JavBusIndexUrl = "https://www.javbus.com/";
 
-        public async static Task<(CookieContainer, string)> GetJavBusCookie()
+        public static (CookieContainer, string) GetJavBusCookie()
         {
             return new(new CookieContainer(), DefaultUserAgent);
         }
@@ -136,11 +136,11 @@ namespace Services
             return ret;
         }
 
-        public async static Task<(List<WebScanUrlModel> success, List<string> fails)> GetJavBusList(JavBusEntryPointType entry, string url, int page, bool magOnly = false)
+        public async static Task<(List<WebScanUrlModel> success, List<string> fails)> GetJavBusList(JavBusEntryPointType entry, string url, int page, IProgress<string> progress, bool magOnly = false)
         {
             (List<WebScanUrlModel> success, List<string> fails) ret = new();
-            List<WebScanUrlModel> retList = new List<WebScanUrlModel>();
-            List<string> failList = new List<string>();
+            List<WebScanUrlModel> retList = new();
+            List<string> failList = new();
             var lastPage = false;
             int currentIndex = 1;
 
@@ -153,7 +153,7 @@ namespace Services
             {
                 if (res.exception == null && !string.IsNullOrEmpty(res.content))
                 {
-                    Console.WriteLine($"获取 {url} 的第{currentIndex} 成功");
+                    progress.Report($"获取 {url} 的第{currentIndex}页 成功");
 
                     HtmlDocument document = new();
                     document.LoadHtml(res.content);
@@ -163,6 +163,8 @@ namespace Services
                     var avImgPath = ".//img";
 
                     var avListNodes = document.DocumentNode.SelectNodes(avListPath);
+
+                    progress.Report($"{url} 第 {currentIndex} 页共有 {avListNodes.Count} 个AV");
 
                     foreach (var av in avListNodes)
                     {
@@ -239,7 +241,7 @@ namespace Services
                     break;
 
                 case JavBusEntryPointType.Actress:
-                    ret = JavBusIndexUrl + "actresses/" + page;
+                    ret = JavBusIndexUrl + "actresses/" + content + "/" + page;
                     break;
 
                 case JavBusEntryPointType.Detail:
@@ -248,6 +250,18 @@ namespace Services
 
                 case JavBusEntryPointType.Passin:
                     ret = content + "/" + page;
+                    break;
+
+                case JavBusEntryPointType.Director:
+                    ret = JavBusIndexUrl + "director/" + content + "/" + page;
+                    break;
+
+                case JavBusEntryPointType.Company:
+                    ret = JavBusIndexUrl + "studio/" + content + "/" + page;
+                    break;
+
+                case JavBusEntryPointType.publisher:
+                    ret = JavBusIndexUrl + "label/" + content + "/" + page;
                     break;
             }
 
@@ -258,7 +272,7 @@ namespace Services
         private async static Task<(Exception exception, string content, bool lastPage)> GetJavBusContent(string url, bool magOnly = false)
         {
             (Exception, string, bool) ret = new();
-            var cookie = await GetJavBusCookie();
+            var cookie = GetJavBusCookie();
             Exception exception = null;
             string content = "";
 

@@ -14,6 +14,7 @@ namespace UnitTest
 {
     class Program
     {
+        [Obsolete]
         static void Main(string[] args)
         {
             //JavLibraryService.GetJavLibraryCookie().Wait();
@@ -52,15 +53,19 @@ namespace UnitTest
 
             //var avs = JavLibraryService.GetSearchJavLibrary("vdd-10").Result;
 
-
             //FileUtility.RenameAndTransferUsingSystem(@"N:\Download\movefiles\fin\DMAT-192-眠る義母 息子に夜●いされて (2).mp4", @"N:\Download\movefiles\DMAT-192-眠る義母 息子に夜●いされて (2).mp4", true);
 
-            var ret1 = MagnetUrlService.SaveFaviUrl("http://www.javlibrary.com/cn/vl_star.php?&mode=&s=aelqc&page=4");
-
-            new ScanDAL().InsertFavi(ret1.site, ret1.type, ret1.url).Wait();
+            Progress<string> progress = new Progress<string>();
+            progress.ProgressChanged += PrintLog;
+            var ret1 = MagnetUrlService.SearchJavBus(JavBusEntryPointType.Passin, "https://www.javbus.com/series/rmc", 3, "FromUnitTest", false, progress).Result;
 
             Console.WriteLine("按任意键退出");
             Console.ReadKey();
+        }
+
+        private static void PrintLog(object sender, string e)
+        {
+            Console.WriteLine(e);
         }
 
         //测试通过分类信息扫描全部JavLibrary

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,7 +13,7 @@ namespace DAL
         {
         }
 
-        public async Task<int> InsertFavi(WebScanUrlSite site, string type, string url)
+        public async Task<int> InsertFavi(WebScanUrlSite site, int type, string url)
         {
             var sql = @"IF NOT EXISTS (SELECT * FROM ScanFavi WHERE Url = @url)
                             BEGIN
@@ -27,11 +28,47 @@ namespace DAL
             return await ExecuteAsync(sql, new { site, type, url });
         }
 
-        public async Task<List<(WebScanUrlSite site, string type, string url)>> GetFaviByWhere(string where)
+        public async Task<List<(WebScanUrlSite site, int type, string url)>> GetFaviByWhere(string where)
         {
             var sql = @"SELECT * FROM ScanFavi WHERE 1 = 1 " + where;
 
-            return await QueryAsync<(WebScanUrlSite, string, string)>(sql);
+            return await QueryAsync<(WebScanUrlSite, int, string)>(sql);
+        }
+
+        public async Task<int> SaveSeedMagnetSearchModel(ScanResult model)
+        {
+            var sql = @"INSERT INTO ScanResult (StartTime, WebSite, Url, Name, MagUrl) VALUES (@StartTime, @Site, @Url, @Name, @MagUrl);
+                            SELECT @@IDENTITY;";
+
+            return await QuerySingleOrDefaultAsync<int>(sql, model);
+        }
+
+        public async Task<int> UpdateSeedMagnetSearchModel(ScanResult model)
+        {
+            var sql = @"UPDATE ScanResult SET MagUrl = @MagUrl WHERE Id = @Id";
+
+            return await ExecuteAsync(sql, model);
+        }
+
+        public async Task<List<ScanResult>> GetSeedMagnetSearchModelAll()
+        {
+            var sql = @"SELECT * FROM ScanResult";
+
+            return await QueryAsync<ScanResult>(sql);
+        }
+
+        public async Task<ScanResult> GetSeedMagnetSearchModelById(int id)
+        {
+            var sql = @"SELECT * FROM ScanResult WHERE ID = @id";
+
+            return await QuerySingleOrDefaultAsync<ScanResult>(sql, new { id });
+        }
+
+        public async Task<int> DeleteSeedMagnetSearchModelById(int id)
+        {
+            var sql = @"DELETE FROM ScanResult WHERE ID = @id";
+
+            return await ExecuteAsync(sql, new { id });
         }
     }
 }

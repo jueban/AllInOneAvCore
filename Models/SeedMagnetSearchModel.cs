@@ -21,7 +21,8 @@ namespace Models
     public enum SearchSeedSiteEnum
     {
         Btsow = 1,
-        Sukebei = 2,
-        JavBus = 3
+        SukebeiSi = 2,
+        SukebeiPro = 3,
+        JavBus = 4
     }
 }

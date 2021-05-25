@@ -25,6 +25,7 @@ namespace Models
         Update = 8,
         Rank = 9,
         Other = 10,
-        Search = 11
+        Search = 11,
+        Scan = 12,
     }
 }

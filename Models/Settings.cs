@@ -19,6 +19,7 @@ namespace Models
         public string Win10Duplicate { get; set; }
         public string LocalSearchFolder { get; set; }
         public string CannotMergeFileTag { get; set; }
+        public SearchSeedSiteEnum MagSearchSite { get; set; }
 
         //Not in setting table
         public string Prefix { get; set; }
