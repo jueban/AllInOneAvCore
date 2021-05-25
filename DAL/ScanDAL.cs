@@ -13,11 +13,11 @@ namespace DAL
         {
         }
 
-        public async Task<int> InsertFavi(WebScanUrlSite site, int type, string url)
+        public async Task<int> InsertFavi(WebScanUrlSite site, int type, string url, string name)
         {
             var sql = @"IF NOT EXISTS (SELECT * FROM ScanFavi WHERE Url = @url)
                             BEGIN
-                                INSERT INTO ScanFavi (Site, Type, Url) VALUES (@site, @type, @url);
+                                INSERT INTO ScanFavi (Site, Type, Url, name) VALUES (@site, @type, @url, @name);
                                 SELECT @@IDENTITY;
                             END
                         ELSE
@@ -25,7 +25,7 @@ namespace DAL
                                 SELECT 0;
                             END";
 
-            return await ExecuteAsync(sql, new { site, type, url });
+            return await ExecuteAsync(sql, new { site, type, url, name });
         }
 
         public async Task<List<(WebScanUrlSite site, int type, string url)>> GetFaviByWhere(string where)

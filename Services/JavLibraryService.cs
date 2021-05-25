@@ -260,6 +260,30 @@ namespace Services
             return ret;
         }
 
+        public async static Task<string> GetListPageName(string url)
+        {
+            string ret = "";
+
+            var content = await GetJavLibraryContent(url);
+
+            if (content.exception == null && !string.IsNullOrEmpty(content.content))
+            {
+                HtmlDocument document = new();
+                document.LoadHtml(content.content);
+
+                var namePath = "//div[@class='boxtitle']";
+
+                var nameNode = document.DocumentNode.SelectSingleNode(namePath);
+
+                if (nameNode != null)
+                {
+                    ret = nameNode.InnerText.Split(' ')[0].Trim().Replace("&quot;", "").ToUpper();
+                }
+            }
+
+            return ret;
+        }
+
         //获取JavLibrary的详情页信息
         public async static Task<(Exception exception, AvModel avModel, List<CommonModel> infos)> GetJavLibraryDetailPageInfo(string url)
         {

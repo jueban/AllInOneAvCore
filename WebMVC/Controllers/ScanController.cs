@@ -19,7 +19,7 @@ namespace WebMVC.Controllers
         [HttpGet]
         public async Task<WebResult> SaveFaviUrl(string url)
         {
-            var res = MagnetUrlService.GetFaviUrl(url);
+            var res = await MagnetUrlService.GetFaviUrl(url);
 
             await MagnetUrlService.SaveFaviUrl(res);
 

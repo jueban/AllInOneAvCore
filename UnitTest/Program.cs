@@ -55,9 +55,7 @@ namespace UnitTest
 
             //FileUtility.RenameAndTransferUsingSystem(@"N:\Download\movefiles\fin\DMAT-192-眠る義母 息子に夜●いされて (2).mp4", @"N:\Download\movefiles\DMAT-192-眠る義母 息子に夜●いされて (2).mp4", true);
 
-            Progress<string> progress = new Progress<string>();
-            progress.ProgressChanged += PrintLog;
-            var ret1 = MagnetUrlService.SearchJavBus(JavBusEntryPointType.Passin, "https://www.javbus.com/series/rmc", 3, "FromUnitTest", false, progress).Result;
+            var ret = JavbusService.GetListPageName("https://www.javbus.com/search/vdd&type=&parent=ce").Result;
 
             Console.WriteLine("按任意键退出");
             Console.ReadKey();

@@ -220,6 +220,30 @@ namespace Services
             return ret;
         }
 
+        public async static Task<string> GetListPageName(string url)
+        {
+            string ret = "";
+
+            var res = await GetJavBusContent(url, false);
+
+            if(res.exception == null && !string.IsNullOrEmpty(res.content))
+            {
+                HtmlDocument document = new();
+                document.LoadHtml(res.content);
+
+                var namePath = "//div[@class='alert alert-success alert-common']//b";
+
+                var nameNode = document.DocumentNode.SelectSingleNode(namePath);
+
+                if (nameNode != null)
+                {
+                    ret = nameNode.InnerText.Split('-')[0].Trim().ToUpper();
+                }
+            }
+
+            return ret;
+        }
+
         #region 内部使用
         //获取JavLibrary各个入口的Url
         private static string GetJavLibraryEntryUrl(JavBusEntryPointType type, string content, int page)

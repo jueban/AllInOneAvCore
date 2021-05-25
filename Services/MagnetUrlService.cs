@@ -15,27 +15,28 @@ namespace Services
 {
     public class MagnetUrlService
     {
-        public async static Task SaveFaviUrl((WebScanUrlSite site, int type, string url) url)
+        public async static Task SaveFaviUrl((WebScanUrlSite site, int type, string url, string name) url)
         {
-            await new ScanDAL().InsertFavi(url.site, url.type, url.url);
+            await new ScanDAL().InsertFavi(url.site, url.type, url.url, url.name);
         }
 
-        //TODO 需要加入页面的名称供扫描下拉菜单用
-        public static (WebScanUrlSite site, int type, string url) GetFaviUrl(string url)
+        public async static Task<(WebScanUrlSite site, int type, string url, string name)> GetFaviUrl(string url)
         {
             if (url.Contains("javbus.com", StringComparison.OrdinalIgnoreCase))
             {
                 var info = PorcessJavBusUrl(url);
-                return (WebScanUrlSite.JavBus, info.type, info.url);
+                var name = await JavbusService.GetListPageName(url);
+                return (WebScanUrlSite.JavBus, info.type, info.url, name);
             }
 
             if (url.Contains("javlibrary.com", StringComparison.OrdinalIgnoreCase))
             {
                 var info = PorcessJavLibraryUrl(url);
-                return (WebScanUrlSite.JavLibrary, info.type, info.url);
+                var name = await JavLibraryService.GetListPageName(url);
+                return (WebScanUrlSite.JavLibrary, info.type, info.url, name);
             }
 
-            return (WebScanUrlSite.None, -1, "");
+            return (WebScanUrlSite.None, -1, "", "");
         }
 
         public async static Task<List<SeedMagnetSearchModel>> SearchJavLibrary(string url, int page, string name, IProgress<string> progress)
