@@ -57,7 +57,7 @@
                     var vm = this;
 
                     $.ajax({ url: "/Scan/GetJavLibraryData", method: "GET" })
-                        .done(function (data) { vm.drops = data });
+                        .done(function (data) { vm.drops = data; });
                 },
 
                 selectChange: function (item) {

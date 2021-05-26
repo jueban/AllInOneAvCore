@@ -28,4 +28,13 @@ namespace Models
         }
         public string location { get; set; }
     }
+
+    [Flags]
+    public enum FileLocation
+    { 
+        None = 0,
+        Local = 1,
+        OneOneFive = 2,
+        LocalAndOneOneFive = 4
+    }
 }

@@ -25,4 +25,15 @@ namespace Models
         SukebeiPro = 3,
         JavBus = 4
     }
+
+    public class ShowMagnetSearchResult
+    { 
+        public long BiggestSize { get; set; }
+        public FileLocation FileLocation { get; set; }
+        public bool HasChinese { get; set; }
+        public bool HasGreaterSize { get; set; }
+        public AvModel AvModel { get; set; }
+        public List<EverythingFileResult> MatchFiles { get; set; }
+        public List<SeedMagnetSearchModel> Magnets { get; set; }
+    }
 }

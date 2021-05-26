@@ -23,7 +23,7 @@ namespace Services
             return new(new CookieContainer(), DefaultUserAgent);
         }
 
-        public async static Task<int> SaveCommonJavLibraryModel(List<CommonModel> list)
+        public async static Task<int> SaveCommonJavBusModel(List<CommonModel> list)
         {
             int ret = 0;
 
@@ -31,6 +31,13 @@ namespace Services
             {
                 ret += await new JavBusDAL().InsertCommonJavBusModel(l);
             }
+
+            return ret;
+        }
+
+        public async static Task<int> SaveJavBusAvModel(AvModel model)
+        {
+            var ret = await new JavBusDAL().InsertAvModel(model);
 
             return ret;
         }
@@ -208,11 +215,36 @@ namespace Services
             ret.mags = magList;
             AvModel avModel = new();
 
+            var imageFolder = SettingService.GetSetting().Result.JavBusImageFolder;
+
+            if (!Directory.Exists(imageFolder))
+            {
+                Directory.CreateDirectory(imageFolder);
+            }
+
             var res = await GetJavBusContent(url);
 
             if (res.exception == null && !string.IsNullOrEmpty(res.content))
             {
                 avModel = GetJavBusAvModel(res.content);
+                avModel.Url = url;
+
+                await SaveJavBusAvModel(avModel);
+                await SaveCommonJavBusModel(avModel.InfoObj);
+
+                var picFile = imageFolder + "\\" + avModel.FileNameWithoutExtension + ".jpg";
+
+                if (!string.IsNullOrWhiteSpace(avModel.PicUrl) && !File.Exists(picFile))
+                {
+                    try
+                    {
+                        new WebClient().DownloadFile(avModel.PicUrl, picFile);
+                    }
+                    catch (Exception)
+                    {
+                        
+                    }
+                }
             }
 
             ret.avModel = avModel;
@@ -367,72 +399,81 @@ namespace Services
                 ret.Name = FileUtility.ReplaceInvalidChar(FileUtility.FanToJian(avBlockNode.SelectSingleNode(avNamePath).Attributes["title"].Value.Trim()));
                 ret.PicUrl = avBlockNode.SelectSingleNode(avNamePath).Attributes["src"].Value.Trim();
 
-                foreach (var infoNode in infoNodes)
+                if (infoNodes != null)
                 {
-                    switch (infoNode.InnerText)
+                    foreach (var infoNode in infoNodes)
                     {
-                        case "識別碼:":
-                            ret.AvId = infoNode.ParentNode.ChildNodes[2].InnerText.Trim();
-                            break;
-                        case "發行日期:":
-                            ret.ReleaseDate = DateTime.Parse(infoNode.ParentNode.ChildNodes[1].InnerText.Trim());
-                            break;
-                        case "長度:":
-                            ret.AvLength = int.Parse(infoNode.ParentNode.ChildNodes[1].InnerText.Trim().Replace("分鐘", ""));
-                            break;
-                        case "導演:":
-                            infos.Add(new CommonModel
-                            {
-                                Name = FileUtility.ReplaceInvalidChar(FileUtility.FanToJian(infoNode.ParentNode.ChildNodes[2].InnerText.Trim())),
-                                Type = CommonModelType.Director,
-                                Url = infoNode.ParentNode.ChildNodes[2].Attributes["href"].Value.Trim()
-                            });
-                            break;
-                        case "製作商:":
-                            infos.Add(new CommonModel
-                            {
-                                Name = FileUtility.ReplaceInvalidChar(FileUtility.FanToJian(infoNode.ParentNode.ChildNodes[2].InnerText.Trim())),
-                                Type = CommonModelType.Company,
-                                Url = infoNode.ParentNode.ChildNodes[2].Attributes["href"].Value.Trim()
-                            });
-                            break;
-                        case "發行商:":
-                            infos.Add(new CommonModel
-                            {
-                                Name = FileUtility.ReplaceInvalidChar(FileUtility.FanToJian(infoNode.ParentNode.ChildNodes[2].InnerText.Trim())),
-                                Type = CommonModelType.Publisher,
-                                Url = infoNode.ParentNode.ChildNodes[2].Attributes["href"].Value.Trim()
-                            });
-                            break;
-                        case "系列:":
-                            infos.Add(new CommonModel
-                            {
-                                Name = FileUtility.ReplaceInvalidChar(FileUtility.FanToJian(infoNode.ParentNode.ChildNodes[2].InnerText.Trim())),
-                                Type = CommonModelType.Series,
-                                Url = infoNode.ParentNode.ChildNodes[2].Attributes["href"].Value.Trim()
-                            });
-                            break;
+                        switch (infoNode.InnerText)
+                        {
+                            case "識別碼:":
+                                ret.AvId = infoNode.ParentNode.ChildNodes[2].InnerText.Trim();
+                                break;
+                            case "發行日期:":
+                                ret.ReleaseDate = DateTime.Parse(infoNode.ParentNode.ChildNodes[1].InnerText.Trim());
+                                break;
+                            case "長度:":
+                                ret.AvLength = int.Parse(infoNode.ParentNode.ChildNodes[1].InnerText.Trim().Replace("分鐘", ""));
+                                break;
+                            case "導演:":
+                                infos.Add(new CommonModel
+                                {
+                                    Name = FileUtility.ReplaceInvalidChar(FileUtility.FanToJian(infoNode.ParentNode.ChildNodes[2].InnerText.Trim())),
+                                    Type = CommonModelType.Director,
+                                    Url = infoNode.ParentNode.ChildNodes[2].Attributes["href"].Value.Trim()
+                                });
+                                break;
+                            case "製作商:":
+                                infos.Add(new CommonModel
+                                {
+                                    Name = FileUtility.ReplaceInvalidChar(FileUtility.FanToJian(infoNode.ParentNode.ChildNodes[2].InnerText.Trim())),
+                                    Type = CommonModelType.Company,
+                                    Url = infoNode.ParentNode.ChildNodes[2].Attributes["href"].Value.Trim()
+                                });
+                                break;
+                            case "發行商:":
+                                infos.Add(new CommonModel
+                                {
+                                    Name = FileUtility.ReplaceInvalidChar(FileUtility.FanToJian(infoNode.ParentNode.ChildNodes[2].InnerText.Trim())),
+                                    Type = CommonModelType.Publisher,
+                                    Url = infoNode.ParentNode.ChildNodes[2].Attributes["href"].Value.Trim()
+                                });
+                                break;
+                            case "系列:":
+                                infos.Add(new CommonModel
+                                {
+                                    Name = FileUtility.ReplaceInvalidChar(FileUtility.FanToJian(infoNode.ParentNode.ChildNodes[2].InnerText.Trim())),
+                                    Type = CommonModelType.Series,
+                                    Url = infoNode.ParentNode.ChildNodes[2].Attributes["href"].Value.Trim()
+                                });
+                                break;
+                        }
                     }
                 }
 
-                foreach (var category in categoryNodes)
+                if (categoryNodes != null)
                 {
-                    infos.Add(new CommonModel
+                    foreach (var category in categoryNodes)
                     {
-                        Name = FileUtility.ReplaceInvalidChar(FileUtility.FanToJian(category.InnerText.Trim())),
-                        Type = CommonModelType.Category,
-                        Url = category.Attributes["href"].Value.Trim()
-                    });
+                        infos.Add(new CommonModel
+                        {
+                            Name = FileUtility.ReplaceInvalidChar(FileUtility.FanToJian(category.InnerText.Trim())),
+                            Type = CommonModelType.Category,
+                            Url = category.Attributes["href"].Value.Trim()
+                        });
+                    }
                 }
 
-                foreach (var actress in actressNodes)
+                if (actressNodes != null)
                 {
-                    infos.Add(new CommonModel
+                    foreach (var actress in actressNodes)
                     {
-                        Name = FileUtility.ReplaceInvalidChar(FileUtility.FanToJian(actress.InnerText.Trim())),
-                        Type = CommonModelType.Actress,
-                        Url = actress.Attributes["href"].Value.Trim()
-                    });
+                        infos.Add(new CommonModel
+                        {
+                            Name = FileUtility.ReplaceInvalidChar(FileUtility.FanToJian(actress.InnerText.Trim())),
+                            Type = CommonModelType.Actress,
+                            Url = actress.Attributes["href"].Value.Trim()
+                        });
+                    }
                 }
 
                 ret.FileNameWithoutExtension = ret.AvId + "-" + ret.Name;

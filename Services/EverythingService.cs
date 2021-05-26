@@ -45,7 +45,7 @@ namespace Services
             return retModel;
         }
 
-        public async static Task<EverythingResult> SearchBothLocalAnd115(string content)
+        public async static Task<EverythingResult> SearchBothLocalAnd115LocalFirst(string content)
         {
             var retModel = new EverythingResult();
 
@@ -82,6 +82,40 @@ namespace Services
             }
 
             return retModel;
+        }
+
+        public async static Task<List<EverythingFileResult>> SearchBothLocalAnd115(string content)
+        {
+            var localPart = await EverythingSearch(content);
+
+            var oneOneFivePart = new List<EverythingFileResult>();
+
+            var oneOneFiveFiles = await OneOneFiveService.Get115SearchFileResult(content, OneOneFiveFolder.AV, true);
+
+            if (oneOneFiveFiles != null && oneOneFiveFiles.Any())
+            {
+                foreach (var file in oneOneFiveFiles)
+                {
+                    EverythingFileResult temp = new()
+                    {
+                        size = file.s + "",
+                        sizeStr = FileUtility.GetAutoSizeString(double.Parse(file.s + ""), 1),
+                        location = "115网盘",
+                        name = file.n,
+                        path = file.pc,
+                        type = file.@class
+                    };
+
+                    oneOneFivePart.Add(temp);
+                }
+            }
+
+            if (localPart != null && localPart.results != null && localPart.results.Any())
+            {
+                oneOneFivePart.AddRange(localPart.results);
+            }
+
+            return oneOneFivePart;
         }
     }
 }

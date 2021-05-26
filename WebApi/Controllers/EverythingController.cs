@@ -18,7 +18,7 @@ namespace WebApi.Controllers
         [HttpGet]
         public async Task<EverythingResult> EverythingSearch(string content)
         {
-            var retModel = await EverythingService.SearchBothLocalAnd115(content);
+            var retModel = await EverythingService.SearchBothLocalAnd115LocalFirst(content);
 
             return retModel;
         }

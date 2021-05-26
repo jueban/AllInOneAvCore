@@ -73,7 +73,9 @@ namespace Services
                         {
                             progress.Report($"正在处理 {index++} / {details.Count} ");
 
-                            var res = SearchSukebeiMag(id.AvId).Result;
+                            JavLibraryService.DownloadJavLibraryDetailAndSavePictureFromWebScanUrl(new List<WebScanUrlModel>() { id }, progress).Wait();
+
+                            var res = SearchSukebeiMag(id.AvId, id.URL).Result;
                             ret.AddRange(res);
                             progress.Report($"\t{id.AvId} 下载了 {res.Count} 个磁链");
 
@@ -128,8 +130,11 @@ namespace Services
                         Parallel.ForEach(details.success, new ParallelOptions() { MaxDegreeOfParallelism = 3 }, id =>
                         {
                             progress.Report($"正在处理 {index++} / {details.success.Count} ");
-                            var res = SearchSukebeiMag(id.AvId).Result;
-                            res.AddRange(SearchJavBusMag(id.AvId).Result);
+
+                            JavbusService.GetJavBusDetail(id.URL).Wait();
+
+                            var res = SearchSukebeiMag(id.AvId, id.URL).Result;
+                            res.AddRange(SearchJavBusMag(id.AvId, id.URL).Result);
 
                             ret.AddRange(res);
                             progress.Report($"\t{id.AvId} 下载了 {res.Count} 个磁链");
@@ -152,7 +157,7 @@ namespace Services
             return ret;
         }
 
-        public async static Task<List<SeedMagnetSearchModel>> SearchSukebeiMag(string id)
+        public async static Task<List<SeedMagnetSearchModel>> SearchSukebeiMag(string id, string fromUrl)
         {
             List<SeedMagnetSearchModel> ret = new List<SeedMagnetSearchModel>();
             var site = SettingService.GetSetting().Result.MagSearchSite;
@@ -209,12 +214,13 @@ namespace Services
 
                         SeedMagnetSearchModel temp = new SeedMagnetSearchModel
                         {
-                            SearchUrl = searchContent,
+                            SearchUrl = fromUrl,
                             Title = text,
                             MagSize = FileUtility.GetFileSizeFromString(size),
                             Date = dt,
                             MagUrl = url,
-                            Source = site
+                            Source = site,
+                            SerachContent = id
                         };
 
                         ret.Add(temp);
@@ -229,7 +235,7 @@ namespace Services
             return ret.OrderByDescending(x => x.MagSize).ToList();
         }
 
-        public async static Task<List<SeedMagnetSearchModel>> SearchJavBusMag(string avId, CookieContainer cc = null)
+        public async static Task<List<SeedMagnetSearchModel>> SearchJavBusMag(string avId, string fromUrl, CookieContainer cc = null)
         {
             List<SeedMagnetSearchModel> ret = new List<SeedMagnetSearchModel>();
 
@@ -328,7 +334,8 @@ namespace Services
                                         MagUrl = magUrl,
                                         Source = SearchSeedSiteEnum.JavBus,
                                         Title = namePart,
-                                        SearchUrl = refere
+                                        SearchUrl = refere,
+                                        SerachContent = fromUrl
                                     });
                                 }
                             }
@@ -367,6 +374,70 @@ namespace Services
             return ret;
         }
 
+        public async static Task<List<ShowMagnetSearchResult>> GetScanResultDetai(int id)
+        {
+            List<ShowMagnetSearchResult> ret = new List<ShowMagnetSearchResult>();
+            var scanResult = await new ScanDAL().GetSeedMagnetSearchModelById(id);
+
+            if (!string.IsNullOrEmpty(scanResult.MagUrl) && scanResult.MagUrlObj != null)
+            {
+                var dic = scanResult.MagUrlObj.GroupBy(x => x.SearchUrl).ToDictionary(x => x.Key, x => x.ToList());
+
+                foreach (var d in dic)
+                {
+                    var avModelList = new JavLibraryDAL().GetAvModelByWhere($" AND Url = '{d.Key}'").Result;
+
+                    if (avModelList != null && avModelList.Any())
+                    {
+                        ShowMagnetSearchResult temp = new ShowMagnetSearchResult();
+
+                        var avModel = avModelList.FirstOrDefault();
+
+                        var magList = d.Value.Where(x => x.Title.Contains(avModel.AvId, StringComparison.OrdinalIgnoreCase)).ToList();
+
+                        if (magList != null && magList.Any())
+                        {
+                            var matchFiles = await EverythingService.SearchBothLocalAnd115(avModel.AvId);
+
+                            temp.FileLocation = FileLocation.None;
+
+                            if (matchFiles != null && matchFiles.Any())
+                            {
+                                if (matchFiles.Exists(x => x.location == "本地"))
+                                {
+                                    temp.FileLocation |= FileLocation.Local;
+                                }
+
+                                if (matchFiles.Exists(x => x.location == "115网盘"))
+                                {
+                                    temp.FileLocation |= FileLocation.OneOneFive;
+                                }
+
+                                temp.BiggestSize = matchFiles.Max(x => long.Parse(x.size));
+
+                                temp.HasChinese = matchFiles.Exists(x => !string.IsNullOrEmpty(x.chinese));
+                                temp.HasGreaterSize = magList.Max(x => x.MagSize) > matchFiles.Max(x => long.Parse(x.size));
+                                temp.MatchFiles = matchFiles;
+                            }
+                            else
+                            {
+                                temp.HasGreaterSize = true;
+                                temp.MatchFiles = new();
+                            }
+
+                            temp.Magnets = magList.OrderByDescending(x => x.MagSize).Take(5).ToList();
+                            temp.AvModel = avModel;
+
+                            ret.Add(temp);
+                        }
+                    }
+                }
+            }
+
+            return ret;
+        }
+
+        #region 私有方法
         private async static Task DoJavLibraryPageMode(ScanPageModel model)
         {
             model.Drops.Add(new ScanPageDrop()
@@ -757,7 +828,6 @@ namespace Services
             }
         }
 
-        #region 私有方法
         private static (int type, string url) PorcessJavLibraryUrl(string url)
         {
             (int type, string url) ret = new();

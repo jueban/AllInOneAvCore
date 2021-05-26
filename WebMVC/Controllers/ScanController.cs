@@ -55,6 +55,13 @@ namespace WebMVC.Controllers
             return View();
         }
 
+        public IActionResult DeleteScanResult(int id)
+        {
+            var ret = new ScanDAL().DeleteSeedMagnetSearchModelById(id).Result;
+
+            return View("ScanResult");
+        }
+
         public ScanPageModel GetJavLibraryData()
         {
             var ret = MagnetUrlService.GetScanPageMode(WebScanUrlSite.JavLibrary);
@@ -67,6 +74,11 @@ namespace WebMVC.Controllers
             var ret = new ScanDAL().GetSeedMagnetSearchModelAll().Result;
 
             return ret;
+        }
+
+        public void GetScanResultDetail(int id)
+        { 
+            
         }
     }
 }
