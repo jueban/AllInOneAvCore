@@ -28,11 +28,11 @@ namespace DAL
             return await ExecuteAsync(sql, new { site, type, url, name });
         }
 
-        public async Task<List<(WebScanUrlSite site, int type, string url)>> GetFaviByWhere(string where)
+        public async Task<List<(WebScanUrlSite site, int type, string url, string name)>> GetFaviByWhere(string where)
         {
             var sql = @"SELECT * FROM ScanFavi WHERE 1 = 1 " + where;
 
-            return await QueryAsync<(WebScanUrlSite, int, string)>(sql);
+            return await QueryAsync<(WebScanUrlSite, int, string, string)>(sql);
         }
 
         public async Task<int> SaveSeedMagnetSearchModel(ScanResult model)

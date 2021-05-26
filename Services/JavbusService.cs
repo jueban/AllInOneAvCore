@@ -284,7 +284,7 @@ namespace Services
                     ret = JavBusIndexUrl + "studio/" + content + "/" + page;
                     break;
 
-                case JavBusEntryPointType.publisher:
+                case JavBusEntryPointType.Publisher:
                     ret = JavBusIndexUrl + "label/" + content + "/" + page;
                     break;
             }

@@ -10,6 +10,7 @@ namespace JobHub.Hubs
     {
         public async Task<string> RemoveFolder(string folder)
         {
+            LogHelper.Info("去文件夹");
             Progress<string> progress = new();
             progress.ProgressChanged += ReportRemoveFolderProgress;
 
@@ -37,5 +38,47 @@ namespace JobHub.Hubs
         {
             Clients.Caller.SendAsync("Rename", e);
         }
+
+        public async Task<string> ScanJavLibrary(string str)
+        {
+            try
+            {
+                await Clients.Caller.SendAsync($"接收到参数 {str}");
+
+                ScanParam param = JsonHelper.Deserialize<ScanParam>(str);
+                Progress<string> progress = new();
+                progress.ProgressChanged += ReportScanProgress;
+
+                await MagnetUrlService.SearchJavLibrary(param.Url, param.Page, param.Name, progress);
+            }
+            catch (Exception ee)
+            {
+                await Clients.Caller.SendAsync($"异常 {ee.ToString()}");
+            }
+
+            return "success";
+        }
+
+        public async Task<string> ScanJavBus(string url, string name, int page)
+        {
+            Progress<string> progress = new();
+            progress.ProgressChanged += ReportScanProgress;
+
+            await MagnetUrlService.SearchJavBus(url, page, name, progress);
+
+            return "success";
+        }
+
+        private void ReportScanProgress(object sender, string e)
+        {
+            Clients.Caller.SendAsync("ScanResult", e);
+        }
+    }
+
+    public class ScanParam
+    {
+        public string Url { get; set; }
+        public string Name { get; set; }
+        public int Page { get; set; }
     }
 }

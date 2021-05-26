@@ -49,37 +49,43 @@ namespace Services
             sr.Site = SearchSeedSiteEnum.SukebeiSi;
             sr.Url = url;
             sr.Name = name;
+            sr.MagUrl = "";
             sr.Id = await new ScanDAL().SaveSeedMagnetSearchModel(sr);
 
             progress.Report($"创建ScanResult ID --> {sr.Id}");
 
             List<SeedMagnetSearchModel> ret = new List<SeedMagnetSearchModel>();
 
-            var details = await JavLibraryService.GetJavLibraryWebScanUrlMode(JavLibraryEntryPointType.Scan, page, url, false, progress);
-
-            progress.Report($"扫描完毕，开始下载磁链");
-            int index = 1;
-
-            await Task.Run(() =>
+            foreach (var subUrl in url.Split(','))
             {
-                try
+                progress.Report($"开始扫描{subUrl}");
+
+                var details = await JavLibraryService.GetJavLibraryWebScanUrlMode(JavLibraryEntryPointType.Scan, page, subUrl, false, progress);
+
+                progress.Report($"扫描完毕，开始下载磁链");
+                int index = 1;
+
+                await Task.Run(() =>
                 {
-                    Parallel.ForEach(details, new ParallelOptions() { MaxDegreeOfParallelism = 10 }, id =>
+                    try
                     {
-                        progress.Report($"正在处理 {index++} / {details.Count} ");
+                        Parallel.ForEach(details, new ParallelOptions() { MaxDegreeOfParallelism = 10 }, id =>
+                        {
+                            progress.Report($"正在处理 {index++} / {details.Count} ");
 
-                        var res = SearchSukebei(id.AvId).Result;
-                        ret.AddRange(res);
-                        progress.Report($"\t{id.AvId} 下载了 {res.Count} 个磁链");
+                            var res = SearchSukebeiMag(id.AvId).Result;
+                            ret.AddRange(res);
+                            progress.Report($"\t{id.AvId} 下载了 {res.Count} 个磁链");
 
-                        Task.Delay(ran.Next(50));
-                    });
-                }
-                catch (Exception)
-                { 
-                
-                }
-            });
+                            Task.Delay(ran.Next(50));
+                        });
+                    }
+                    catch (Exception)
+                    {
+
+                    }
+                });
+            }
 
             sr.MagUrl = JsonHelper.SerializeWithUtf8(ret);
 
@@ -106,32 +112,37 @@ namespace Services
 
             List<SeedMagnetSearchModel> ret = new();
 
-            var details = await JavbusService.GetJavBusList(JavBusEntryPointType.Passin, url, page, progress, true);
-            int index = 1;
-
-            progress.Report($"扫描完毕，开始下载磁链");
-
-            await Task.Run(() =>
+            foreach (var subUrl in url.Split(','))
             {
-                try
+                progress.Report($"开始扫描{subUrl}");
+
+                var details = await JavbusService.GetJavBusList(JavBusEntryPointType.Passin, subUrl, page, progress, true);
+                int index = 1;
+
+                progress.Report($"扫描完毕，开始下载磁链");
+
+                await Task.Run(() =>
                 {
-                    Parallel.ForEach(details.success, new ParallelOptions() { MaxDegreeOfParallelism = 3 }, id =>
+                    try
                     {
-                        progress.Report($"正在处理 {index++} / {details.success.Count} ");
-                        var res = SearchSukebei(id.AvId).Result;
-                        res.AddRange(SearchJavBus(id.AvId).Result);
+                        Parallel.ForEach(details.success, new ParallelOptions() { MaxDegreeOfParallelism = 3 }, id =>
+                        {
+                            progress.Report($"正在处理 {index++} / {details.success.Count} ");
+                            var res = SearchSukebeiMag(id.AvId).Result;
+                            res.AddRange(SearchJavBusMag(id.AvId).Result);
 
-                        ret.AddRange(res);
-                        progress.Report($"\t{id.AvId} 下载了 {res.Count} 个磁链");
+                            ret.AddRange(res);
+                            progress.Report($"\t{id.AvId} 下载了 {res.Count} 个磁链");
 
-                        Task.Delay(ran.Next(50));
-                    });
-                }
-                catch (Exception)
-                { 
-                    
-                }
-            });
+                            Task.Delay(ran.Next(50));
+                        });
+                    }
+                    catch (Exception)
+                    {
+
+                    }
+                });
+            }
 
             sr.MagUrl = JsonHelper.SerializeWithUtf8(ret);
 
@@ -141,7 +152,7 @@ namespace Services
             return ret;
         }
 
-        public async static Task<List<SeedMagnetSearchModel>> SearchSukebei(string id)
+        public async static Task<List<SeedMagnetSearchModel>> SearchSukebeiMag(string id)
         {
             List<SeedMagnetSearchModel> ret = new List<SeedMagnetSearchModel>();
             var site = SettingService.GetSetting().Result.MagSearchSite;
@@ -218,7 +229,7 @@ namespace Services
             return ret.OrderByDescending(x => x.MagSize).ToList();
         }
 
-        public async static Task<List<SeedMagnetSearchModel>> SearchJavBus(string avId, CookieContainer cc = null)
+        public async static Task<List<SeedMagnetSearchModel>> SearchJavBusMag(string avId, CookieContainer cc = null)
         {
             List<SeedMagnetSearchModel> ret = new List<SeedMagnetSearchModel>();
 
@@ -348,6 +359,11 @@ namespace Services
                 DoJavLibraryPageMode(ret).Wait();
             }
 
+            if (site == WebScanUrlSite.JavBus)
+            {
+                DoJavBusPageMode(ret).Wait();
+            }
+
             return ret;
         }
 
@@ -380,35 +396,362 @@ namespace Services
 
             foreach (var f in favi)
             {
+                var temp = model.Drops.FirstOrDefault(x => x.Type == f.type);
+
                 switch ((JavLibraryEntryPointType)f.type)
                 {
                     case JavLibraryEntryPointType.Actress:
 
-                        var temp = model.Drops.FirstOrDefault(x => x.Type == f.type);
                         if (temp == null)
                         {
                             model.Drops.Add(new ScanPageDrop()
                             {
                                 Type = f.type,
                                 Title = "选择演员",
-                                Items = new List<ScanPageDropItem>() { 
-                                    new ScanPageDropItem(){ 
-                                        Value = f.url
+                                Items = new List<ScanPageDropItem>() {
+                                    new ScanPageDropItem(){
+                                        Value = f.url,
+                                        Text = f.name
                                     }
                                 }
+                            });
+                        }
+                        else
+                        {
+                            temp.Items.Add(new ScanPageDropItem()
+                            {
+                                Value = f.url,
+                                Text = f.name
                             });
                         }
 
                         break;
                     case JavLibraryEntryPointType.Category:
+
+                        if (temp == null)
+                        {
+                            model.Drops.Add(new ScanPageDrop()
+                            {
+                                Type = f.type,
+                                Title = "选择类别",
+                                Items = new List<ScanPageDropItem>() {
+                                    new ScanPageDropItem(){
+                                        Value = f.url,
+                                        Text = f.name
+                                    }
+                                }
+                            });
+                        }
+                        else
+                        {
+                            temp.Items.Add(new ScanPageDropItem()
+                            {
+                                Value = f.url,
+                                Text = f.name
+                            });
+                        }
+
                         break;
                     case JavLibraryEntryPointType.Company:
+
+                        if (temp == null)
+                        {
+                            model.Drops.Add(new ScanPageDrop()
+                            {
+                                Type = f.type,
+                                Title = "选择公司",
+                                Items = new List<ScanPageDropItem>() {
+                                    new ScanPageDropItem(){
+                                        Value = f.url,
+                                        Text = f.name
+                                    }
+                                }
+                            });
+                        }
+                        else
+                        {
+                            temp.Items.Add(new ScanPageDropItem()
+                            {
+                                Value = f.url,
+                                Text = f.name
+                            });
+                        }
+
                         break;
                     case JavLibraryEntryPointType.Director:
+
+                        if (temp == null)
+                        {
+                            model.Drops.Add(new ScanPageDrop()
+                            {
+                                Type = f.type,
+                                Title = "选择导演",
+                                Items = new List<ScanPageDropItem>() {
+                                    new ScanPageDropItem(){
+                                        Value = f.url,
+                                        Text = f.name
+                                    }
+                                }
+                            });
+                        }
+                        else
+                        {
+                            temp.Items.Add(new ScanPageDropItem()
+                            {
+                                Value = f.url,
+                                Text = f.name
+                            });
+                        }
+
                         break;
                     case JavLibraryEntryPointType.Publisher:
+
+                        if (temp == null)
+                        {
+                            model.Drops.Add(new ScanPageDrop()
+                            {
+                                Type = f.type,
+                                Title = "选择发行商",
+                                Items = new List<ScanPageDropItem>() {
+                                    new ScanPageDropItem(){
+                                        Value = f.url,
+                                        Text = f.name
+                                    }
+                                }
+                            });
+                        }
+                        else
+                        {
+                            temp.Items.Add(new ScanPageDropItem()
+                            {
+                                Value = f.url,
+                                Text = f.name
+                            });
+                        }
+
                         break;
                     case JavLibraryEntryPointType.Search:
+
+                        if (temp == null)
+                        {
+                            model.Drops.Add(new ScanPageDrop()
+                            {
+                                Type = f.type,
+                                Title = "选择前缀",
+                                Items = new List<ScanPageDropItem>() {
+                                    new ScanPageDropItem(){
+                                        Value = f.url,
+                                        Text = f.name
+                                    }
+                                }
+                            });
+                        }
+                        else
+                        {
+                            temp.Items.Add(new ScanPageDropItem()
+                            {
+                                Value = f.url,
+                                Text = f.name
+                            });
+                        }
+
+                        break;
+                }
+            }
+        }
+
+        private async static Task DoJavBusPageMode(ScanPageModel model)
+        {
+            var favi = await new ScanDAL().GetFaviByWhere($" AND Site = {(int)WebScanUrlSite.JavBus}");
+
+            foreach (var f in favi)
+            {
+                var temp = model.Drops.FirstOrDefault(x => x.Type == f.type);
+
+                switch ((JavBusEntryPointType)f.type)
+                {
+                    case JavBusEntryPointType.Actress:
+
+                        if (temp == null)
+                        {
+                            model.Drops.Add(new ScanPageDrop()
+                            {
+                                Type = f.type,
+                                Title = "选择演员",
+                                Items = new List<ScanPageDropItem>() {
+                                    new ScanPageDropItem(){
+                                        Value = f.url,
+                                        Text = f.name
+                                    }
+                                }
+                            });
+                        }
+                        else
+                        {
+                            temp.Items.Add(new ScanPageDropItem()
+                            {
+                                Value = f.url,
+                                Text = f.name
+                            });
+                        }
+
+                        break;
+                    case JavBusEntryPointType.Category:
+
+                        if (temp == null)
+                        {
+                            model.Drops.Add(new ScanPageDrop()
+                            {
+                                Type = f.type,
+                                Title = "选择类别",
+                                Items = new List<ScanPageDropItem>() {
+                                    new ScanPageDropItem(){
+                                        Value = f.url,
+                                        Text = f.name
+                                    }
+                                }
+                            });
+                        }
+                        else
+                        {
+                            temp.Items.Add(new ScanPageDropItem()
+                            {
+                                Value = f.url,
+                                Text = f.name
+                            });
+                        }
+
+                        break;
+                    case JavBusEntryPointType.Company:
+
+                        if (temp == null)
+                        {
+                            model.Drops.Add(new ScanPageDrop()
+                            {
+                                Type = f.type,
+                                Title = "选择公司",
+                                Items = new List<ScanPageDropItem>() {
+                                    new ScanPageDropItem(){
+                                        Value = f.url,
+                                        Text = f.name
+                                    }
+                                }
+                            });
+                        }
+                        else
+                        {
+                            temp.Items.Add(new ScanPageDropItem()
+                            {
+                                Value = f.url,
+                                Text = f.name
+                            });
+                        }
+
+                        break;
+                    case JavBusEntryPointType.Director:
+
+                        if (temp == null)
+                        {
+                            model.Drops.Add(new ScanPageDrop()
+                            {
+                                Type = f.type,
+                                Title = "选择导演",
+                                Items = new List<ScanPageDropItem>() {
+                                    new ScanPageDropItem(){
+                                        Value = f.url,
+                                        Text = f.name
+                                    }
+                                }
+                            });
+                        }
+                        else
+                        {
+                            temp.Items.Add(new ScanPageDropItem()
+                            {
+                                Value = f.url,
+                                Text = f.name
+                            });
+                        }
+
+                        break;
+                    case JavBusEntryPointType.Publisher:
+
+                        if (temp == null)
+                        {
+                            model.Drops.Add(new ScanPageDrop()
+                            {
+                                Type = f.type,
+                                Title = "选择发行商",
+                                Items = new List<ScanPageDropItem>() {
+                                    new ScanPageDropItem(){
+                                        Value = f.url,
+                                        Text = f.name
+                                    }
+                                }
+                            });
+                        }
+                        else
+                        {
+                            temp.Items.Add(new ScanPageDropItem()
+                            {
+                                Value = f.url,
+                                Text = f.name
+                            });
+                        }
+
+                        break;
+                    case JavBusEntryPointType.Search:
+
+                        if (temp == null)
+                        {
+                            model.Drops.Add(new ScanPageDrop()
+                            {
+                                Type = f.type,
+                                Title = "选择前缀",
+                                Items = new List<ScanPageDropItem>() {
+                                    new ScanPageDropItem(){
+                                        Value = f.url,
+                                        Text = f.name
+                                    }
+                                }
+                            });
+                        }
+                        else
+                        {
+                            temp.Items.Add(new ScanPageDropItem()
+                            {
+                                Value = f.url,
+                                Text = f.name
+                            });
+                        }
+
+                        break;
+
+                    case JavBusEntryPointType.Series:
+
+                        if (temp == null)
+                        {
+                            model.Drops.Add(new ScanPageDrop()
+                            {
+                                Type = f.type,
+                                Title = "选择系列",
+                                Items = new List<ScanPageDropItem>() {
+                                    new ScanPageDropItem(){
+                                        Value = f.url,
+                                        Text = f.name
+                                    }
+                                }
+                            });
+                        }
+                        else
+                        {
+                            temp.Items.Add(new ScanPageDropItem()
+                            {
+                                Value = f.url,
+                                Text = f.name
+                            });
+                        }
+
                         break;
                 }
             }
@@ -520,7 +863,7 @@ namespace Services
         {
             (int type, string url) ret = new();
 
-            Dictionary<string, JavBusEntryPointType> dic = new() { { "director", JavBusEntryPointType.Director }, { "star", JavBusEntryPointType.Actress }, { "label", JavBusEntryPointType.publisher }, { "studio", JavBusEntryPointType.Company }, { "genre", JavBusEntryPointType.Category }, { "series", JavBusEntryPointType.Series }, { "search", JavBusEntryPointType.Search } };
+            Dictionary<string, JavBusEntryPointType> dic = new() { { "director", JavBusEntryPointType.Director }, { "star", JavBusEntryPointType.Actress }, { "label", JavBusEntryPointType.Publisher }, { "studio", JavBusEntryPointType.Company }, { "genre", JavBusEntryPointType.Category }, { "series", JavBusEntryPointType.Series }, { "search", JavBusEntryPointType.Search } };
 
             Regex reg = new($@"https://www.javbus.com/{t}/(.+)");
             Match match = reg.Match(url);

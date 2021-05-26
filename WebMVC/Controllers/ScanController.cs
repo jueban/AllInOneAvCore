@@ -44,36 +44,7 @@ namespace WebMVC.Controllers
 
         public ScanPageModel GetJavLibraryData()
         {
-            ScanPageModel ret = new()
-            {
-                Drops = new List<ScanPageDrop>(),
-                Name = "WebScan",
-                Page = 9999,
-                Url = ""
-            };
-
-            ret.Drops.Add(new ScanPageDrop()
-            {
-                Title = "选择页面",
-                Items = new List<ScanPageDropItem>() { 
-                    new ScanPageDropItem() { 
-                        Text = "更新",
-                        Value = "http://www.javlibrary.com/cn/vl_update.php?&mode="
-                    },
-                    new ScanPageDropItem(){ 
-                        Text = "新加入",
-                        Value = "http://www.javlibrary.com/cn/vl_newentries.php?&mode="
-                    },
-                    new ScanPageDropItem(){
-                        Text = "最想要",
-                        Value = "http://www.javlibrary.com/cn/vl_mostwanted.php?&mode="
-                    },
-                    new ScanPageDropItem(){
-                        Text = "高评价",
-                        Value = "http://www.javlibrary.com/cn/vl_bestrated.php?&mode="
-                    }
-                }
-            });
+            var ret = MagnetUrlService.GetScanPageMode(WebScanUrlSite.JavLibrary);
 
             return ret;
         }

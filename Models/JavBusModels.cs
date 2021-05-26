@@ -20,7 +20,7 @@ namespace Models
         Passin = 6,
         Director = 7,
         Company = 8,
-        publisher = 9,
+        Publisher = 9,
         Series = 10
     }
 }

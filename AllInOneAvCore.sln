@@ -25,7 +25,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hangfire", "Hangfire\Hangfi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InitProject", "InitProject\InitProject.csproj", "{3A0FBCEE-0E2F-4723-901F-C37462954D02}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityServer", "IdentityServer\IdentityServer.csproj", "{EB50F509-2626-48E1-9D15-F979B1D5A231}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer", "IdentityServer\IdentityServer.csproj", "{EB50F509-2626-48E1-9D15-F979B1D5A231}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Prepare", "Prepare", "{38E5BE65-35F1-40C5-8B55-38A40BB382E6}"
+	ProjectSection(SolutionItems) = preProject
+		TemperMonkeyScript.js = TemperMonkeyScript.js
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
