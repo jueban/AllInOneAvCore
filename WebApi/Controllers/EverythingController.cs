@@ -18,39 +18,7 @@ namespace WebApi.Controllers
         [HttpGet]
         public async Task<EverythingResult> EverythingSearch(string content)
         {
-            var retModel = new EverythingResult();
-
-            retModel = await EverythingService.EverythingSearch(content);
-
-            if (retModel == null || retModel.results == null || retModel.results.Count <= 0)
-            {          
-                retModel = new EverythingResult
-                {
-                    results = new List<EverythingFileResult>()
-                };
-
-                List<OneOneFiveFileItemModel> oneOneFiveFiles = await OneOneFiveService.Get115SearchFileResult(content, OneOneFiveFolder.AV, true);
-
-                if (oneOneFiveFiles != null && oneOneFiveFiles.Any())
-                {
-                    retModel.totalResults = oneOneFiveFiles.Count + "";
-
-                    foreach (var file in oneOneFiveFiles)
-                    {
-                        EverythingFileResult temp = new()
-                        {
-                            size = file.s + "",
-                            sizeStr = FileUtility.GetAutoSizeString(double.Parse(file.s + ""), 1),
-                            location = "115网盘",
-                            name = file.n,
-                            path = file.pc,
-                            type = file.@class
-                        };
-
-                        retModel.results.Add(temp);
-                    }
-                }
-            }
+            var retModel = await EverythingService.SearchBothLocalAnd115(content);
 
             return retModel;
         }
