@@ -46,7 +46,7 @@ namespace Services
 
             ScanResult sr = new();
             sr.StartTime = startTime;
-            sr.Site = SearchSeedSiteEnum.SukebeiSi;
+            sr.WebSite = SearchSeedSiteEnum.SukebeiSi;
             sr.Url = url;
             sr.Name = name;
             sr.MagUrl = "";
@@ -102,7 +102,7 @@ namespace Services
 
             ScanResult sr = new();
             sr.StartTime = startTime;
-            sr.Site = SearchSeedSiteEnum.JavBus;
+            sr.WebSite = SearchSeedSiteEnum.JavBus;
             sr.Url = url;
             sr.Name = name;
             sr.MagUrl = "";

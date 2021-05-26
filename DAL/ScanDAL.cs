@@ -37,7 +37,7 @@ namespace DAL
 
         public async Task<int> SaveSeedMagnetSearchModel(ScanResult model)
         {
-            var sql = @"INSERT INTO ScanResult (StartTime, WebSite, Url, Name, MagUrl) VALUES (@StartTime, @Site, @Url, @Name, @MagUrl);
+            var sql = @"INSERT INTO ScanResult (StartTime, WebSite, Url, Name, MagUrl) VALUES (@StartTime, @WebSite, @Url, @Name, @MagUrl);
                             SELECT @@IDENTITY;";
 
             return await QuerySingleOrDefaultAsync<int>(sql, model);
@@ -52,7 +52,7 @@ namespace DAL
 
         public async Task<List<ScanResult>> GetSeedMagnetSearchModelAll()
         {
-            var sql = @"SELECT * FROM ScanResult";
+            var sql = @"SELECT * FROM ScanResult WHERE MagUrl <> '' ORDER BY StartTime ASC";
 
             return await QueryAsync<ScanResult>(sql);
         }
