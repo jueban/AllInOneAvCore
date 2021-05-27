@@ -8,3 +8,6 @@ WebMVC project is the main UI for all kinds of functions like web crawl, talk wi
 JobHub project is a SignalR hub for some services.
 
 Hangfire project is where to run background task, like open broswer to get cookie or using ffmpeg to do some stuff.
+
+
+!! Due to this project is being updated frenquently, so I'm not upload any database related sql or infomation, because it's changing all the time !!
