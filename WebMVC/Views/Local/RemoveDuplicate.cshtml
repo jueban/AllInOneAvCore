@@ -9,24 +9,26 @@
 </head>
 
 <body>
-    <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
-        <div class="btn-group mr-2" role="group" aria-label="First group">
-            <button type="button" class="btn btn-primary" id="refresh">刷新</button>
+    <div class="container">
+        <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+            <div class="btn-group mr-2" role="group" aria-label="First group">
+                <button type="button" class="btn btn-primary" id="refresh">刷新</button>
+            </div>
+            <div class="btn-group mr-2" role="group" aria-label="Second group">
+                <button type="button" class="btn btn-info" id="selectAll" data-type="all">全选/取消</button>
+                <button type="button" class="btn btn-success" id="intel">智能</button>
+            </div>
+            <div class="btn-group" role="group" aria-label="Third group">
+                <button type="button" class="btn btn-danger" id="delete">删除</button>
+            </div>
         </div>
-        <div class="btn-group mr-2" role="group" aria-label="Second group">
-            <button type="button" class="btn btn-info" id="selectAll" data-type="all">全选/取消</button>
-            <button type="button" class="btn btn-success" id="intel">智能</button>
-        </div>
-        <div class="btn-group" role="group" aria-label="Third group">
-            <button type="button" class="btn btn-danger" id="delete">删除</button>
-        </div>
+
+        <ul class="list-group">
+            <li class="list-group-item" id="content">
+
+            </li>
+        </ul>
     </div>
-
-    <ul class="list-group">
-        <li class="list-group-item" id="content">
-
-        </li>
-    </ul>
 
     <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style="display:none">
         <div class="modal-dialog">

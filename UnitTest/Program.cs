@@ -55,7 +55,7 @@ namespace UnitTest
 
             //FileUtility.RenameAndTransferUsingSystem(@"N:\Download\movefiles\fin\DMAT-192-眠る義母 息子に夜●いされて (2).mp4", @"N:\Download\movefiles\DMAT-192-眠る義母 息子に夜●いされて (2).mp4", true);
 
-            MagnetUrlService.GetScanResultDetai(14).Wait();
+            var ret =MagnetUrlService.GetScanResultDetail(15).Result;
 
             Console.WriteLine("按任意键退出");
             Console.ReadKey();

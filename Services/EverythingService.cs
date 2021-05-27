@@ -115,7 +115,7 @@ namespace Services
                 oneOneFivePart.AddRange(localPart.results);
             }
 
-            return oneOneFivePart;
+            return oneOneFivePart.OrderByDescending(x => x.size).ToList();
         }
     }
 }

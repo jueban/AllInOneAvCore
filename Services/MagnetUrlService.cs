@@ -374,7 +374,7 @@ namespace Services
             return ret;
         }
 
-        public async static Task<List<ShowMagnetSearchResult>> GetScanResultDetai(int id)
+        public async static Task<List<ShowMagnetSearchResult>> GetScanResultDetail(int id)
         {
             List<ShowMagnetSearchResult> ret = new List<ShowMagnetSearchResult>();
             var scanResult = await new ScanDAL().GetSeedMagnetSearchModelById(id);
@@ -385,7 +385,17 @@ namespace Services
 
                 foreach (var d in dic)
                 {
-                    var avModelList = new JavLibraryDAL().GetAvModelByWhere($" AND Url = '{d.Key}'").Result;
+                    var avModelList = new List<AvModel>();
+
+                    if (scanResult.Url.Contains("javlibrary", StringComparison.OrdinalIgnoreCase))
+                    {
+                        avModelList = new JavLibraryDAL().GetAvModelByWhere($" AND Url = '{d.Key}'").Result;
+                    }
+
+                    if (scanResult.Url.Contains("javbus", StringComparison.OrdinalIgnoreCase))
+                    {
+                        avModelList = new JavBusDAL().GetAvModelByWhere($" AND Url = '{d.Key}'").Result;
+                    }
 
                     if (avModelList != null && avModelList.Any())
                     {
@@ -399,6 +409,8 @@ namespace Services
                         {
                             var matchFiles = await EverythingService.SearchBothLocalAnd115(avModel.AvId);
 
+                            magList.ForEach(x => x.MagSizeStr = FileUtility.GetAutoSizeString(x.MagSize, 1));
+
                             temp.FileLocation = FileLocation.None;
 
                             if (matchFiles != null && matchFiles.Any())
@@ -406,15 +418,17 @@ namespace Services
                                 if (matchFiles.Exists(x => x.location == "本地"))
                                 {
                                     temp.FileLocation |= FileLocation.Local;
+                                    temp.LocalSizeStr = FileUtility.GetAutoSizeString(matchFiles.Where(x => x.location == "本地").Max(x => long.Parse(x.size)), 1);
                                 }
 
                                 if (matchFiles.Exists(x => x.location == "115网盘"))
                                 {
                                     temp.FileLocation |= FileLocation.OneOneFive;
+                                    temp.OneOneFiveSizeStr = FileUtility.GetAutoSizeString(matchFiles.Where(x => x.location == "115网盘").Max(x => long.Parse(x.size)), 1);
                                 }
 
                                 temp.BiggestSize = matchFiles.Max(x => long.Parse(x.size));
-
+                                temp.BiggestSizeStr = FileUtility.GetAutoSizeString(temp.BiggestSize, 1);
                                 temp.HasChinese = matchFiles.Exists(x => !string.IsNullOrEmpty(x.chinese));
                                 temp.HasGreaterSize = magList.Max(x => x.MagSize) > matchFiles.Max(x => long.Parse(x.size));
                                 temp.MatchFiles = matchFiles;

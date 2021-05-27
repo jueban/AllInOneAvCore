@@ -16,6 +16,7 @@ namespace Models
         public DateTime Date { get; set; }
         public int CompleteCount { get; set; }
         public SearchSeedSiteEnum Source { get; set; }
+        public string MagSizeStr { get; set; }
     }
 
     public enum SearchSeedSiteEnum
@@ -27,11 +28,15 @@ namespace Models
     }
 
     public class ShowMagnetSearchResult
-    { 
+    {
+        public string BiggestSizeStr { get; set; }
         public long BiggestSize { get; set; }
         public FileLocation FileLocation { get; set; }
         public bool HasChinese { get; set; }
         public bool HasGreaterSize { get; set; }
+        public string Url { get; set; }
+        public string LocalSizeStr { get; set; }
+        public string OneOneFiveSizeStr { get; set; }
         public AvModel AvModel { get; set; }
         public List<EverythingFileResult> MatchFiles { get; set; }
         public List<SeedMagnetSearchModel> Magnets { get; set; }

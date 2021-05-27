@@ -59,12 +59,22 @@ namespace JobHub.Hubs
             return "success";
         }
 
-        public async Task<string> ScanJavBus(string url, string name, int page)
+        public async Task<string> ScanJavBus(string str)
         {
-            Progress<string> progress = new();
-            progress.ProgressChanged += ReportScanProgress;
+            try
+            {
+                await Clients.Caller.SendAsync($"接收到参数 {str}");
 
-            await MagnetUrlService.SearchJavBus(url, page, name, progress);
+                ScanParam param = JsonHelper.Deserialize<ScanParam>(str);
+                Progress<string> progress = new();
+                progress.ProgressChanged += ReportScanProgress;
+
+                await MagnetUrlService.SearchJavBus(param.Url, param.Page, param.Name, progress);
+            }
+            catch (Exception ee)
+            {
+                await Clients.Caller.SendAsync($"异常 {ee.ToString()}");
+            }
 
             return "success";
         }

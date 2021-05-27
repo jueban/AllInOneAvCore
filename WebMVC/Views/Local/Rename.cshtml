@@ -9,23 +9,25 @@
 </head>
 
 <body>
-    <div style="background-color:#e9ecef">
-        <div class="input-group mb-3">
-            <input type="text" class="form-control" value="@ViewData["Folder"]" id="folder" style="background-color: #343a40 !important; color: white">
-            <div class="input-group-append">
-                <button class="btn btn-outline-secondary" type="button" id="popAlert">开始</button>
+    <div class="container">
+        <div style="background-color:#e9ecef">
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" value="@ViewData["Folder"]" id="folder" style="background-color: #343a40 !important; color: white">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button" id="popAlert">开始</button>
+                </div>
             </div>
-        </div>
 
-        <div class="alert alert-dark" role="alert">
-            @ViewData["Infos"]
-        </div>
-
-        <div class="input-group">
-            <div class="input-group-prepend">
-                <span class="input-group-text">操作日志</span>
+            <div class="alert alert-dark" role="alert">
+                @ViewData["Infos"]
             </div>
-            <textarea class="form-control" aria-label="With textarea" id="messages" style="height:750px;resize:none;background-color:#343a40!important;color:white"></textarea>
+
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">操作日志</span>
+                </div>
+                <textarea class="form-control" aria-label="With textarea" id="messages" style="height:750px;resize:none;background-color:#343a40!important;color:white"></textarea>
+            </div>
         </div>
     </div>
 

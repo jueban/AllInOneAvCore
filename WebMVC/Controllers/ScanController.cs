@@ -52,6 +52,7 @@ namespace WebMVC.Controllers
         public IActionResult ShowScanResult(int id)
         {
             ViewData.Add("Title", "扫描详情-扫描");
+            ViewData.Add("Id", id);
             return View();
         }
 
@@ -69,6 +70,13 @@ namespace WebMVC.Controllers
             return ret;
         }
 
+        public ScanPageModel GetJavBusData()
+        {
+            var ret = MagnetUrlService.GetScanPageMode(WebScanUrlSite.JavBus);
+
+            return ret;
+        }
+
         public List<ScanResult> GetScanResult()
         {
             var ret = new ScanDAL().GetSeedMagnetSearchModelAll().Result;
@@ -76,9 +84,11 @@ namespace WebMVC.Controllers
             return ret;
         }
 
-        public void GetScanResultDetail(int id)
-        { 
-            
+        public async Task<List<ShowMagnetSearchResult>> GetScanResultDetail(int id)
+        {
+            var ret = await MagnetUrlService.GetScanResultDetail(id);
+
+            return ret;
         }
     }
 }
