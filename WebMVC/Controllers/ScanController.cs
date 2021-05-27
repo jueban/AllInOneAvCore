@@ -60,7 +60,7 @@ namespace WebMVC.Controllers
         {
             var ret = new ScanDAL().DeleteSeedMagnetSearchModelById(id).Result;
 
-            return View("ScanResult");
+            return Redirect("ScanResult");
         }
 
         public ScanPageModel GetJavLibraryData()
@@ -89,6 +89,12 @@ namespace WebMVC.Controllers
             var ret = await MagnetUrlService.GetScanResultDetail(id);
 
             return ret;
+        }
+
+        [HttpPost]
+        public async Task<OneOneFiveResult> Add115Task(string mag)
+        {
+            return await OneOneFiveService.AddOneOneFiveTask(mag);
         }
     }
 }

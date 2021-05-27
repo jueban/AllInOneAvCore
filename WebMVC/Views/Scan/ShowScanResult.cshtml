@@ -133,11 +133,18 @@
                         download += $(this).data("magurl") + "\n\r";
                     });
 
-                    //TODO
+                    $.ajax({ type: 'post', url: '/Scan/Add115Task/', data: { 'mag': download }, async: true, dataType: 'json' })
+                        .done(function (data) {
+                            if (data.error_msg == undefined || data.error_msg == null || data.error_msg == '') {
+                                alert("下载成功");
+                            } else {
+                                alert(data.error_msg);
+                            }
+                        });
                 },
                 itemClick: function (event) {
                     $(event.currentTarget).siblings().removeClass("active");
-                    $(event.currentTarget).addClass("active");
+                    $(event.currentTarget).toggleClass("active");
                 }
             }
         })

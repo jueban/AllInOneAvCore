@@ -43,6 +43,8 @@ namespace JobHub.Hubs
         {
             try
             {
+                var startTime = DateTime.Now;
+
                 await Clients.Caller.SendAsync($"接收到参数 {str}");
 
                 ScanParam param = JsonHelper.Deserialize<ScanParam>(str);
@@ -50,6 +52,8 @@ namespace JobHub.Hubs
                 progress.ProgressChanged += ReportScanProgress;
 
                 await MagnetUrlService.SearchJavLibrary(param.Url, param.Page, param.Name, progress);
+
+                NoticeService.SendBarkNotice(SettingService.GetSetting().Result.BarkId, $"扫描JavLibrary完成，耗时 {(DateTime.Now - startTime).TotalSeconds} 秒");
             }
             catch (Exception ee)
             {
@@ -63,6 +67,8 @@ namespace JobHub.Hubs
         {
             try
             {
+                var startTime = DateTime.Now;
+
                 await Clients.Caller.SendAsync($"接收到参数 {str}");
 
                 ScanParam param = JsonHelper.Deserialize<ScanParam>(str);
@@ -70,6 +76,8 @@ namespace JobHub.Hubs
                 progress.ProgressChanged += ReportScanProgress;
 
                 await MagnetUrlService.SearchJavBus(param.Url, param.Page, param.Name, progress);
+
+                NoticeService.SendBarkNotice(SettingService.GetSetting().Result.BarkId, $"扫描JavBus完成，耗时 {(DateTime.Now - startTime).TotalSeconds} 秒");
             }
             catch (Exception ee)
             {

@@ -17,6 +17,9 @@ namespace UnitTest
         [Obsolete]
         static void Main(string[] args)
         {
+            Progress<string> progress = new Progress<string>();
+            progress.ProgressChanged += PrintLog;
+
             //JavLibraryService.GetJavLibraryCookie().Wait();
             //var res = JavLibraryService.GetRankActressLinks().Result;
 
@@ -54,8 +57,7 @@ namespace UnitTest
             //var avs = JavLibraryService.GetSearchJavLibrary("vdd-10").Result;
 
             //FileUtility.RenameAndTransferUsingSystem(@"N:\Download\movefiles\fin\DMAT-192-眠る義母 息子に夜●いされて (2).mp4", @"N:\Download\movefiles\DMAT-192-眠る義母 息子に夜●いされて (2).mp4", true);
-
-            var ret =MagnetUrlService.GetScanResultDetail(15).Result;
+            MagnetUrlService.SearchJavBus("https://www.javbus.com/page", 1, "Siri扫描Javbus", progress).Wait();
 
             Console.WriteLine("按任意键退出");
             Console.ReadKey();

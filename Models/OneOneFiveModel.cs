@@ -71,6 +71,7 @@ namespace Models
         public bool state { get; set; }
         public string error { get; set; }
         public string errorno { get; set; }
+        public string error_msg { get; set; }
     }
 
     public class OneOneFiveCookie

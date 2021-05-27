@@ -10,7 +10,7 @@ namespace Models
     public class ScanResult
     {
         public int Id { get; set; }
-        public SearchSeedSiteEnum WebSite { get; set; }
+        public WebScanUrlSite WebSite { get; set; }
         public DateTime StartTime { get; set; }
         public string Url { get; set; }
         public string MagUrl { get; set; }

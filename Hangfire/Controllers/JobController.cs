@@ -52,5 +52,13 @@ namespace Hangfire.Controllers
 
             return "success";
         }
+
+        [HttpGet]
+        public string ScanJavUpdate(string site, int page = 0)
+        {
+            BackgroundJob.Enqueue(() => Jobs.ScanJavUpdate(site, page));
+
+            return "success";
+        }
     }
 }

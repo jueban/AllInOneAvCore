@@ -86,5 +86,23 @@ namespace Hangfire
             LogHelper.Info(e);
         }
 
+        public static void ScanJavUpdate(string site, int page)
+        {
+            DateTime startTime = DateTime.Now;
+            NoticeService.SendBarkNotice(SettingService.GetSetting().Result.BarkId, $"开始扫描 {site} 磁链");
+            Progress<string> progress = new Progress<string>();
+
+            if (site == "javlibrary")
+            {
+                MagnetUrlService.SearchJavLibrary("http://www.javlibrary.com/cn/vl_update.php?&mode=", page, "Siri扫描Javlibrary", progress).Wait();
+            }
+
+            if (site == "javbus")
+            {
+                MagnetUrlService.SearchJavBus("https://www.javbus.com/page", page, "Siri扫描Javbus", progress).Wait();
+            }
+
+            NoticeService.SendBarkNotice(SettingService.GetSetting().Result.BarkId, $"结束扫描 {site} 磁链, 用时 {(DateTime.Now - startTime).TotalSeconds} 秒");
+        }
     }
 }
