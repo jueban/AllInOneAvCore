@@ -28,4 +28,10 @@ namespace Models
         Search = 11,
         Scan = 12,
     }
+
+    public class JavLibrarySearchOrder
+    {
+        public static string Asc = "Asc";
+        public static string Desc = "Desc";
+    }
 }

@@ -26,6 +26,10 @@
                 <input type="text" class="form-control" v-model="drops.url">
                 <div class="input-group-prepend">
                     <input type="text" class="form-control" v-model="drops.name">
+                    <select class="custom-select" v-model="drops.order">
+                        <option value="Asc">正序</option>
+                        <option value="Desc">倒序</option>
+                    </select>
                     <input type="number" step="1" class="form-control" v-model="drops.page">
                 </div>
                 <div class="input-group-append">
@@ -92,8 +96,9 @@
             var url = app.drops.url;
             var name = app.drops.name;
             var page = app.drops.page;
+            var order = app.drops.order;
 
-            var p = JSON.stringify({ Url: url, Name: name, Page: Number(page) });
+            var p = JSON.stringify({ Url: url, Name: name, Page: Number(page), Order: order });
 
             connection.invoke("ScanJavLibrary", p).catch(function (err) {
                 return console.error(err.toString());

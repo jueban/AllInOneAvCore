@@ -11,6 +11,7 @@ namespace Models
         public int Page { get; set; }
         public string Url { get; set; }
         public string Name { get; set; }
+        public string Order { get; set; }
         public List<ScanPageDrop> Drops { get; set; }
     }
 

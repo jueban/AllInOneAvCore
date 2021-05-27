@@ -39,7 +39,7 @@ namespace Services
             return (WebScanUrlSite.None, -1, "", "");
         }
 
-        public async static Task<List<SeedMagnetSearchModel>> SearchJavLibrary(string url, int page, string name, IProgress<string> progress)
+        public async static Task<List<SeedMagnetSearchModel>> SearchJavLibrary(string url, int page, string name, string order, IProgress<string> progress)
         {
             var startTime = DateTime.Now;
             Random ran = new();
@@ -60,7 +60,7 @@ namespace Services
             {
                 progress.Report($"开始扫描{subUrl}");
 
-                var details = await JavLibraryService.GetJavLibraryWebScanUrlMode(JavLibraryEntryPointType.Scan, page, subUrl, false, progress);
+                var details = await JavLibraryService.GetJavLibraryWebScanUrlMode(JavLibraryEntryPointType.Scan, page, subUrl, false, order, progress);
 
                 progress.Report($"扫描完毕，开始下载磁链");
                 int index = 1;
@@ -358,7 +358,8 @@ namespace Services
                 Drops = new List<ScanPageDrop>(),
                 Name = "WebScan",
                 Page = 9999,
-                Url = ""
+                Url = "",
+                Order = JavLibrarySearchOrder.Asc
             };
 
             if (site == WebScanUrlSite.JavLibrary)
@@ -647,6 +648,17 @@ namespace Services
 
         private async static Task DoJavBusPageMode(ScanPageModel model)
         {
+            model.Drops.Add(new ScanPageDrop()
+            {
+                Title = "选择页面",
+                Items = new List<ScanPageDropItem>() {
+                    new ScanPageDropItem() {
+                        Text = "更新",
+                        Value = "https://www.javbus.com/page"
+                    }
+                }
+            }) ;
+
             var favi = await new ScanDAL().GetFaviByWhere($" AND Site = {(int)WebScanUrlSite.JavBus}");
 
             foreach (var f in favi)

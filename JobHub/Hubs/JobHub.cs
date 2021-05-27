@@ -51,7 +51,7 @@ namespace JobHub.Hubs
                 Progress<string> progress = new();
                 progress.ProgressChanged += ReportScanProgress;
 
-                await MagnetUrlService.SearchJavLibrary(param.Url, param.Page, param.Name, progress);
+                await MagnetUrlService.SearchJavLibrary(param.Url, param.Page, param.Name, param.Order, progress);
 
                 NoticeService.SendBarkNotice(SettingService.GetSetting().Result.BarkId, $"扫描JavLibrary完成，耗时 {(DateTime.Now - startTime).TotalSeconds} 秒");
             }
@@ -98,5 +98,6 @@ namespace JobHub.Hubs
         public string Url { get; set; }
         public string Name { get; set; }
         public int Page { get; set; }
+        public string Order { get; set; }
     }
 }

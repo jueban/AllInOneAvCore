@@ -74,7 +74,7 @@ namespace Hangfire
             Progress<string> progress = new();
             progress.ProgressChanged += LogInfo;
 
-            var scans = JavLibraryService.GetJavLibraryWebScanUrlMode(entry, pages, url, useExactPassin, progress).Result;
+            var scans = JavLibraryService.GetJavLibraryWebScanUrlMode(entry, pages, url, useExactPassin, JavLibrarySearchOrder.Asc, progress).Result;
 
             var ret = JavLibraryService.DownloadJavLibraryDetailAndSavePictureFromWebScanUrl(scans, progress).Result;
 
@@ -94,7 +94,7 @@ namespace Hangfire
 
             if (site == "javlibrary")
             {
-                MagnetUrlService.SearchJavLibrary("http://www.javlibrary.com/cn/vl_update.php?&mode=", page, "Siri扫描Javlibrary", progress).Wait();
+                MagnetUrlService.SearchJavLibrary("http://www.javlibrary.com/cn/vl_update.php?&mode=", page, "Siri扫描Javlibrary", JavLibrarySearchOrder.Asc, progress).Wait();
             }
 
             if (site == "javbus")

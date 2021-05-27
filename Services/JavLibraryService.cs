@@ -570,7 +570,7 @@ namespace Services
             return ret;
         }
 
-        public async static Task<List<WebScanUrlModel>> GetJavLibraryWebScanUrlMode(JavLibraryEntryPointType entry, int pages, string url, bool useExactPassin, IProgress<string> progress)
+        public async static Task<List<WebScanUrlModel>> GetJavLibraryWebScanUrlMode(JavLibraryEntryPointType entry, int pages, string url, bool useExactPassin, string order, IProgress<string> progress)
         {
             List<WebScanUrlModel> scans = new();
 
@@ -583,11 +583,11 @@ namespace Services
 
             List<int> pageRange = new();
 
-            if (pages <= -1)
+            if (order == JavLibrarySearchOrder.Desc)
             {
-                for (int i = 1; i <= totalPage; i++)
+                for (int i = 0; i < pages && totalPage - i >= 1; i++)
                 {
-                    pageRange.Add(i);
+                    pageRange.Add(totalPage - i);
                 }
             }
             else
