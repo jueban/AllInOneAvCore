@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using DAL;
 using Microsoft.AspNetCore.Mvc;
 using Models;
+using Newtonsoft.Json;
 using Services;
 
 namespace WebMVC.Controllers
@@ -95,6 +96,16 @@ namespace WebMVC.Controllers
         public async Task<OneOneFiveResult> Add115Task(string mag)
         {
             return await OneOneFiveService.AddOneOneFiveTask(mag);
+        }
+
+        [HttpPost]
+        public string PushAndGetRedisKey(string str)
+        {
+            var guid = Guid.NewGuid().ToString();
+
+            RedisService.SetHash("scan", guid, str);
+
+            return guid;
         }
     }
 }

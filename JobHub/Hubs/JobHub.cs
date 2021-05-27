@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using Models;
+using Newtonsoft.Json;
 using Services;
 using System;
 using System.Threading.Tasks;
@@ -43,11 +45,13 @@ namespace JobHub.Hubs
         {
             try
             {
+                NoticeService.SendBarkNotice(SettingService.GetSetting().Result.BarkId, $"开始扫描JavLibrary");
+
                 var startTime = DateTime.Now;
 
-                await Clients.Caller.SendAsync($"接收到参数 {str}");
+                str = RedisService.GetHash("scan", str);
 
-                ScanParam param = JsonHelper.Deserialize<ScanParam>(str);
+                ScanParam param = JsonConvert.DeserializeObject<ScanParam>(str);
                 Progress<string> progress = new();
                 progress.ProgressChanged += ReportScanProgress;
 
@@ -57,7 +61,11 @@ namespace JobHub.Hubs
             }
             catch (Exception ee)
             {
-                await Clients.Caller.SendAsync($"异常 {ee.ToString()}");
+                await Clients.Caller.SendAsync($"异常 {ee}");
+            }
+            finally
+            {
+                RedisService.DeleteHash("scan", str);
             }
 
             return "success";
@@ -67,9 +75,11 @@ namespace JobHub.Hubs
         {
             try
             {
+                NoticeService.SendBarkNotice(SettingService.GetSetting().Result.BarkId, $"开始扫描JavBus");
+
                 var startTime = DateTime.Now;
 
-                await Clients.Caller.SendAsync($"接收到参数 {str}");
+                str = RedisService.GetHash("scan", str);
 
                 ScanParam param = JsonHelper.Deserialize<ScanParam>(str);
                 Progress<string> progress = new();
@@ -81,7 +91,11 @@ namespace JobHub.Hubs
             }
             catch (Exception ee)
             {
-                await Clients.Caller.SendAsync($"异常 {ee.ToString()}");
+                await Clients.Caller.SendAsync($"异常 {ee}");
+            }
+            finally
+            {
+                RedisService.DeleteHash("scan", str);
             }
 
             return "success";
@@ -91,13 +105,5 @@ namespace JobHub.Hubs
         {
             Clients.Caller.SendAsync("ScanResult", e);
         }
-    }
-
-    public class ScanParam
-    {
-        public string Url { get; set; }
-        public string Name { get; set; }
-        public int Page { get; set; }
-        public string Order { get; set; }
     }
 }

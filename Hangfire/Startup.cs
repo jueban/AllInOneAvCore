@@ -15,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using Services;
 using Utils;
 
 namespace Hangfire
@@ -35,6 +36,8 @@ namespace Hangfire
         {
             services.AddHangfire(configuration => {
                 configuration.UseSqlServerStorage("Server=localhost\\SQLEXPRESS;Database=Hangfire;User=sa;password=pa$$w0rd;");
+
+                RecurringJob.AddOrUpdate("start", () => OneOneFiveService.RefreshOneOneFiveFinFilesCache(), Cron.HourInterval(4));
             });
 
             services.AddSingleton(new LogHelper());

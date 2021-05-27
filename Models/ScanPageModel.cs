@@ -27,4 +27,12 @@ namespace Models
         public string Value { get; set; }
         public string Text { get; set; }
     }
+
+    public class ScanParam
+    {
+        public string Url { get; set; }
+        public string Name { get; set; }
+        public int Page { get; set; }
+        public string Order { get; set; }
+    }
 }

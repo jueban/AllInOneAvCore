@@ -84,30 +84,29 @@ namespace Services
             return retModel;
         }
 
-        public async static Task<List<EverythingFileResult>> SearchBothLocalAnd115(string content)
+        public async static Task<List<EverythingFileResult>> SearchBothLocalAnd115(string content, List<OneOneFiveFileItemModel> oneOneFiveAllFiles)
         {
             var localPart = await EverythingSearch(content);
 
             var oneOneFivePart = new List<EverythingFileResult>();
 
-            var oneOneFiveFiles = await OneOneFiveService.Get115SearchFileResult(content, OneOneFiveFolder.AV, true);
+            //var oneOneFiveFiles = await OneOneFiveService.Get115SearchFileResult(content, OneOneFiveFolder.AV, true);
 
-            if (oneOneFiveFiles != null && oneOneFiveFiles.Any())
+            var matchFile = oneOneFiveAllFiles.FirstOrDefault(x => x.n.Contains(content, StringComparison.OrdinalIgnoreCase));
+
+            if (matchFile != null)
             {
-                foreach (var file in oneOneFiveFiles)
+                EverythingFileResult temp = new()
                 {
-                    EverythingFileResult temp = new()
-                    {
-                        size = file.s + "",
-                        sizeStr = FileUtility.GetAutoSizeString(double.Parse(file.s + ""), 1),
-                        location = "115网盘",
-                        name = file.n,
-                        path = file.pc,
-                        type = file.@class
-                    };
+                    size = matchFile.s + "",
+                    sizeStr = FileUtility.GetAutoSizeString(double.Parse(matchFile.s + ""), 1),
+                    location = "115网盘",
+                    name = matchFile.n,
+                    path = matchFile.pc,
+                    type = matchFile.@class
+                };
 
-                    oneOneFivePart.Add(temp);
-                }
+                oneOneFivePart.Add(temp);
             }
 
             if (localPart != null && localPart.results != null && localPart.results.Any())

@@ -1,6 +1,7 @@
 ﻿using DAL;
 using HtmlAgilityPack;
 using Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -47,7 +48,7 @@ namespace Services
             ScanResult sr = new();
             sr.StartTime = startTime;
             sr.WebSite = WebScanUrlSite.JavLibrary;
-            sr.Url = url;
+            sr.Url = url.Split(',')[0];
             sr.Name = name;
             sr.MagUrl = "";
             sr.Id = await new ScanDAL().SaveSeedMagnetSearchModel(sr);
@@ -105,7 +106,7 @@ namespace Services
             ScanResult sr = new();
             sr.StartTime = startTime;
             sr.WebSite = WebScanUrlSite.JavBus;
-            sr.Url = url;
+            sr.Url = url.Split(',')[0];
             sr.Name = name;
             sr.MagUrl = "";
             sr.Id = await new ScanDAL().SaveSeedMagnetSearchModel(sr);
@@ -384,31 +385,33 @@ namespace Services
             {
                 var dic = scanResult.MagUrlObj.GroupBy(x => x.SearchUrl).ToDictionary(x => x.Key, x => x.ToList());
 
+                var avModelList = new List<AvModel>();
+
+                if (scanResult.Url.Contains("javlibrary", StringComparison.OrdinalIgnoreCase))
+                {
+                    avModelList = new JavLibraryDAL().GetAvModelByWhere("").Result;
+                }
+
+                if (scanResult.Url.Contains("javbus", StringComparison.OrdinalIgnoreCase))
+                {
+                    avModelList = new JavBusDAL().GetAvModelByWhere("").Result;
+                }
+
+                var oneOneFiveAllFiles = JsonConvert.DeserializeObject<List<OneOneFiveFileItemModel>>(RedisService.GetHash("115", "allfiles"));
+
                 foreach (var d in dic)
                 {
-                    var avModelList = new List<AvModel>();
+                    var avModel = avModelList.FirstOrDefault(x => x.Url == d.Key);
 
-                    if (scanResult.Url.Contains("javlibrary", StringComparison.OrdinalIgnoreCase))
-                    {
-                        avModelList = new JavLibraryDAL().GetAvModelByWhere($" AND Url = '{d.Key}'").Result;
-                    }
-
-                    if (scanResult.Url.Contains("javbus", StringComparison.OrdinalIgnoreCase))
-                    {
-                        avModelList = new JavBusDAL().GetAvModelByWhere($" AND Url = '{d.Key}'").Result;
-                    }
-
-                    if (avModelList != null && avModelList.Any())
+                    if (avModel != null)
                     {
                         ShowMagnetSearchResult temp = new ShowMagnetSearchResult();
-
-                        var avModel = avModelList.FirstOrDefault();
 
                         var magList = d.Value.Where(x => x.Title.Contains(avModel.AvId, StringComparison.OrdinalIgnoreCase)).ToList();
 
                         if (magList != null && magList.Any())
                         {
-                            var matchFiles = await EverythingService.SearchBothLocalAnd115(avModel.AvId);
+                            var matchFiles = await EverythingService.SearchBothLocalAnd115(avModel.AvId, oneOneFiveAllFiles);
 
                             magList.ForEach(x => x.MagSizeStr = FileUtility.GetAutoSizeString(x.MagSize, 1));
 

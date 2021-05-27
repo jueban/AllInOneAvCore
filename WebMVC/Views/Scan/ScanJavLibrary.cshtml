@@ -100,9 +100,17 @@
 
             var p = JSON.stringify({ Url: url, Name: name, Page: Number(page), Order: order });
 
-            connection.invoke("ScanJavLibrary", p).catch(function (err) {
-                return console.error(err.toString());
-            });
+            //TODO post to controller push into redis get key and pass key to job hub, after process delete key
+            $.ajax({ url: "/Scan/PushAndGetRedisKey", method: "POST", async: false, data: { str: p } })
+                .done(function (data) {
+                    if (data != '') {
+                        connection.invoke("ScanJavLibrary", data).catch(function (err) {
+                            return console.error(err.toString());
+                        });
+                    }else {
+                        alert("创建失败");
+                    }
+                });
 
             event.preventDefault();
         });

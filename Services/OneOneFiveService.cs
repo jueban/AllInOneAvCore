@@ -40,30 +40,7 @@ namespace Services
             return new(cc, userAgent);
         }
 
-        public async static Task<string> GetOneOneFiveContent(string url)
-        {
-            string ret = "";
-
-            var cookie = await Get115Cookie();
-            CookieContainer cc = cookie.Item1;
-            var ccStr = "";
-
-            if (cc.Count > 0)
-            {
-                ccStr = cc.GetCookieHeader(new Uri(OneOneFiveCookieHost));
-            }
-
-            using (HttpClient client = new())
-            {
-                client.DefaultRequestHeaders.Add("Cookie", ccStr);
-                client.DefaultRequestHeaders.Add("User-Agent", cookie.Item2);
-                ret = await client.GetStringAsync(url);  
-            }
-
-            return ret;
-        }
-
-        public async static Task<List<OneOneFiveFileItemModel>> Get115SearchFileResult(string content, string folder, bool searchAccurate, int offset = 0, int limit = 1050,  OneOneFiveSearchType searchType = OneOneFiveSearchType.All)
+        public async static Task<List<OneOneFiveFileItemModel>> Get115SearchFileResult(string content, string folder, bool searchAccurate, int offset = 0, int limit = 1050, OneOneFiveSearchType searchType = OneOneFiveSearchType.All)
         {
             OneOneFiveFileListModel temp = new OneOneFiveFileListModel();
 
@@ -71,7 +48,7 @@ namespace Services
 
             var url = string.Format(string.Format($"https://webapi.115.com/files/search?search_value={content}&format=json&offset={offset}&limit={limit}&cid={folder}&type={(int)searchType}"));
 
-            resContent = await GetOneOneFiveContent(url);          
+            resContent = await GetOneOneFiveContent(url);
 
             if (!string.IsNullOrEmpty(resContent))
             {
@@ -152,7 +129,7 @@ namespace Services
 
             if (split.Count() <= 1)
             {
-                url= "https://115.com/web/lixian/?ct=lixian&ac=add_task_url";
+                url = "https://115.com/web/lixian/?ct=lixian&ac=add_task_url";
             }
             else
             {
@@ -161,7 +138,8 @@ namespace Services
 
             var res = await OneOneFiveTaskPost(url, param);
 
-            return new OneOneFiveResult() { 
+            return new OneOneFiveResult()
+            {
                 error_msg = res.msg,
                 state = res.status
             };
@@ -205,6 +183,122 @@ namespace Services
                 {
                     ret.msg = data.error_msg;
                 }
+            }
+
+            return ret;
+        }
+
+        public async static Task<int> Get115PagesInFolder(OneOneFiveSearchType type, string folder, int pageSize = 1)
+        {
+            var url = $"https://webapi.115.com/files?aid=1&cid={folder}&o=user_ptime&asc=0&offset=0&show_dir=1&limit={pageSize}&code=&scid=&snap=0&natsort=1&record_open_time=1&source=&format=json&type={((int)type).ToString()}";
+
+            var res = await GetOneOneFiveContent(url);
+            if (!string.IsNullOrEmpty(res))
+            {
+                var data = JsonConvert.DeserializeObject<OneOneFiveFileListModel>(res);
+
+                if (data != null && data.count > 0)
+                {
+                    if (data.data == null)
+                    {
+                        return data.count % pageSize == 0 ? data.count / pageSize : data.count / pageSize + 1;
+                    }
+
+                    return data.count % data.page_size == 0 ? data.count / data.page_size : data.count / data.page_size + 1;
+                }
+            }
+
+            return 0;
+        }
+
+        public async static Task<OneOneFiveFileListModel> GetMixedOneOneFileInFolder(string folder, int page = 0, int pageSize = 1150)
+        {
+            OneOneFiveFileListModel ret = new OneOneFiveFileListModel();
+
+            var url = $"https://aps.115.com/natsort/files.php?aid=1&cid={folder}&o=file_name&asc=1&offset={page}&show_dir=1&limit={pageSize}&code=&scid=&snap=0&natsort=1&record_open_time=1&source=&format=json&fc_mix=0";
+
+            var res = await GetOneOneFiveContent(url);
+
+            if (!string.IsNullOrEmpty(res))
+            {
+                ret = JsonConvert.DeserializeObject<OneOneFiveFileListModel>(res);
+            }
+
+            return ret;
+        }
+
+        public async static Task<OneOneFiveFileListModel> GetOneOneFileInFolder(string folder, OneOneFiveSearchType type, int page = 0, int pageSize = 1150)
+        {
+            OneOneFiveFileListModel ret = new();
+
+            var url = $"https://webapi.115.com/files?aid=1&cid={folder}&o=user_ptime&asc=0&offset={page}&show_dir=1&limit={pageSize}&code=&scid=&snap=0&natsort=1&record_open_time=1&source=&format=json&type={((int)type).ToString()}&star=&is_q=&is_share=";
+
+            var res = await GetOneOneFiveContent(url);
+
+            if (!string.IsNullOrEmpty(res))
+            {
+                ret = JsonConvert.DeserializeObject<OneOneFiveFileListModel>(res);
+
+                if (ret.data == null)
+                {
+                    ret = await GetMixedOneOneFileInFolder(folder, page, pageSize);
+                }
+            }
+
+            return ret;
+        }
+
+        public async static Task<List<OneOneFiveFileItemModel>> Get115AllFilesModel(string folder, OneOneFiveSearchType type = OneOneFiveSearchType.All)
+        {
+            List<OneOneFiveFileItemModel> list = new List<OneOneFiveFileItemModel>();
+
+            var pages = await Get115PagesInFolder(type, folder, 1050);
+
+            for (int i = 0; i < pages; i++)
+            {
+                var files = await GetOneOneFileInFolder(folder, type, i * 1150, 1150);
+
+                if (files != null && files.data != null)
+                {
+                    list.AddRange(files.data);
+                }
+            }
+
+            return list;
+        }
+
+        public async static Task RefreshOneOneFiveFinFilesCache()
+        {
+            NoticeService.SendBarkNotice(SettingService.GetSetting().Result.BarkId, $"开始更新115文件缓存");
+            var startTime = DateTime.Now;
+
+            var ret = await Get115AllFilesModel(OneOneFiveFolder.Fin, OneOneFiveSearchType.Video);
+
+            RedisService.DeleteHash("115", "allfiles");
+
+            RedisService.SetHash("115", "allfiles", JsonConvert.SerializeObject(ret));
+
+            NoticeService.SendBarkNotice(SettingService.GetSetting().Result.BarkId, $"更新115文件缓存结束，更新了 {ret.Count} 条，耗时 {(DateTime.Now - startTime).TotalSeconds} 秒");
+        }
+
+        public async static Task<string> GetOneOneFiveContent(string url)
+        {
+            string ret = "";
+
+            var cookie = await Get115Cookie();
+            CookieContainer cc = cookie.Item1;
+            var ccStr = "";
+
+            if (cc.Count > 0)
+            {
+                ccStr = cc.GetCookieHeader(new Uri(OneOneFiveCookieHost));
+            }
+
+            using (HttpClient client = new())
+            {
+                client.DefaultRequestHeaders.Add("Cookie", ccStr);
+                client.DefaultRequestHeaders.Add("User-Agent", cookie.Item2);
+                ret = await client.GetStringAsync(url);
             }
 
             return ret;

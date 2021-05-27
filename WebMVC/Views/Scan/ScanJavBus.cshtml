@@ -95,9 +95,16 @@
 
             var p = JSON.stringify({ Url: url, Name: name, Page: Number(page) });
 
-            connection.invoke("ScanJavBus", p).catch(function (err) {
-                return console.error(err.toString());
-            });
+            $.ajax({ url: "/Scan/PushAndGetRedisKey", method: "POST", async: false, data: { str: p } })
+                .done(function (data) {
+                    if (data != '') {
+                        connection.invoke("ScanJavBus", data).catch(function (err) {
+                            return console.error(err.toString());
+                        });
+                    } else {
+                        alert("创建失败");
+                    }
+                });
 
             event.preventDefault();
         });
