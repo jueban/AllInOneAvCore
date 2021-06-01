@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Services;
 using Utils;
 
 namespace WebMVC
@@ -28,6 +29,8 @@ namespace WebMVC
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var setting = SettingService.GetSetting().Result;
+
             services.AddDbContext<IdentityUserContext>(options =>
             {
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
@@ -81,7 +84,7 @@ namespace WebMVC
                 options.AddPolicy("CustomCorsPolicy", policy =>
                 {
                     // 设定允许跨域的来源，有多个可以用','隔开
-                    policy.WithOrigins("http://localhost:20004")
+                    policy.WithOrigins("http://localhost:20004", setting.JobHubSite)
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .AllowCredentials();

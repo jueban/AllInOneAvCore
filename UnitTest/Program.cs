@@ -60,7 +60,19 @@ namespace UnitTest
             //FileUtility.RenameAndTransferUsingSystem(@"N:\Download\movefiles\fin\DMAT-192-眠る義母 息子に夜●いされて (2).mp4", @"N:\Download\movefiles\DMAT-192-眠る義母 息子に夜●いされて (2).mp4", true);
             //MagnetUrlService.SearchJavBus("https://www.javbus.com/page", 1, "Siri扫描Javbus", progress).Wait();
 
-            var ret = MagnetUrlService.GetScanResultDetail(77).Result;
+            //var ret = MagnetUrlService.GetScanResultDetail(77).Result;
+
+            var business = new JavBusDAL();
+            var rets = business.GetAvModelByWhere("").Result;
+
+            foreach (var av in rets)
+            {
+                if (av.PicUrl.Contains("https://www.javbus.com//"))
+                {
+                    av.PicUrl = av.PicUrl.Replace("https://www.javbus.com//", "https://www.javbus.com/");
+                    business.UpdateAvModel(av).Wait();
+                }
+            }
 
             Console.ReadKey();
         }

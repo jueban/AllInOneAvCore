@@ -12,6 +12,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Models;
+using Services;
 using Utils;
 
 namespace WebApi
@@ -28,11 +29,13 @@ namespace WebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var setting = SettingService.GetSetting().Result;
+
             services.AddAuthentication("Bearer")
                 .AddIdentityServerAuthentication("Bearer", options =>
                 {
                     options.ApiName = "api";
-                    options.Authority = "http://localhost:20020";
+                    options.Authority = setting.IdentityServerSite;
                     options.RequireHttpsMetadata = false;
                 });
 
@@ -41,7 +44,7 @@ namespace WebApi
                 options.AddPolicy("CustomCorsPolicy", policy =>
                 {
                     // 设定允许跨域的来源，有多个可以用','隔开
-                    policy.WithOrigins("http://localhost:20003")
+                    policy.WithOrigins("http://localhost:20003", setting.MvcSite)
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .AllowCredentials();

@@ -399,6 +399,11 @@ namespace Services
                 ret.Name = FileUtility.ReplaceInvalidChar(FileUtility.FanToJian(avBlockNode.SelectSingleNode(avNamePath).Attributes["title"].Value.Trim()));
                 ret.PicUrl = avBlockNode.SelectSingleNode(avNamePath).Attributes["src"].Value.Trim();
 
+                if (!ret.PicUrl.StartsWith("http")) 
+                {
+                    ret.PicUrl = JavBusIndexUrl.Substring(0, JavBusIndexUrl.Length - 1) + ret.PicUrl;
+                }
+
                 if (infoNodes != null)
                 {
                     foreach (var infoNode in infoNodes)

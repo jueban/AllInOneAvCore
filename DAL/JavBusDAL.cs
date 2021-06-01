@@ -110,6 +110,13 @@ namespace DAL
             return await QueryAsync<AvModel>(sql);
         }
 
+        public async Task<int> UpdateAvModel(AvModel model)
+        {
+            var sql = "UPDATE AvModel SET PicUrl = @PicUrl WHERE Id = @Id";
+
+            return await ExecuteAsync(sql, model);
+        }
+
         public async Task<int> DeleteAvMapping(int avId)
         {
             var sql = @"DELETE FROM AvMapping WHERE AvId = @avId";

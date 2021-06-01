@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Utils;
 using JobHub.Hubs;
+using Services;
 
 namespace JobHub
 {
@@ -25,10 +26,12 @@ namespace JobHub
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var setting = SettingService.GetSetting().Result;
+
             services.AddSignalR();
             services.AddCors(option => option.AddPolicy("cors",
                 policy => policy.AllowAnyHeader().AllowAnyMethod().AllowCredentials()
-                    .WithOrigins("http://localhost:20003")));
+                    .WithOrigins("http://localhost:20003", setting.MvcSite)));
 
             services.AddSingleton(new LogHelper());
         }

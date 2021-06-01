@@ -17,14 +17,9 @@ namespace Services
         //从WebAPI获取配置
         public async static Task<Settings> GetSetting()
         {
-            string content = "";
+            var content = await new SettingsDAL().GetAllSettings();
 
-            using (HttpClient client = new())
-            {
-                content = await client.GetStringAsync($"http://localhost:20001/api/config/GetConfig");
-            }
-
-            return JsonSerializer.Deserialize<Settings>(content, new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+            return content;
         }
 
         public async static Task SaveSetting(Settings settings, IProgress<string> progress)

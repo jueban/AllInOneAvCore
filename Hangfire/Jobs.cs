@@ -13,19 +13,11 @@ namespace Hangfire
 {
     public class Jobs
     {
-        public static void OpenBroswerJob(string location, string url)
+        public static void OpenBroswerJob()
         {
             NoticeService.SendBarkNotice(SettingService.GetSetting().Result.BarkId, "开始打开浏览器获取Cookie");
 
             ScheduleService.RunScheduler("OpenJavLibraryToGetCookie");
-        }
-
-        //没想好怎么搞processId
-        public static void CloseBroswerJob(int processId)
-        {
-            NoticeService.SendBarkNotice(SettingService.GetSetting().Result.BarkId, "开始关闭浏览器获取Cookie");
-
-            System.Diagnostics.Process.GetProcessById(processId);
         }
 
         public static void ScanJavLibraryAllUrlsAndSave()

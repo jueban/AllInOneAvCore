@@ -23,6 +23,11 @@ namespace Models
 
         //Not in setting table
         public string Prefix { get; set; }
+        public string MvcSite { get; set; }
+        public string ApiSite { get; set; }
+        public string HangfireSite { get; set; }
+        public string JobHubSite { get; set; }
+        public string IdentityServerSite{ get; set; }
     }
 
     public class JavLibrarySettings

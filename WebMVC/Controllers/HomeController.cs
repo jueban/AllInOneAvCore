@@ -10,6 +10,7 @@ using WebMVC.Models;
 
 namespace WebMVC.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -19,7 +20,6 @@ namespace WebMVC.Controllers
             _logger = logger;
         }
 
-        [Authorize]
         public IActionResult Index()
         {
             return View();

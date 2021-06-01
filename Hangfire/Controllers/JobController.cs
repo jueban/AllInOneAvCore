@@ -16,7 +16,7 @@ namespace Hangfire.Controllers
         [HttpGet]
         public string OpenBroswer(string location, string url)
         {
-            BackgroundJob.Enqueue(() => Jobs.OpenBroswerJob(location, url));
+            BackgroundJob.Enqueue(() => Jobs.OpenBroswerJob());
 
             return "success";
         }

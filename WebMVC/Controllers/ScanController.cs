@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DAL;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models;
 using Newtonsoft.Json;
@@ -10,6 +11,7 @@ using Services;
 
 namespace WebMVC.Controllers
 {
+    [Authorize]
     public class ScanController : Controller
     {
         public IActionResult Index()
