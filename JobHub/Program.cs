@@ -20,7 +20,7 @@ namespace JobHub
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<Startup>().UseUrls("http://*:20004");
+                    webBuilder.UseStartup<Startup>().UseUrls("http://*:20004").UseIISIntegration();
                 });
     }
 }

@@ -20,7 +20,7 @@ namespace Hangfire
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<Startup>().UseUrls("http://*:20002");
+                    webBuilder.UseStartup<Startup>().UseUrls("http://*:20002").UseIISIntegration();
                 });
     }
 }

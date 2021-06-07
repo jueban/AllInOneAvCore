@@ -11,6 +11,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Utils;
+using Dasync.Collections;
 
 namespace Services
 {
@@ -66,28 +67,25 @@ namespace Services
                 progress.Report($"扫描完毕，开始下载磁链");
                 int index = 1;
 
-                await Task.Run(() =>
+                try
                 {
-                    try
+                    await details.ParallelForEachAsync(async id =>
                     {
-                        Parallel.ForEach(details, new ParallelOptions() { MaxDegreeOfParallelism = 10 }, id =>
-                        {
-                            progress.Report($"正在处理 {index++} / {details.Count} ");
+                        progress.Report($"正在处理 {index++} / {details.Count} ");
 
-                            JavLibraryService.DownloadJavLibraryDetailAndSavePictureFromWebScanUrl(new List<WebScanUrlModel>() { id }, progress).Wait();
+                        await JavLibraryService.DownloadJavLibraryDetailAndSavePictureFromWebScanUrl(new List<WebScanUrlModel>() { id }, progress);
 
-                            var res = SearchSukebeiMag(id.AvId, id.URL).Result;
-                            ret.AddRange(res);
-                            progress.Report($"\t{id.AvId} 下载了 {res.Count} 个磁链");
+                        var res = await SearchSukebeiMag(id.AvId, id.URL);
+                        ret.AddRange(res);
+                        progress.Report($"\t{id.AvId} 下载了 {res.Count} 个磁链");
 
-                            Task.Delay(ran.Next(50));
-                        });
-                    }
-                    catch (Exception)
-                    {
+                        await Task.Delay(ran.Next(50));
+                    });
+                }
+                catch (Exception)
+                {
 
-                    }
-                });
+                }
             }
 
             sr.MagUrl = JsonHelper.SerializeWithUtf8(ret);
@@ -124,30 +122,27 @@ namespace Services
 
                 progress.Report($"扫描完毕，开始下载磁链");
 
-                await Task.Run(() =>
+                try
                 {
-                    try
+                    await details.success.ParallelForEachAsync(async id =>
                     {
-                        Parallel.ForEach(details.success, new ParallelOptions() { MaxDegreeOfParallelism = 3 }, id =>
-                        {
-                            progress.Report($"正在处理 {index++} / {details.success.Count} ");
+                        progress.Report($"正在处理 {index++} / {details.success.Count} ");
 
-                            JavbusService.GetJavBusDetail(id.URL).Wait();
+                        await JavbusService.GetJavBusDetail(id.URL);
 
-                            var res = SearchSukebeiMag(id.AvId, id.URL).Result;
-                            res.AddRange(SearchJavBusMag(id.AvId, id.URL).Result);
+                        var res = await SearchSukebeiMag(id.AvId, id.URL);
+                        res.AddRange(await SearchJavBusMag(id.AvId, id.URL));
 
-                            ret.AddRange(res);
-                            progress.Report($"\t{id.AvId} 下载了 {res.Count} 个磁链");
+                        ret.AddRange(res);
+                        progress.Report($"\t{id.AvId} 下载了 {res.Count} 个磁链");
 
-                            Task.Delay(ran.Next(50));
-                        });
-                    }
-                    catch (Exception)
-                    {
+                        await Task.Delay(ran.Next(50));
+                    });
+                }
+                catch (Exception)
+                {
 
-                    }
-                });
+                }
             }
 
             sr.MagUrl = JsonHelper.SerializeWithUtf8(ret);

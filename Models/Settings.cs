@@ -28,6 +28,8 @@ namespace Models
         public string HangfireSite { get; set; }
         public string JobHubSite { get; set; }
         public string IdentityServerSite{ get; set; }
+        public string PingServiceLocation { get; set; }
+        public string PingServiceSite { get; set; }
     }
 
     public class JavLibrarySettings

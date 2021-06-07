@@ -36,10 +36,6 @@ namespace Hangfire
         {
             services.AddHangfire(configuration => {
                 configuration.UseSqlServerStorage("Server=localhost\\SQLEXPRESS;Database=Hangfire;User=sa;password=pa$$w0rd;");
-
-                RecurringJob.AddOrUpdate("RefreshRedis", () => OneOneFiveService.RefreshOneOneFiveFinFilesCache(), Cron.HourInterval(4));
-
-                RecurringJob.AddOrUpdate("ScanJavLibraryUpdate", () => JavLibraryService.ScanJavLibraryUpdate(), Cron.HourInterval(4));
             });
 
             services.AddSingleton(new LogHelper());

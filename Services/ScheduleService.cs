@@ -30,6 +30,32 @@ namespace Services
             }
         }
 
+        public static void CreateIntervalTimeScheduler(string name, string desc, string exeLocation, string param, int mintutes)
+        {
+            using (TaskService ts = new())
+            {
+                var task = ts.FindTask(name);
+
+                // Create a new task definition and assign properties
+                TaskDefinition td = ts.NewTask();
+                td.RegistrationInfo.Description = desc;
+
+                // Create a trigger that will fire the task at this time every other day
+                //td.Triggers.Add(new DailyTrigger { DaysInterval = 2 });
+
+                // Create an action that will launch Notepad whenever the trigger fires
+                td.Actions.Add(new ExecAction(exeLocation, param, null));
+
+                TimeTrigger tt = new TimeTrigger();
+                tt.Repetition.Interval = TimeSpan.FromMinutes(mintutes);
+
+                td.Triggers.Add(tt);
+
+                // Register the task in the root folder
+                ts.RootFolder.RegisterTaskDefinition(name, td);
+            }
+        }
+
         public static void RunScheduler(string name)
         {
             using (TaskService ts = new())

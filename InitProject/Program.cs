@@ -49,13 +49,17 @@ namespace InitProject
                 HangfireSite = "http://localhost:20002",
                 IdentityServerSite = "http://localhost:20020",
                 JobHubSite = "http://localhost:20004",
-                MvcSite = "http://localhost:20003"
+                MvcSite = "http://localhost:20003",
+                PingServiceLocation = @"E:\Github\AllInOneAvCore\AllInOneAvCore\PingServiceToKeepAlive\bin\Debug\net5.0\PingServiceToKeepAlive.exe",
+                PingServiceSite = "http://localhost:20002,http://localhost:20003"
             };
 
             Progress<string> progress = new();
             progress.ProgressChanged += Printlog;
 
             SettingService.SaveSetting(settings, progress).Wait();
+
+            InitPingServiceToKeepAliveTask(settings.PingServiceLocation, settings.PingServiceSite);
         }
 
         private static void Printlog(object sender, string e)
@@ -74,6 +78,12 @@ namespace InitProject
         {
             Console.WriteLine("创建用浏览器获取JavLibrary Cookie的定时任务");
             ScheduleService.CreateOneTimeScheduler("OpenJavLibraryToGetCookie", "Open JavLibrary To Get Cookie", Win32Helper.GetExeLocation("Chrome.exe"), "http://www.javlibrary.com/cn/");
+        }
+
+        static void InitPingServiceToKeepAliveTask(string location, string site)
+        {
+            Console.WriteLine("定时调用Web服务保证服务不会回收");
+            ScheduleService.CreateIntervalTimeScheduler("PingServiceToKeepAlive", "Ping Service To Keep Alive", location, site, 30);
         }
     }
 }

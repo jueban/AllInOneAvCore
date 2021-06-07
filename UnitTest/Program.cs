@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using DAL;
+using JobHub.Hubs;
 using Models;
 using Newtonsoft.Json;
 using Services;
@@ -62,17 +63,9 @@ namespace UnitTest
 
             //var ret = MagnetUrlService.GetScanResultDetail(77).Result;
 
-            var business = new JavBusDAL();
-            var rets = business.GetAvModelByWhere("").Result;
+            //MagnetUrlService.SearchJavLibrary("http://www.javlibrary.com/cn/vl_update.php?&mode=", 20, "test", "ASC", progress).Wait();
 
-            foreach (var av in rets)
-            {
-                if (av.PicUrl.Contains("https://www.javbus.com//"))
-                {
-                    av.PicUrl = av.PicUrl.Replace("https://www.javbus.com//", "https://www.javbus.com/");
-                    business.UpdateAvModel(av).Wait();
-                }
-            }
+            ScheduleService.RunScheduler("OpenJavLibraryToGetCookie");
 
             Console.ReadKey();
         }

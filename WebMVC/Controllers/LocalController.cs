@@ -87,6 +87,14 @@ namespace WebMVC.Controllers
         }
 
         [HttpPost]
+        public JsonResult GetPossibleAvMatch([FromBody] string fileName)
+        {
+            var ret = LocalService.GetPossibleAvMatch(fileName);
+
+            return Json(ret);
+        }
+
+        [HttpPost]
         public async Task<JsonResult> GetJavLibrarySearchResult([FromBody] string content)
         {
             Progress<string> progress = new();

@@ -27,7 +27,7 @@ namespace Hangfire
 
             Progress<string> progress = new();
             progress.ProgressChanged += LogInfo;
-            JavLibraryService.ScanJavLibraryAllUrlsAndSave(progress);
+            JavLibraryService.ScanJavLibraryAllUrlsAndSave(progress).Wait();
 
             NoticeService.SendBarkNotice(SettingService.GetSetting().Result.BarkId, $"处理扫描全部Urls完成，耗时 {(DateTime.Now - startTime).TotalSeconds} 秒");
         }
@@ -83,6 +83,7 @@ namespace Hangfire
             DateTime startTime = DateTime.Now;
             NoticeService.SendBarkNotice(SettingService.GetSetting().Result.BarkId, $"开始扫描 {site} 磁链");
             Progress<string> progress = new Progress<string>();
+            progress.ProgressChanged += LogInfo;
 
             if (site == "javlibrary")
             {

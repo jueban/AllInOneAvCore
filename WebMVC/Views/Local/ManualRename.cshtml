@@ -26,6 +26,9 @@
                 <span class="input-group-text" id="currentFileName"></span>
             </div>
             <input type="text" class="form-control" id="finalFileName">
+            <div class="input-group-prepend">
+                <button type="button" class="btn btn-primary" id="match" onclick="javascript:match();">匹配</button>
+            </div>
         </div>
 
         <div class="input-group" style="position:absolute;margin-top:39px">
@@ -70,7 +73,7 @@
             </div>
             <input type="text" class="form-control content-list" value="" id="searchContent">
             <div class="input-group-append">
-                <a href="javascript:search();" class="btn btn-info" type="button">搜索</a>
+                <a href="javascript:search();" class="btn btn-info" type="button">搜索JavLibrary</a>
             </div>
         </div>
 
@@ -226,6 +229,32 @@
                     success: function (data) {
                         $("#finalFileName").val(data.result.item1);
                         showAv(data.result.item2);
+                    }
+                });
+            }
+        }
+
+        function match() {
+            var name = $("#finalFileName").val();
+
+            $("#localtion").text("0");
+            $("#episode").text("0");
+            $("#language").text("0");
+
+            $("#localtionDrop").text("位置");
+            $("#episodeDrop").text("序号");
+            $("#languageDrop").text("语言");
+
+            if (name != undefined && name != "") {
+                $.ajax({
+                    url: "/Local/GetPossibleAvMatch",
+                    type: 'post',
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    data: JSON.stringify(name),
+                    async: true,
+                    success: function (data) {
+                        showAv(data.result);
                     }
                 });
             }

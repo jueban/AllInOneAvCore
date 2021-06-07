@@ -14,6 +14,7 @@ using Microsoft.Extensions.Http;
 using Models;
 using Polly;
 using Utils;
+using Dasync.Collections;
 
 namespace Services
 {
@@ -363,7 +364,7 @@ namespace Services
             {
                 if (res.content.Contains("识别码搜寻结果"))
                 {
-                    var firstPageResult = JavLibraryService.GetJavLibraryListPageInfo(JavLibraryEntryPointType.Search, content, 1, false).Result;
+                    var firstPageResult = await GetJavLibraryListPageInfo(JavLibraryEntryPointType.Search, content, 1, false);
                     var totalPage = firstPageResult.pageCount;
 
                     List<int> pageRange = new();
@@ -373,9 +374,9 @@ namespace Services
                         pageRange.Add(i);
                     }
 
-                    await Task.Run(() => Parallel.ForEach(pageRange, new ParallelOptions { MaxDegreeOfParallelism = 10 }, i =>
+                    await pageRange.ParallelForEachAsync(async i =>
                     {
-                        var currentResult = JavLibraryService.GetJavLibraryListPageInfo(JavLibraryEntryPointType.Search, content, i, false).Result;
+                        var currentResult = await GetJavLibraryListPageInfo(JavLibraryEntryPointType.Search, content, i, false);
 
                         if (!string.IsNullOrEmpty(currentResult.fail))
                         {
@@ -386,7 +387,7 @@ namespace Services
                         {
                             foreach (var scan in currentResult.successList)
                             {
-                                var tempRes = GetJavLibraryContent(scan.URL).Result;
+                                var tempRes = await GetJavLibraryContent(scan.URL);
 
                                 if (tempRes.exception == null && !string.IsNullOrEmpty(tempRes.content))
                                 {
@@ -397,7 +398,7 @@ namespace Services
                                 }
                             }
                         }
-                    }));
+                    });
                 }
                 else
                 {
@@ -410,7 +411,7 @@ namespace Services
                     if (urlNode != null)
                     {
                         List<CommonModel> infos = new();
-                        var avModel = GenerateAVModel(res.content, urlNode.Attributes["href"].Value.Trim(), infos);
+                        var avModel = GenerateAVModel(res.content, "http:" + urlNode.Attributes["href"].Value.Trim(), infos);
                         avModel.Infos = JsonHelper.SerializeWithUtf8(infos);
                         ret.Add(avModel);
                     }
@@ -432,15 +433,15 @@ namespace Services
         //    return await new JavLibraryDAL().InsertAvMapping(avId, model.Id, model.Type);
         //}
 
-        public static void ScanJavLibraryAllUrlsAndSave(IProgress<string> progress)
+        public async static Task ScanJavLibraryAllUrlsAndSave(IProgress<string> progress)
         {
             Random ran = new();
 
             var javLibraryCategories = JavLibraryService.GetJavLibraryCategory().Result;
 
-            Parallel.ForEach(javLibraryCategories, new ParallelOptions { MaxDegreeOfParallelism = 10 }, category =>
+            await javLibraryCategories.ParallelForEachAsync(async category =>
             {
-                var firstPageResult = JavLibraryService.GetJavLibraryListPageInfo(JavLibraryEntryPointType.Category, category.Url, 1).Result;
+                var firstPageResult = await JavLibraryService.GetJavLibraryListPageInfo(JavLibraryEntryPointType.Category, category.Url, 1);
 
                 var totalPage = firstPageResult.pageCount;
 
@@ -453,12 +454,12 @@ namespace Services
                 {
                     foreach (var scan in firstPageResult.successList)
                     {
-                        WebScanCommonService.SaveWebScanUrlModel(scan).Wait();
+                        await WebScanCommonService .SaveWebScanUrlModel(scan);
                     }
 
                     for (int i = 2; i <= totalPage; i++)
                     {
-                        var tempScanResult = JavLibraryService.GetJavLibraryListPageInfo(JavLibraryEntryPointType.Category, category.Url, i).Result;
+                        var tempScanResult = await JavLibraryService.GetJavLibraryListPageInfo(JavLibraryEntryPointType.Category, category.Url, i);
 
                         if (!string.IsNullOrEmpty(tempScanResult.fail))
                         {
@@ -467,10 +468,10 @@ namespace Services
 
                         foreach (var scan in tempScanResult.successList)
                         {
-                            WebScanCommonService.SaveWebScanUrlModel(scan).Wait();
+                            await WebScanCommonService.SaveWebScanUrlModel(scan);
                         }
 
-                        Task.Delay(ran.Next(50)).Wait();
+                        await Task.Delay(ran.Next(50));
                     }
                 }
             });
@@ -521,28 +522,28 @@ namespace Services
                 Directory.CreateDirectory(imageFolder);
             }
 
-            await Task.Run(() => Parallel.ForEach(waitForDownload, new ParallelOptions { MaxDegreeOfParallelism = 10 }, toBeDownload =>
+            await waitForDownload.ParallelForEachAsync(async toBeDownload =>
             {
-                var avModelScan = JavLibraryService.GetJavLibraryDetailPageInfo(toBeDownload.URL).Result;
+                var avModelScan = await GetJavLibraryDetailPageInfo(toBeDownload.URL);
 
                 if (avModelScan.exception == null && avModelScan.avModel != null)
                 {
                     var result = 0;
                     try
                     {
-                        result = JavLibraryService.SaveJavLibraryAvModel(avModelScan.avModel).Result;
+                        result = await SaveJavLibraryAvModel(avModelScan.avModel);
                     }
                     catch (Exception)
                     {
                         progress.Report($"<=====获取 {toBeDownload.URL} 失败=====>");
                     }
 
-                    JavLibraryService.SaveCommonJavLibraryModel(avModelScan.infos).Wait();
+                    await SaveCommonJavLibraryModel(avModelScan.infos);
 
                     if (result > 0)
                     {
                         ret++;
-                        JavLibraryService.UpdateJavLibraryScanDownloadState(toBeDownload.Id, true).Wait();
+                        await UpdateJavLibraryScanDownloadState(toBeDownload.Id, true);
                     }
 
                     var picFile = imageFolder + "\\" + avModelScan.avModel.FileNameWithoutExtension + ".jpg";
@@ -564,8 +565,8 @@ namespace Services
                     progress.Report($"<=====获取 {toBeDownload.URL} 失败=====>");
                 }
 
-                Task.Delay(random.Next(50)).Wait();
-            }));
+                await Task.Delay(random.Next(50));
+            });
 
             return ret;
         }
@@ -576,7 +577,7 @@ namespace Services
 
             Random ran = new();
 
-            var firstPageResult = JavLibraryService.GetJavLibraryListPageInfo(entry, url, 1, useExactPassin).Result;
+            var firstPageResult = await GetJavLibraryListPageInfo(entry, url, 1, useExactPassin);
             var totalPage = firstPageResult.pageCount;
 
             progress.Report($"一共有 {totalPage} 页");
@@ -598,11 +599,11 @@ namespace Services
                 }
             }
 
-            await Task.Run(() => Parallel.ForEach(pageRange, new ParallelOptions { MaxDegreeOfParallelism = 10 }, i =>
+            await pageRange.ParallelForEachAsync(async i =>
             {
                 progress.Report($"正在扫描第 {i} 页");
 
-                var currentResult = JavLibraryService.GetJavLibraryListPageInfo(entry, url, i, useExactPassin).Result;
+                var currentResult = await GetJavLibraryListPageInfo(entry, url, i, useExactPassin);
 
                 if (!string.IsNullOrEmpty(currentResult.fail))
                 {
@@ -613,7 +614,7 @@ namespace Services
                 {
                     foreach (var scan in currentResult.successList)
                     {
-                        var id = WebScanCommonService.SaveWebScanUrlModel(scan).Result;
+                        var id = await WebScanCommonService.SaveWebScanUrlModel(scan);
 
                         if (id > 0)
                         {
@@ -624,8 +625,8 @@ namespace Services
                     }
                 }
 
-                Task.Delay(ran.Next(50));
-            }));
+                await Task.Delay(ran.Next(50));
+            });
 
             return scans;
         }

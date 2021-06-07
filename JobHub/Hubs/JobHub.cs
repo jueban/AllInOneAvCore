@@ -10,6 +10,8 @@ namespace JobHub.Hubs
 {
     public class JobHubs : Hub
     {
+        private static readonly bool IsDebug = false;
+
         public async Task<string> RemoveFolder(string folder)
         {
             LogHelper.Info("去文件夹");
@@ -45,6 +47,9 @@ namespace JobHub.Hubs
         {
             try
             {
+                Progress<string> progress = new();
+                progress.ProgressChanged += ReportScanProgress;
+
                 NoticeService.SendBarkNotice(SettingService.GetSetting().Result.BarkId, $"开始扫描JavLibrary");
 
                 var startTime = DateTime.Now;
@@ -52,8 +57,6 @@ namespace JobHub.Hubs
                 str = RedisService.GetHash("scan", str);
 
                 ScanParam param = JsonConvert.DeserializeObject<ScanParam>(str);
-                Progress<string> progress = new();
-                progress.ProgressChanged += ReportScanProgress;
 
                 await MagnetUrlService.SearchJavLibrary(param.Url, param.Page, param.Name, param.Order, progress);
 
@@ -61,6 +64,7 @@ namespace JobHub.Hubs
             }
             catch (Exception ee)
             {
+                LogHelper.Info(ee.ToString());
                 await Clients.Caller.SendAsync($"异常 {ee}");
             }
             finally
@@ -103,7 +107,14 @@ namespace JobHub.Hubs
 
         private void ReportScanProgress(object sender, string e)
         {
-            Clients.Caller.SendAsync("ScanResult", e);
+            if (!IsDebug)
+            {
+                Clients.Caller.SendAsync("ScanResult", e);
+            }
+            else
+            {
+                Console.WriteLine(e);
+            }
         }
     }
 }

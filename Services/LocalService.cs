@@ -485,6 +485,16 @@ namespace Services
             return ret;
         }
 
+        public static async Task<List<AvModel>> GetPossibleAvMatch(string avId)
+        {
+            var ret = new List<AvModel>();
+
+            ret = await new JavLibraryDAL().GetAvModelByWhere($" AND AvId = '{avId}'");
+
+            return ret;
+        }
+
+
         public static bool ManualRemove(ManualRenameModel model)
         {
             bool ret = false;

@@ -14,7 +14,7 @@ namespace Hangfire.Controllers
     public class JobController : ControllerBase
     {
         [HttpGet]
-        public string OpenBroswer(string location, string url)
+        public string OpenBroswer()
         {
             BackgroundJob.Enqueue(() => Jobs.OpenBroswerJob());
 
@@ -57,6 +57,14 @@ namespace Hangfire.Controllers
         public string ScanJavUpdate(string site, int page = 0)
         {
             BackgroundJob.Enqueue(() => Jobs.ScanJavUpdate(site, page));
+
+            return "success";
+        }
+
+        [HttpGet]
+        public string RegJavlibraryDailyUpdate()
+        {
+            RecurringJob.AddOrUpdate(() => Jobs.ScanJavLibraryUpdateUrls(JavLibraryEntryPointType.Update, 200, "", false), Cron.HourInterval(4));
 
             return "success";
         }
