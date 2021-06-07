@@ -59,7 +59,7 @@ namespace InitProject
 
             SettingService.SaveSetting(settings, progress).Wait();
 
-            InitPingServiceToKeepAliveTask(settings.PingServiceLocation, settings.PingServiceSite);
+            //InitPingServiceToKeepAliveTask(settings.PingServiceLocation, settings.PingServiceSite);
         }
 
         private static void Printlog(object sender, string e)
@@ -80,10 +80,10 @@ namespace InitProject
             ScheduleService.CreateOneTimeScheduler("OpenJavLibraryToGetCookie", "Open JavLibrary To Get Cookie", Win32Helper.GetExeLocation("Chrome.exe"), "http://www.javlibrary.com/cn/");
         }
 
-        static void InitPingServiceToKeepAliveTask(string location, string site)
-        {
-            Console.WriteLine("定时调用Web服务保证服务不会回收");
-            ScheduleService.CreateIntervalTimeScheduler("PingServiceToKeepAlive", "Ping Service To Keep Alive", location, site, 30);
-        }
+        //static void InitPingServiceToKeepAliveTask(string location, string site)
+        //{
+        //    Console.WriteLine("定时调用Web服务保证服务不会回收");
+        //    ScheduleService.CreateIntervalTimeScheduler("PingServiceToKeepAlive", "Ping Service To Keep Alive", location, site, 30);
+        //}
     }
 }

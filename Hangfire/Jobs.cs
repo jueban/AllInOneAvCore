@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Utils;
 
@@ -96,6 +97,21 @@ namespace Hangfire
             }
 
             NoticeService.SendBarkNotice(SettingService.GetSetting().Result.BarkId, $"结束扫描 {site} 磁链, 用时 {(DateTime.Now - startTime).TotalSeconds} 秒");
+        }
+
+        public static void PingService()
+        {
+            var setting = SettingService.GetSetting().Result;
+
+            var sites = setting.PingServiceSite.Split(',').ToList();
+
+            foreach (var site in sites)
+            {
+                using (HttpClient hc = new HttpClient())
+                {
+                    var result = hc.GetStringAsync(site + "/ping/ping").Result;
+                }
+            }
         }
     }
 }

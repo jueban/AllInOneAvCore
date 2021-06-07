@@ -68,5 +68,13 @@ namespace Hangfire.Controllers
 
             return "success";
         }
+
+        [HttpGet]
+        public string PingService()
+        {
+            RecurringJob.AddOrUpdate(() => Jobs.PingService(), Cron.MinuteInterval(30));
+
+            return "success";
+        }
     }
 }
