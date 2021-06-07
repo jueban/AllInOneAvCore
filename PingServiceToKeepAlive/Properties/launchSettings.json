@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "PingServiceToKeepAlive": {
-      "commandName": "Project",
-      "commandLineArgs": "http://localhost:20002,http://localhost:20003"
-    }
-  }
-}
