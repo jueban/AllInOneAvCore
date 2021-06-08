@@ -65,7 +65,9 @@ namespace UnitTest
 
             //MagnetUrlService.SearchJavLibrary("http://www.javlibrary.com/cn/vl_update.php?&mode=", 20, "test", "ASC", progress).Wait();
 
-            ScheduleService.RunScheduler("OpenJavLibraryToGetCookie");
+            //ScheduleService.RunScheduler("OpenJavLibraryToGetCookie");
+
+            var res = OneOneFiveService.GetRepeatFiles().Result;
 
             Console.ReadKey();
         }

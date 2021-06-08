@@ -27,6 +27,7 @@ namespace InitProject
             Settings settings = new Settings()
             {
                 BarkId = "4z4uANLXpe8BXT3wAZVe9F",
+                BarkSite = "http://localhost:20005",
                 CommonSettings = new CommonSettings()
                 {
                     ChromeLocation = Win32Helper.GetExeLocation("Chrome.exe")

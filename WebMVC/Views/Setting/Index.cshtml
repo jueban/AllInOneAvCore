@@ -31,11 +31,18 @@
                         <input type="text" class="form-control" v-model="settings.commonSettings.chromeLocation">
                     </div>
 
-                    <div class="input-group">
+                    <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text">Bark通知Id</span>
                         </div>
                         <input type="text" class="form-control" v-model="settings.barkId">
+                    </div>
+
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Bark站点</span>
+                        </div>
+                        <input type="text" class="form-control" v-model="settings.barkSite">
                     </div>
                 </div>
             </div>
@@ -137,39 +144,39 @@
                         <input type="text" class="form-control" v-model="settings.cannotMergeFileTag">
                     </div>
 
-                    <div class="input-group">
+                    <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text">AV前缀设置</span>
                         </div>
                         <textarea class="form-control" v-model="settings.prefix"></textarea>
                     </div>
 
-                    <div class="input-group">
+                    <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text">MVC站点</span>
                         </div>
-                        <textarea class="form-control" v-model="settings.mvcSite"></textarea>
+                        <input type="text" class="form-control" v-model="settings.mvcSite">
                     </div>
 
-                    <div class="input-group">
+                    <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text">API站点</span>
                         </div>
-                        <textarea class="form-control" v-model="settings.apiSite"></textarea>
+                        <input type="text" class="form-control" v-model="settings.apiSite">
                     </div>
 
-                    <div class="input-group">
+                    <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text">Hangfire站点</span>
                         </div>
-                        <textarea class="form-control" v-model="settings.hangfireSite"></textarea>
+                        <input type="text" class="form-control" v-model="settings.hangfireSite">
                     </div>
 
                     <div class="input-group">
                         <div class="input-group-prepend">
                             <span class="input-group-text">Jobhub站点</span>
                         </div>
-                        <textarea class="form-control" v-model="settings.jobHubSite"></textarea>
+                        <input type="text" class="form-control" v-model="settings.jobHubSite">
                     </div>
                 </div>
             </div>

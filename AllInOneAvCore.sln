@@ -27,6 +27,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer", "IdentityS
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Prepare", "Prepare", "{38E5BE65-35F1-40C5-8B55-38A40BB382E6}"
 	ProjectSection(SolutionItems) = preProject
+		BarkServer.txt = BarkServer.txt
 		TemperMonkeyScript.js = TemperMonkeyScript.js
 	EndProjectSection
 EndProject

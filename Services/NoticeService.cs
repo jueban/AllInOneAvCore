@@ -11,9 +11,10 @@ namespace Services
     {
         public async static void SendBarkNotice(string barkId, string content)
         {
+            var setting = await SettingService.GetSetting();
             using (HttpClient client = new())
             {
-                await client.GetAsync($"https://api.day.app/{barkId}/{content}");
+                await client.GetAsync($"{setting.BarkSite}/{barkId}/{content}");
             }
         }
     }

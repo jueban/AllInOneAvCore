@@ -3,10 +3,12 @@ using Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Utils;
 
@@ -302,6 +304,324 @@ namespace Services
             }
 
             return ret;
+        }
+
+        public async static Task<Dictionary<string, List<OneOneFiveFileItemModel>>> GetRepeatFiles(string folder = "0", int pageSize = 1)
+        {
+            Dictionary<string, List<OneOneFiveFileItemModel>> ret = new Dictionary<string, List<OneOneFiveFileItemModel>>();
+            var pattern = @"\(\d+\)";
+            var data = await Get115AllFilesModel(folder, OneOneFiveSearchType.Video);
+
+            var retRepeat = data.Where(x => Regex.IsMatch(x.n, pattern)).ToList();
+
+            foreach (var repeat in retRepeat)
+            {
+                var ori = Regex.Replace(repeat.n, pattern, "");
+
+                if (!ret.ContainsKey(ori))
+                {
+                    var oriItem = data.FirstOrDefault(x => x.n == ori);
+
+                    if (oriItem != null)
+                    {
+                        List<OneOneFiveFileItemModel> temp = new List<OneOneFiveFileItemModel>();
+
+                        temp.Add(oriItem);
+                        temp.Add(repeat);
+
+                        ret.Add(ori, temp);
+                    }
+                    else
+                    {
+                        List<OneOneFiveFileItemModel> temp = new List<OneOneFiveFileItemModel>();
+
+                        temp.Add(repeat);
+
+                        ret.Add(ori, temp);
+                    }
+                }
+                else
+                {
+                    ret[ori].Add(repeat);
+                }
+            }
+
+            return ret;
+        }
+
+        public async static Task<string> DeleteAndRename(Dictionary<string, List<OneOneFiveFileItemModel>> input)
+        {
+            double deleteSize = 0;
+            var pattern = @"\(\d+\)";
+
+            foreach (var data in input)
+            {
+                if (data.Value.Count >= 2)
+                {
+                    Console.WriteLine("正在处理 " + data.Key);
+
+                    var biggest = data.Value.LastOrDefault();
+                    var chinese = data.Value.FirstOrDefault(x => x.n.Contains("-C."));
+
+                    Console.WriteLine("\t最大文件为 " + biggest.n + " 大小为 " + FileUtility.GetAutoSizeString(biggest.s, 2));
+
+                    data.Value.Remove(biggest);
+
+                    foreach (var de in data.Value)
+                    {
+                        Console.WriteLine("\t删除 " + de.n + " 大小为 " + FileUtility.GetAutoSizeString(de.s, 2));
+                        await Delete(new List<OneOneFiveFileItemModel> { de });
+                        deleteSize += de.s;
+                    }
+
+                    Console.WriteLine("\t重命名 " + biggest.n + " 到 " + Regex.Replace(biggest.n, pattern, ""));
+                    await Rename(biggest.fid, Regex.Replace(biggest.n, pattern, ""));
+                    Console.WriteLine();
+                }
+
+                if (data.Value.Count == 1)
+                {
+                    Console.WriteLine("\t重命名 " + data.Value.LastOrDefault().n + " 到 " + Regex.Replace(data.Value.LastOrDefault().n, pattern, ""));
+                    await Rename(data.Value.LastOrDefault().fid, Regex.Replace(data.Value.LastOrDefault().n, pattern, ""));
+                }
+            }
+
+            return FileUtility.GetAutoSizeString(deleteSize, 2);
+        }
+
+        public async static Task<OneOneFiveResult> Delete(List<OneOneFiveFileItemModel> files)
+        {
+            var url = @"https://webapi.115.com/rb/delete";
+
+            Dictionary<string, string> param = new();
+            int index = 0;
+            long deleteSize = 0;
+            string msg;
+            bool status;
+
+            param.Add("pid", "0");
+
+            foreach (var file in files)
+            {
+                param.Add($"fid[{index++}]", file.fid);
+                deleteSize += file.s;
+            }
+
+            try
+            {
+                var res = await OneOneFiveTaskPost(url, param);
+
+                status = res.status;
+                msg = $"删除了 {index} 个文件， 共{FileUtility.GetAutoSizeString(deleteSize, 1)}";
+            }
+            catch (Exception ee)
+            {
+                status = false;
+                msg = ee.ToString();
+            }
+
+            return new OneOneFiveResult()
+            {
+                error_msg = msg,
+                state = status
+            };
+        }
+
+        public async static Task<OneOneFiveResult> Rename(string fid, string newName)
+        {
+            var url = @"https://webapi.115.com/files/batch_rename";
+            string msg;
+            bool status;
+
+            Dictionary<string, string> param = new();
+            param.Add("files_new_name[" + fid + "]", newName);
+
+            try
+            {
+                var res = await OneOneFiveTaskPost(url, param);
+
+                status = res.status;
+                msg = res.msg;
+            }
+            catch (Exception ee)
+            {
+                status = false;
+                msg = ee.ToString();
+            }
+
+            return new OneOneFiveResult()
+            {
+                error_msg = msg,
+                state = status
+            };
+        }
+
+        public async static Task<OneOneFiveResult> Move(List<string> fids, string folder)
+        {
+            var url = @"https://webapi.115.com/files/move";
+            string msg;
+            bool status;
+            int index = 0;
+            
+            Dictionary<string, string> param = new();
+            param.Add("pid", folder);
+            
+            foreach (var fid in fids)
+            {
+                param.Add($"fid[{index++}]", fid);
+            }
+
+            try
+            {
+                var res = await OneOneFiveTaskPost(url, param);
+
+                status = res.status;
+                msg = $"移动了 {index} 个文件";
+            }
+            catch (Exception ee)
+            {
+                status = false;
+                msg = ee.ToString();
+            }
+
+            return new OneOneFiveResult()
+            {
+                error_msg = msg,
+                state = status
+            };
+        }
+
+        public async static Task<OneOneFiveResult> Copy(List<string> fids, string folder)
+        {
+            var url = @"https://webapi.115.com/files/copy";
+            string msg;
+            bool status;
+            int index = 0;
+
+            Dictionary<string, string> param = new Dictionary<string, string>();
+            param.Add("pid", folder);
+
+            foreach (var fid in fids)
+            {
+                param.Add($"fid[{index++}]", fid);
+            }
+
+            try
+            {
+                var res = await OneOneFiveTaskPost(url, param);
+
+                status = res.status;
+                msg = $"复制了 {index} 个文件";
+            }
+            catch (Exception ee)
+            {
+                status = false;
+                msg = ee.ToString();
+            }
+
+            return new OneOneFiveResult()
+            {
+                error_msg = msg,
+                state = status
+            };
+        }
+
+        public static void GetNeedToUpload115Avs()
+        {
+            var drivers = Environment.GetLogicalDrives();
+            var oneOneFiveFiles = JsonConvert.DeserializeObject<List<OneOneFiveFileItemModel>>(RedisService.GetHash("115", "allfiles"));
+            Dictionary<string, List<string>> uplpadFilesDic = new();
+
+            foreach (var driver in drivers)
+            {
+                if (Directory.Exists(driver + "fin\\"))
+                {
+                    if (!Directory.Exists(driver + "upload115\\"))
+                    {
+                        Directory.CreateDirectory(driver + "upload115\\");
+                    }
+
+                    var files = new DirectoryInfo(driver + "fin\\").GetFiles();
+
+                    foreach (var file in files)
+                    {
+                        if (oneOneFiveFiles.FirstOrDefault(x => x.n.Equals(file.Name, StringComparison.OrdinalIgnoreCase) && x.s == file.Length) == null)
+                        {
+                            if (uplpadFilesDic.ContainsKey(driver + "upload115\\"))
+                            {
+                                uplpadFilesDic[driver + "upload115\\"].Add(file.FullName);
+                            }
+                            else
+                            {
+                                uplpadFilesDic.Add(driver + "upload115\\", new List<string> { file.FullName });
+                            }
+                        }
+                    }
+
+                    if (uplpadFilesDic.ContainsKey(driver + "upload115\\") && uplpadFilesDic[driver + "upload115\\"] != null && uplpadFilesDic[driver + "upload115\\"].Count > 0)
+                    {
+                        var pageSize = uplpadFilesDic[driver + "upload115\\"].Count % 5 == 0 ? uplpadFilesDic[driver + "upload115\\"].Count / 5 : (uplpadFilesDic[driver + "upload115\\"].Count % 5) + 1;
+                        var contiune = true;
+                        int index = 1;
+                        int page = 0;
+                        while (contiune)
+                        {
+                            var tempFolder = driver + "upload115\\" + driver.Replace("\\", "") + "-" + DateTime.Today.ToString("yyyyMMdd") + "-" + index++;
+                            Directory.CreateDirectory(tempFolder);
+                            FileUtility.TransferFileUsingSystem(uplpadFilesDic[driver + "upload115\\"].Skip(page++ * pageSize).Take(pageSize).ToList(), tempFolder, true, false);
+
+                            if (page == 5)
+                            {
+                                contiune = false;
+                            }
+                        }
+                    }
+                }
+            }         
+        }
+
+        public async static Task MoveNeedToUpload115AvsBackToFin()
+        {
+            var drivers = Environment.GetLogicalDrives();
+            await RefreshOneOneFiveFinFilesCache();
+            var oneOneFiveFiles = JsonConvert.DeserializeObject<List<OneOneFiveFileItemModel>>(RedisService.GetHash("115", "allfiles"));
+            Dictionary<string, List<string>> uplpadFilesDic = new();
+
+            foreach (var driver in drivers)
+            {
+                if (Directory.Exists(driver + "upload115\\") && Directory.Exists(driver + "fin\\"))
+                {
+                    var files = new DirectoryInfo(driver + "upload115\\").GetFiles("*.*", new EnumerationOptions { RecurseSubdirectories = true });
+
+                    foreach (var file in files)
+                    {
+                        if (oneOneFiveFiles.FirstOrDefault(x => x.n.Equals(file.Name, StringComparison.OrdinalIgnoreCase) && x.s == file.Length) != null)
+                        {
+                            if (uplpadFilesDic.ContainsKey(driver + "fin\\"))
+                            {
+                                uplpadFilesDic[driver + "fin\\"].Add(file.FullName);
+                            }
+                            else
+                            {
+                                uplpadFilesDic.Add(driver + "fin\\", new List<string> { file.FullName });
+                            }
+                        }
+                    }
+
+                    if (uplpadFilesDic.ContainsKey(driver + "fin\\"))
+                    {
+                        FileUtility.TransferFileUsingSystem(uplpadFilesDic[driver + "fin\\"], driver + "fin\\", true, false);
+                    }
+
+                    foreach (var subFolder in new DirectoryInfo(driver + "upload115\\").GetDirectories())
+                    {
+                        if (subFolder.GetFiles().Length == 0)
+                        {
+                            subFolder.Delete();
+                        }
+                    }
+                }
+            }
         }
     }
 }

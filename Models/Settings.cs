@@ -20,7 +20,7 @@ namespace Models
         public string LocalSearchFolder { get; set; }
         public string CannotMergeFileTag { get; set; }
         public SearchSeedSiteEnum MagSearchSite { get; set; }
-
+        public string BarkSite { get; set; }
         //Not in setting table
         public string Prefix { get; set; }
         public string MvcSite { get; set; }
