@@ -254,7 +254,7 @@ namespace Services
         {
             List<OneOneFiveFileItemModel> list = new List<OneOneFiveFileItemModel>();
 
-            var pages = await Get115PagesInFolder(type, folder, 1050);
+            var pages = await Get115PagesInFolder(type, folder, 1150);
 
             for (int i = 0; i < pages; i++)
             {
@@ -621,6 +621,62 @@ namespace Services
                         }
                     }
                 }
+            }
+        }
+
+        public async static Task<Dictionary<string, List<OneOneFiveFileItemModel>>> GetSameAvNameFiles()
+        {
+            Dictionary<string, List<OneOneFiveFileItemModel>> ret = new();
+
+            var files = await Get115AllFilesModel(OneOneFiveFolder.Fin, OneOneFiveSearchType.Video);
+
+            var test = files.Where(x => x.n.Contains("ABP-290"));
+
+            foreach (var file in files)
+            {
+                var nameArray = file.n.Split('-');
+
+                if (nameArray.Length >= 3)
+                {
+                    var key = nameArray[0] + "-" + nameArray[1];
+
+                    if (ret.ContainsKey(key))
+                    {
+                        ret[key].Add(file);
+                    }
+                    else
+                    {
+                        ret.Add(key, new List<OneOneFiveFileItemModel> { file });
+                    }
+                }
+            }
+
+            return ret.Where(x => x.Value.Count > 1).ToDictionary(x => x.Key, x => x.Value);
+        }
+
+        public async static Task DeleteSameAvNameFiles(Dictionary<string, List<OneOneFiveFileItemModel>> files, IProgress<string> progress)
+        {
+            foreach (var r in files)
+            {
+                var values = r.Value;
+
+                var keep = values.FirstOrDefault(x => x.s == values.Max(x => x.s));
+
+                if (values.Exists(x => x.n.Contains("-C.")))
+                {
+                    keep = values.Where(x => x.n.Contains("-C.")).OrderByDescending(x => x.s).FirstOrDefault();
+                }
+
+                progress.Report($"{r.Key} 共有 {values.Count} \r\n\t保留 {keep.n} 大小 {FileUtility.GetAutoSizeString(keep.s, 1)}");
+
+                foreach (var exc in values.Except(new List<OneOneFiveFileItemModel> { keep }))
+                {
+                    progress.Report($"\r\n\t删除 {exc.n} 大小 {FileUtility.GetAutoSizeString(exc.s, 1)}");
+
+                    await Delete(values.Except(new List<OneOneFiveFileItemModel> { keep }).ToList());
+                }
+
+                progress.Report(Environment.NewLine);
             }
         }
     }

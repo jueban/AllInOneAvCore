@@ -116,7 +116,21 @@ namespace DAL
                 map(reader);
             }
         }
-        #endregion
 
+        protected void BatchInsert(DataTable dt)
+        {
+            using (SqlConnection conn = (SqlConnection)NewConnection())
+            {
+                SqlBulkCopy bulkCopy = new(conn);
+                bulkCopy.DestinationTableName = "ReportItem";
+                bulkCopy.BatchSize = dt.Rows.Count;
+                conn.Open();
+                if (dt != null && dt.Rows.Count != 0)
+                {
+                    bulkCopy.WriteToServer(dt);
+                }
+            }
+        }
+        #endregion
     }
 }

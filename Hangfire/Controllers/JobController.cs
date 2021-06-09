@@ -62,6 +62,14 @@ namespace Hangfire.Controllers
         }
 
         [HttpGet]
+        public string GenerateReport()
+        {
+            BackgroundJob.Enqueue(() => Jobs.GenerateReport());
+
+            return "success";
+        }
+
+        [HttpGet]
         public string RegJavlibraryDailyUpdate()
         {
             RecurringJob.AddOrUpdate(() => Jobs.ScanJavLibraryUpdateUrls(JavLibraryEntryPointType.Update, 200, "", false), Cron.HourInterval(4));

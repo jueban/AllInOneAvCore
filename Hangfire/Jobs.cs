@@ -59,6 +59,18 @@ namespace Hangfire
             NoticeService.SendBarkNotice(SettingService.GetSetting().Result.BarkId, $"处理错误丢失URL完成，耗时 {(DateTime.Now - startTime).TotalSeconds} 秒");
         }
 
+        public static void GenerateReport()
+        {
+            DateTime startTime = DateTime.Now;
+            NoticeService.SendBarkNotice(SettingService.GetSetting().Result.BarkId, "开始生成报表");
+
+            Progress<string> progress = new();
+            progress.ProgressChanged += LogInfo;
+            ReportService.GenerateReport().Wait();
+
+            NoticeService.SendBarkNotice(SettingService.GetSetting().Result.BarkId, $"生成报表完成，耗时 {(DateTime.Now - startTime).TotalSeconds} 秒");
+        }
+
         public static void ScanJavLibraryUpdateUrls(JavLibraryEntryPointType entry, int pages, string url, bool useExactPassin)
         {
             DateTime startTime = DateTime.Now;
