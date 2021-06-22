@@ -74,7 +74,7 @@ namespace DAL
                             END
                         ELSE
                             BEGIN
-                                SELECT Id From ScanUrl WITH(NOLOCK) WHERE Url = @Url;
+                                SELECT TOP 1 Id From ScanUrl WITH(NOLOCK) WHERE Url = @Url;
                             END";
 
             return await QuerySingleOrDefaultAsync<int>(sql, entity);

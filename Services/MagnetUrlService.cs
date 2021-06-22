@@ -171,6 +171,10 @@ namespace Services
                 {
                     searchContent = "https://sukebei.nyaa.si?f=0&c=0_0&q=" + id;
                 }
+                else if (site == SearchSeedSiteEnum.SukebeiNet)
+                { 
+                    searchContent = "https://sukebei.nyaa.net/search?c=_&q=" + id;
+                }
 
                 using (HttpClient client = new())
                 {
@@ -186,40 +190,81 @@ namespace Services
 
                 if (!string.IsNullOrEmpty(resContent))
                 {
-                    HtmlDocument htmlDocument = new();
-                    htmlDocument.LoadHtml(resContent);
-
-                    string xpath = "//tr";
-
-                    HtmlNodeCollection nodes = htmlDocument.DocumentNode.SelectNodes(xpath);
-
-                    foreach (var node in nodes.Skip(1))
+                    if (site == SearchSeedSiteEnum.SukebeiPro || site == SearchSeedSiteEnum.SukebeiSi)
                     {
-                        var text = FileUtility.ReplaceInvalidChar(node.ChildNodes[3].InnerText.Trim());
-                        var a = node.ChildNodes[5].OuterHtml;
-                        var size = node.ChildNodes[7].InnerText.Trim();
-                        var date = node.ChildNodes[9].OuterHtml.Trim().Replace("<td class=\"text-center\" data-timestamp=\"", "").Replace("\"></td>", "");
+                        HtmlDocument htmlDocument = new();
+                        htmlDocument.LoadHtml(resContent);
 
-                        var url = a.Substring(a.IndexOf("<a href=\"magnet:?xt") + 9);
-                        url = url.Substring(0, url.IndexOf("\""));
+                        string xpath = "//tr";
 
-                        int.TryParse(date, out int seconds);
+                        HtmlNodeCollection nodes = htmlDocument.DocumentNode.SelectNodes(xpath);
 
-                        DateTime startTime = TimeZone.CurrentTimeZone.ToLocalTime(new System.DateTime(1970, 1, 1)); // 当地时区
-                        DateTime dt = startTime.AddSeconds(seconds);
-
-                        SeedMagnetSearchModel temp = new SeedMagnetSearchModel
+                        foreach (var node in nodes.Skip(1))
                         {
-                            SearchUrl = fromUrl,
-                            Title = text,
-                            MagSize = FileUtility.GetFileSizeFromString(size),
-                            Date = dt,
-                            MagUrl = url,
-                            Source = site,
-                            SerachContent = id
-                        };
+                            var text = FileUtility.ReplaceInvalidChar(node.ChildNodes[3].InnerText.Trim());
+                            var a = node.ChildNodes[5].OuterHtml;
+                            var size = node.ChildNodes[7].InnerText.Trim();
+                            var date = node.ChildNodes[9].OuterHtml.Trim().Replace("<td class=\"text-center\" data-timestamp=\"", "").Replace("\"></td>", "");
 
-                        ret.Add(temp);
+                            var url = a.Substring(a.IndexOf("<a href=\"magnet:?xt") + 9);
+                            url = url.Substring(0, url.IndexOf("\""));
+
+                            int.TryParse(date, out int seconds);
+
+                            DateTime startTime = TimeZone.CurrentTimeZone.ToLocalTime(new System.DateTime(1970, 1, 1)); // 当地时区
+                            DateTime dt = startTime.AddSeconds(seconds);
+
+                            SeedMagnetSearchModel temp = new SeedMagnetSearchModel
+                            {
+                                SearchUrl = fromUrl,
+                                Title = text,
+                                MagSize = FileUtility.GetFileSizeFromString(size),
+                                Date = dt,
+                                MagUrl = url,
+                                Source = site,
+                                SerachContent = id
+                            };
+
+                            ret.Add(temp);
+                        }
+                    }
+                    else if (site == SearchSeedSiteEnum.SukebeiNet)
+                    {
+                        HtmlDocument htmlDocument = new();
+                        htmlDocument.LoadHtml(resContent);
+
+                        string xpath = "//tbody[@id='torrentListResults']//tr";
+
+                        HtmlNodeCollection nodes = htmlDocument.DocumentNode.SelectNodes(xpath);
+
+                        foreach (var node in nodes.Skip(1))
+                        {
+                            var text = FileUtility.ReplaceInvalidChar(node.ChildNodes[3].InnerText.Trim());
+                            var a = node.ChildNodes[5].OuterHtml;
+                            var size = node.ChildNodes[7].InnerText.Trim();
+                            //var date = node.ChildNodes[9].OuterHtml.Trim().Replace("<td class=\"tr-date home-td date-short hide-xs\" title=\"", "").Replace("\"></td>", "");
+
+                            var url = a.Substring(a.IndexOf("<a href=\"magnet:?xt") + 9);
+                            url = url.Substring(0, url.IndexOf("\""));
+
+                            //int.TryParse(date, out int seconds);
+
+                            //DateTime startTime = TimeZone.CurrentTimeZone.ToLocalTime(new System.DateTime(1970, 1, 1)); // 当地时区
+                            //DateTime dt = startTime.AddSeconds(seconds);
+
+                            SeedMagnetSearchModel temp = new SeedMagnetSearchModel
+                            {
+                                SearchUrl = fromUrl,
+                                Title = text,
+                                MagSize = FileUtility.GetFileSizeFromString(size),
+                                //Date = dt,
+                                MagUrl = url,
+                                Source = site,
+                                SerachContent = id
+                            };
+
+                            ret.Add(temp);
+                        }
                     }
                 }
             }

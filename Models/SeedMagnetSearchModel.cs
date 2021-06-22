@@ -24,7 +24,8 @@ namespace Models
         Btsow = 1,
         SukebeiSi = 2,
         SukebeiPro = 3,
-        JavBus = 4
+        JavBus = 4,
+        SukebeiNet = 5
     }
 
     public class ShowMagnetSearchResult

@@ -9,8 +9,8 @@ namespace Models
     public class OneOneFiveFolder
     {
         public static string All = "0";
-        public static string Temp = "2091444771508569858";
-        public static string Download = "2068937774368408801";
+        public static string Temp = "2125578091372594769";
+        public static string Download = "2125607513744066507";
         public static string Upload = "2089198611951633887";
         public static string AV = "1810938661372282371";
         public static string Fin = "1834397846621504875";

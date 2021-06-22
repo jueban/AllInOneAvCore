@@ -22,7 +22,14 @@ namespace UnitTest
             Progress<string> progress = new Progress<string>();
             progress.ProgressChanged += PrintLog;
 
-            var rest = OneOneFiveService.Get115AllFilesModel(OneOneFiveFolder.Upload, OneOneFiveSearchType.Video).Result;
+            //var rest = OneOneFiveService.GetM3U8("acjpxvomv83tlhtnb").Result;
+
+            //OneOneFiveService.UpdateKeepAvs().Wait();
+
+            //var files = OneOneFiveService.GetRepeatFiles().Result;
+            //OneOneFiveService.DeleteSameAvNameFiles(files, progress).Wait();
+
+            OneOneFiveService.CheckPossibleDuplicatedAv(OneOneFiveFolder.Fin).Wait();
 
             Console.ReadKey();
         }

@@ -526,58 +526,71 @@ namespace Services
             };
         }
 
-        public static void GetNeedToUpload115Avs()
+        public static string GetNeedToUpload115Avs()
         {
+            var ret = "";
+
             var drivers = Environment.GetLogicalDrives();
             var oneOneFiveFiles = JsonConvert.DeserializeObject<List<OneOneFiveFileItemModel>>(RedisService.GetHash("115", "allfiles"));
             Dictionary<string, List<string>> uplpadFilesDic = new();
 
-            foreach (var driver in drivers)
+            try
             {
-                if (Directory.Exists(driver + "fin\\"))
+                foreach (var driver in drivers)
                 {
-                    if (!Directory.Exists(driver + "upload115\\"))
+                    if (Directory.Exists(driver + "fin\\"))
                     {
-                        Directory.CreateDirectory(driver + "upload115\\");
-                    }
-
-                    var files = new DirectoryInfo(driver + "fin\\").GetFiles();
-
-                    foreach (var file in files)
-                    {
-                        if (oneOneFiveFiles.FirstOrDefault(x => x.n.Equals(file.Name, StringComparison.OrdinalIgnoreCase) && x.s == file.Length) == null)
+                        if (!Directory.Exists(driver + "upload115\\"))
                         {
-                            if (uplpadFilesDic.ContainsKey(driver + "upload115\\"))
+                            Directory.CreateDirectory(driver + "upload115\\");
+                        }
+
+                        var files = new DirectoryInfo(driver + "fin\\").GetFiles();
+
+                        foreach (var file in files)
+                        {
+                            if (oneOneFiveFiles.FirstOrDefault(x => x.n.Equals(file.Name, StringComparison.OrdinalIgnoreCase) && x.s == file.Length) == null)
                             {
-                                uplpadFilesDic[driver + "upload115\\"].Add(file.FullName);
-                            }
-                            else
-                            {
-                                uplpadFilesDic.Add(driver + "upload115\\", new List<string> { file.FullName });
+                                if (uplpadFilesDic.ContainsKey(driver + "upload115\\"))
+                                {
+                                    uplpadFilesDic[driver + "upload115\\"].Add(file.FullName);
+                                }
+                                else
+                                {
+                                    uplpadFilesDic.Add(driver + "upload115\\", new List<string> { file.FullName });
+                                }
                             }
                         }
-                    }
 
-                    if (uplpadFilesDic.ContainsKey(driver + "upload115\\") && uplpadFilesDic[driver + "upload115\\"] != null && uplpadFilesDic[driver + "upload115\\"].Count > 0)
-                    {
-                        var pageSize = uplpadFilesDic[driver + "upload115\\"].Count % 5 == 0 ? uplpadFilesDic[driver + "upload115\\"].Count / 5 : (uplpadFilesDic[driver + "upload115\\"].Count % 5) + 1;
-                        var contiune = true;
-                        int index = 1;
-                        int page = 0;
-                        while (contiune)
+                        if (uplpadFilesDic.ContainsKey(driver + "upload115\\") && uplpadFilesDic[driver + "upload115\\"] != null && uplpadFilesDic[driver + "upload115\\"].Count > 0)
                         {
-                            var tempFolder = driver + "upload115\\" + driver.Replace("\\", "") + "-" + DateTime.Today.ToString("yyyyMMdd") + "-" + index++;
-                            Directory.CreateDirectory(tempFolder);
-                            FileUtility.TransferFileUsingSystem(uplpadFilesDic[driver + "upload115\\"].Skip(page++ * pageSize).Take(pageSize).ToList(), tempFolder, true, false);
-
-                            if (page == 5)
+                            var pageSize = uplpadFilesDic[driver + "upload115\\"].Count % 5 == 0 ? uplpadFilesDic[driver + "upload115\\"].Count / 5 : (uplpadFilesDic[driver + "upload115\\"].Count % 5) + 1;
+                            var contiune = true;
+                            int index = 1;
+                            int page = 0;
+                            while (contiune)
                             {
-                                contiune = false;
+                                var tempFolder = driver + "upload115\\" + driver.Replace("\\", "").Replace(":", "") + "-" + DateTime.Today.ToString("yyyyMMdd") + "-" + index++;
+                                Directory.CreateDirectory(tempFolder);
+                                FileUtility.TransferFileUsingSystem(uplpadFilesDic[driver + "upload115\\"].Skip(page++ * pageSize).Take(pageSize).ToList(), tempFolder, true, false);
+
+                                if (page == 5)
+                                {
+                                    contiune = false;
+                                }
                             }
                         }
                     }
                 }
-            }         
+            }
+            catch (Exception ee)
+            {
+                ret = ee.ToString();
+            }
+
+            ret = $"共移动{uplpadFilesDic.Values.Count}个文件";
+
+            return ret;
         }
 
         public async static Task MoveNeedToUpload115AvsBackToFin()
@@ -678,6 +691,69 @@ namespace Services
 
                 progress.Report(Environment.NewLine);
             }
+        }
+
+        public async static Task<string> GetM3U8(string pc)
+        {
+            var url = "https://v.anxia.com/site/api/video/m3u8/" + pc + ".m3u8";
+            var m3u8 = "";
+
+            var htmlRet = await GetOneOneFiveContent(url);
+
+            if (!string.IsNullOrEmpty(htmlRet))
+            {
+                m3u8 = htmlRet.Substring(htmlRet.IndexOf("http"));
+            }
+
+            return m3u8;
+        }
+
+        public async static Task MoveToFin()
+        {
+            var files = await Get115AllFilesModel(OneOneFiveFolder.Upload, OneOneFiveSearchType.Video);
+
+            await Move(files.Select(x => x.fid).ToList(), OneOneFiveFolder.Fin);
+        }
+
+        public async static Task UpdateKeepAvs()
+        {
+            var drivers = Environment.GetLogicalDrives();
+            var oneOneFiveFiles = JsonConvert.DeserializeObject<List<OneOneFiveFileItemModel>>(RedisService.GetHash("115", "allfiles"));
+
+            foreach (var driver in drivers)
+            {
+                if (Directory.Exists(driver + "keep\\"))
+                {
+                    var files = new DirectoryInfo(driver + "keep\\").GetFiles();
+
+                    foreach (var file in files)
+                    {
+                        var wangPanFiles = oneOneFiveFiles.Where(x => x.n.Contains(file.Name.Split('-')[0] + "-" + file.Name.Split('-')[1], StringComparison.OrdinalIgnoreCase)).ToList();
+
+                        if (file.Name.Contains("-C."))
+                        {
+                            if (wangPanFiles.Exists(x => x.s > file.Length && x.n.Contains("-C.", StringComparison.OrdinalIgnoreCase)))
+                            {
+                                await Copy(wangPanFiles.Where(x => x.s > file.Length && x.n.Contains("-C.", StringComparison.OrdinalIgnoreCase)).Select(x => x.fid).ToList(), OneOneFiveFolder.MoveBackToLocal);
+                            }
+                        }
+                        else
+                        {
+                            if (wangPanFiles.Exists(x => x.s > file.Length))
+                            {
+                                await Copy(wangPanFiles.Where(x => x.s > file.Length).Select(x => x.fid).ToList(), OneOneFiveFolder.MoveBackToLocal);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        public async static Task CheckPossibleDuplicatedAv(string folder)
+        {
+            var files = await Get115AllFilesModel(folder, OneOneFiveSearchType.Video);
+
+            var dic = files.Where(x => x.n.Split('-').Length >= 3).GroupBy(x => (x.n.Split('-')[0] + "-" + x.n.Split('-')[1]).ToUpper()).Where(x => x.Count() > 1).ToDictionary(x => x.Key, x => x.ToList());
         }
     }
 }
