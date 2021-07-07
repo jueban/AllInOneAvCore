@@ -8,38 +8,39 @@
 // @match        http://*.javlibrary.com/cn/*
 // @icon         https://www.google.com/s2/favicons?domain=115.com
 // @grant        GM_xmlhttpRequest
-// @connect      /avapi/Save115Cookie
-// @connect      /api/OneOneFive/SaveOneOneFiveCookie
+// @connect      http://www.cainqs.com:8087/avapi/Save115Cookie
+// @connect      http://www.cainqs.com:20001/api/JavLibraryApi/SaveJavlibraryCookie
 // ==/UserScript==
 
-(function() {
+(function () {
     'use strict';
 
     GM_xmlhttpRequest({
-        url:"/avapi/Save115Cookie?cookie=" + document.cookie,
-        method :"POST",
+        url: "http://www.cainqs.com:20001/api/OneOneFive/SaveOneOneFiveCookie?cookie=" + document.cookie + "&userAgent=" + navigator.userAgent,
+        method: "POST",
         headers: {
             "Content-type": "application/x-www-form-urlencoded"
         },
-        onload:function(xhr){
-            console.log(xhr.responseText);
+        onload: function (xhr) {
+            console.log("Core =====> " + xhr.responseText);
         },
-        onerror:function(data){
-            console.log(data);
+        onerror: function (data) {
+            console.log("Core =====> " + data);
         }
     });
 
     GM_xmlhttpRequest({
-        url:"/api/OneOneFive/SaveOneOneFiveCookie?cookie=" + document.cookie + "&userAgent=" + navigator.userAgent,
-        method :"POST",
+        url: "http://www.cainqs.com:20001/api/JavLibraryApi/SaveJavlibraryCookie?cookie=" + document.cookie + "&userAgent=" + navigator.userAgent,
+        method: "POST",
         headers: {
             "Content-type": "application/x-www-form-urlencoded"
         },
-        onload:function(xhr){
+        onload: function (xhr) {
             console.log("Core =====> " + xhr.responseText);
         },
-        onerror:function(data){
+        onerror: function (data) {
             console.log("Core =====> " + data);
         }
     });
 })();
+
