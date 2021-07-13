@@ -210,6 +210,15 @@ namespace Services
             {
                 Directory.CreateDirectory(moveFolder);
             }
+            else
+            {
+                var alreadyFiles = new DirectoryInfo(moveFolder).GetFiles();
+
+                foreach (var f in alreadyFiles)
+                {
+                    moveReocrd.Add(f.Name.ToUpper(), 1);
+                }
+            }
 
             progress.Report("开始加载缓存");
 
@@ -278,7 +287,7 @@ namespace Services
                         {
                             progress.Report($"\t找到适配的番号 {pi}");
 
-                            var possibleAv = avs.Where(x => x.AvId == pi).ToList();
+                            var possibleAv = avs.Where(x => x.AvId.Equals(pi, StringComparison.OrdinalIgnoreCase)).ToList();
 
                             if (possibleAv == null || possibleAv.Count <= 0)
                             {
@@ -291,7 +300,7 @@ namespace Services
 
                                     pi = prefixPart + "-" + numberPart;
 
-                                    possibleAv = avs.Where(x => x.AvId == pi).ToList();
+                                    possibleAv = avs.Where(x => x.AvId.Equals(pi, StringComparison.OrdinalIgnoreCase)).ToList();
                                 }
                             }
 
@@ -343,6 +352,7 @@ namespace Services
                     }
 
                     var tempFileName = item.Value.FirstOrDefault().AvId + "-" + item.Value.FirstOrDefault().Name + chinese + item.Key.Extension;
+                    tempFileName = tempFileName.ToUpper();
 
                     if (moveReocrd.ContainsKey(tempFileName))
                     {
@@ -365,7 +375,7 @@ namespace Services
 
                     try
                     {
-                        File.Move(item.Key.FullName, moveFolder + tempFileName.ToUpper());
+                        File.Move(item.Key.FullName, moveFolder + tempFileName);
 
                         progress.Report($"\t移动文件 -> {item.Key.FullName} 到 -> {moveFolder + tempFileName}");
                     }

@@ -29,7 +29,7 @@ namespace UnitTest
             //var files = OneOneFiveService.GetRepeatFiles().Result;
             //OneOneFiveService.DeleteSameAvNameFiles(files, progress).Wait();
 
-            OneOneFiveService.CheckPossibleDuplicatedAv(OneOneFiveFolder.Fin).Wait();
+            LocalService.Rename(@"N:\new", progress).Wait();
 
             Console.ReadKey();
         }

@@ -34,8 +34,11 @@ namespace Services
 
                 foreach (var item in sessionCookieItems)
                 {
-                    Cookie temp = new Cookie(item.Name, item.Value, "/", "115.com");
-                    cc.Add(temp);
+                    if (!item.Name.Equals("music", StringComparison.OrdinalIgnoreCase))
+                    {
+                        Cookie temp = new Cookie(item.Name, item.Value, "/", "115.com");
+                        cc.Add(temp);
+                    }
                 }
             }
 
