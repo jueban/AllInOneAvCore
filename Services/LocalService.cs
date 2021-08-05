@@ -335,9 +335,54 @@ namespace Services
                 }
                 else if (item.Value.Count > 1)
                 {
-                    foreach (var subItem in item.Value)
+                    var names = item.Value.Select(x => x.FileNameWithoutExtension).Distinct();
+                    if (names.Count() != 1)
                     {
                         progress.Report($"文件 {item.Key.Name} 找到多条匹配,暂不处理");
+                    }
+                    else
+                    {
+                        progress.Report($"文件 {item.Key.Name} 找到1条匹配,开始处理");
+
+                        var chinese = "";
+
+                        if (item.Key.Name.Replace(item.Value.FirstOrDefault().AvId, "").Replace(item.Value.FirstOrDefault().Name, "").Contains("-C", StringComparison.OrdinalIgnoreCase) || item.Key.Name.Replace(item.Value.FirstOrDefault().AvId, "").Replace(item.Value.FirstOrDefault().Name, "").Contains("ch", StringComparison.OrdinalIgnoreCase))
+                        {
+                            chinese = "-C";
+                        }
+
+                        var tempFileName = item.Value.FirstOrDefault().AvId + "-" + item.Value.FirstOrDefault().Name + chinese + item.Key.Extension;
+                        tempFileName = tempFileName.ToUpper();
+
+                        if (moveReocrd.ContainsKey(tempFileName))
+                        {
+                            moveReocrd[tempFileName]++;
+
+                            progress.Report($"\t存在移动记录,文件名后缀+1 -> {moveReocrd[tempFileName]}");
+
+                            if (moveReocrd[tempFileName] == 2)
+                            {
+                                var oldFileMove = item.Value.FirstOrDefault().AvId + "-" + item.Value.FirstOrDefault().Name + "-1" + item.Key.Extension;
+                                File.Move(moveFolder + tempFileName, moveFolder + oldFileMove.ToUpper());
+                            }
+
+                            tempFileName = item.Value.FirstOrDefault().AvId + "-" + item.Value.FirstOrDefault().Name + "-" + moveReocrd[tempFileName] + item.Key.Extension;
+                        }
+                        else
+                        {
+                            moveReocrd.Add(tempFileName, 1);
+                        }
+
+                        try
+                        {
+                            File.Move(item.Key.FullName, moveFolder + tempFileName);
+
+                            progress.Report($"\t移动文件 -> {item.Key.FullName} 到 -> {moveFolder + tempFileName}");
+                        }
+                        catch (Exception ee)
+                        {
+                            progress.Report("异常 " + ee.ToString());
+                        }
                     }
                 }
                 else if (item.Value.Count == 1)
@@ -626,11 +671,16 @@ namespace Services
             return ret;
         }
 
-        public async static Task<List<FileInfo>> GetAllLocalFile()
+        public async static Task<List<FileInfo>> GetAllLocalFile(bool onlyFin = false)
         {
             List<FileInfo> ret = new();
             var searchFolder = await SettingService.GetSetting();
             var drives = Environment.GetLogicalDrives();
+
+            if (onlyFin)
+            {
+                searchFolder.LocalSearchFolder = "fin";
+            }
 
             foreach (var drive in drives)
             {
@@ -663,6 +713,33 @@ namespace Services
             }
 
             return count;
+        }
+
+        public async static Task<int> KeepAndDelete(KeepModel model)
+        {
+            foreach (var d in model.avs)
+            {
+                if (d.Keep == false)
+                {
+                    File.Delete(d.Fid);
+                }
+                else
+                {
+                    var fi = new FileInfo(d.Fid);
+                    var keepLocation = fi.DirectoryName + "\\keep\\";
+                    var keepFile = keepLocation + fi.Name;
+
+                    if (!Directory.Exists(keepLocation))
+                    {
+                        Directory.CreateDirectory(keepLocation);
+                        await Task.Delay(15);
+                    }
+
+                    fi.MoveTo(keepFile);
+                }
+            }
+
+            return 1;
         }
 
         private static string CreateFolder(string folder)

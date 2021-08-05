@@ -19,17 +19,20 @@ namespace UnitTest
         [Obsolete]
         static void Main(string[] args)
         {
-            Progress<string> progress = new Progress<string>();
+            Progress<string> progress = new();
             progress.ProgressChanged += PrintLog;
 
-            //var rest = OneOneFiveService.GetM3U8("acjpxvomv83tlhtnb").Result;
+            var rest = OneOneFiveService.GetM3U8("acjpxvomv83tlhtnb").Result;
+
+            System.Diagnostics.Process.Start("C:\\Program Files\\DAUM\\PotPlayer\\PotPlayerMini64.exe", rest);
 
             //OneOneFiveService.UpdateKeepAvs().Wait();
 
-            //var files = OneOneFiveService.GetRepeatFiles().Result;
+            //OneOneFiveService.Get115Cookie().Wait();
+            //var files = OneOneFiveService.GetSameAvNameFiles().Result;
             //OneOneFiveService.DeleteSameAvNameFiles(files, progress).Wait();
 
-            LocalService.Rename(@"N:\new", progress).Wait();
+            //LocalService.Rename(@"N:\new", progress).Wait();
 
             Console.ReadKey();
         }

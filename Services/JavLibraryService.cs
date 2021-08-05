@@ -15,6 +15,8 @@ using Models;
 using Polly;
 using Utils;
 using Dasync.Collections;
+using Newtonsoft.Json;
+using System.Linq;
 
 namespace Services
 {
@@ -102,7 +104,7 @@ namespace Services
 
                     JavLibraryCookieJson entity = new()
                     {
-                        CookieJson = JsonSerializer.Serialize(items),
+                        CookieJson = System.Text.Json.JsonSerializer.Serialize(items),
                         UserAgent = userAgent
                     };
 
@@ -642,6 +644,24 @@ namespace Services
 
             NoticeService.SendBarkNotice(SettingService.GetSetting().Result.BarkId, $"更新JavLibrary的更新列表结束, 更新了 {count} 条, 耗时 {(DateTime.Now - startTime).TotalSeconds} 秒");
         }
+
+        public async static Task<List<AvModel>> RefreshJavLibraryRedis()
+        {
+            var ret = await new JavLibraryDAL().GetAvModelByWhere("");
+
+            RedisService.DeleteHash("javlibrary", "allavs");
+
+            RedisService.SetHash("javlibrary", "allavs", JsonConvert.SerializeObject(ret));
+
+            return ret;
+        }
+
+        public static async Task<AvModel> GetAvModelByName(string avId, string name)
+        {
+            var model = await new JavLibraryDAL().GetAvModelByWhere(string.Format(" AND AvId = '{0}' AND Name = '{1}'", avId, name));
+
+            return model.FirstOrDefault();
+        }
         #endregion
 
         #region 内部使用
@@ -773,7 +793,7 @@ namespace Services
             {
                 userAgent = dbCookieItem.UserAgent;
 
-                List<CookieItem> sessionCookieItems = JsonSerializer.Deserialize<List<CookieItem>>(dbCookieItem.CookieJson);
+                List<CookieItem> sessionCookieItems = System.Text.Json.JsonSerializer.Deserialize<List<CookieItem>>(dbCookieItem.CookieJson);
 
                 foreach (var item in sessionCookieItems)
                 {

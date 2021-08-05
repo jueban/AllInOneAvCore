@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Utils;
 
 namespace Models
 {
@@ -56,8 +58,22 @@ namespace Models
                 }
             }
         }
-        public string AvId { get; set; }
-        public string AvName { get; set; }
+        [JsonIgnore]
+        public string AvId 
+        {
+            get
+            {
+                return this.n.Split('-')[0] + "-" + this.n.Split('-')[1];
+            }
+        }
+        [JsonIgnore]
+        public string AvName 
+        {
+            get
+            { 
+                return this.n.Replace(this.AvId, "").Substring(1).Replace("." + this.ico, "").Replace("-C", "");
+            }
+        }
     }
 
     public enum OneOneFiveSearchType
@@ -89,5 +105,65 @@ namespace Models
         Move = 4,
         Delete = 5,
         Copy = 6,
+    }
+
+    public class OneOneFiveDuplicateFileRemoveModel
+    { 
+        public Dictionary<string, List<OneOneFiveDuplicateFileRemoveItem>> data { get; set; }
+    }
+
+    public class OneOneFiveDuplicateFileRemoveItem
+    { 
+        public string name { get; set; }
+        public string newName { get; set; }
+        public long s { get; set; }
+        public string pc { get; set; }
+        public string fid { get; set; }
+        public bool delete { get; set; }
+        public string m3u8 { get; set; }
+        public List<string> localFile { get; set; }
+        public bool change
+        {
+            get 
+            {
+                return !this.name.Equals(this.newName);
+            }
+        }
+        public string sizeStr 
+        {
+            get
+            {
+                return FileUtility.GetAutoSizeString(this.s, 1);
+            }
+        }
+        public bool isChinese 
+        {
+            get
+            {
+                return this.name.Contains("-C.");
+            }
+        }
+    }
+
+    public class MoveBackToLocal
+    {
+        public string AvId { get; set; }
+        public string AvName { get; set; }
+        public string AvPic { get; set; }
+        public long AvSize { get; set; }
+        public string AvSizeStr { get; set; }
+        public string Fid { get; set; }
+        public bool LocalHas { get; set; }
+        public bool Keep { get; set; }
+    }
+
+    public class KeepModel
+    { 
+        public int total { get; set; }
+        public List<MoveBackToLocal> avs { get; set; }
+        public int size { get; set; }
+        public int count { get; set; }
+        public int current { get; set; }
+        public int jumpPage { get; set; }
     }
 }

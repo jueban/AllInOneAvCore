@@ -116,5 +116,23 @@ namespace Services
 
             return oneOneFivePart.OrderByDescending(x => x.size).ToList();
         }
+
+        public async static Task<bool> IsLocalHas(string content, long size)
+        {
+            var localSearch = await EverythingSearch(content);
+
+            if (localSearch != null && localSearch.results != null && localSearch.results.Any())
+            {
+                foreach (var f in localSearch.results)
+                {
+                    if (long.Parse(f.size) == size)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
     }
 }

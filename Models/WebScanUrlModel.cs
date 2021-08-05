@@ -1,4 +1,5 @@
 using Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
@@ -47,11 +48,12 @@ public class AvModel
     public DateTime? ReleaseDate { get; set; }
     public DateTime CreateTime { get; set; }
     public DateTime UpdateTime { get; set; }
+    [JsonIgnore]
     public List<CommonModel> InfoObj
     {
         get
         {
-            return !string.IsNullOrEmpty(this.Infos) ? JsonSerializer.Deserialize<List<CommonModel>>(this.Infos) : new List<CommonModel>();
+            return !string.IsNullOrEmpty(this.Infos) ? System.Text.Json.JsonSerializer.Deserialize<List<CommonModel>>(this.Infos) : new List<CommonModel>();
         }
     }
 

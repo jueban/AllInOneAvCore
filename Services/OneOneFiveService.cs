@@ -272,7 +272,7 @@ namespace Services
             return list;
         }
 
-        public async static Task RefreshOneOneFiveFinFilesCache()
+        public async static Task<List<OneOneFiveFileItemModel>> RefreshOneOneFiveFinFilesCache()
         {
             NoticeService.SendBarkNotice(SettingService.GetSetting().Result.BarkId, $"开始更新115文件缓存");
             var startTime = DateTime.Now;
@@ -284,6 +284,8 @@ namespace Services
             RedisService.SetHash("115", "allfiles", JsonConvert.SerializeObject(ret));
 
             NoticeService.SendBarkNotice(SettingService.GetSetting().Result.BarkId, $"更新115文件缓存结束，更新了 {ret.Count} 条，耗时 {(DateTime.Now - startTime).TotalSeconds} 秒");
+
+            return ret;
         }
 
         public async static Task<string> GetOneOneFiveContent(string url)
@@ -311,7 +313,7 @@ namespace Services
 
         public async static Task<Dictionary<string, List<OneOneFiveFileItemModel>>> GetRepeatFiles(string folder = "0", int pageSize = 1)
         {
-            Dictionary<string, List<OneOneFiveFileItemModel>> ret = new Dictionary<string, List<OneOneFiveFileItemModel>>();
+            Dictionary<string, List<OneOneFiveFileItemModel>> ret = new();
             var pattern = @"\(\d+\)";
             var data = await Get115AllFilesModel(folder, OneOneFiveSearchType.Video);
 
@@ -640,13 +642,14 @@ namespace Services
             }
         }
 
-        public async static Task<Dictionary<string, List<OneOneFiveFileItemModel>>> GetSameAvNameFiles()
+        public async static Task<OneOneFiveDuplicateFileRemoveModel> GetSameAvNameFiles()
         {
-            Dictionary<string, List<OneOneFiveFileItemModel>> ret = new();
+            var pattern = @"\(\d+\).";
+            OneOneFiveDuplicateFileRemoveModel ret = new();
+            Dictionary<string, List<OneOneFiveDuplicateFileRemoveItem>> res = new();
+            ret.data = res;
 
             var files = await Get115AllFilesModel(OneOneFiveFolder.Fin, OneOneFiveSearchType.Video);
-
-            var test = files.Where(x => x.n.Contains("ABP-290"));
 
             foreach (var file in files)
             {
@@ -654,20 +657,75 @@ namespace Services
 
                 if (nameArray.Length >= 3)
                 {
-                    var key = nameArray[0] + "-" + nameArray[1];
+                    var key = (nameArray[0] + "-" + nameArray[1]).ToUpper();
 
-                    if (ret.ContainsKey(key))
+                    if (res.ContainsKey(key))
                     {
-                        ret[key].Add(file);
+                        res[key].Add(
+                            new OneOneFiveDuplicateFileRemoveItem()
+                            {
+                                delete = false,
+                                fid = file.fid,
+                                name = file.n,
+                                newName = file.n,
+                                pc = file.pc,
+                                s = file.s
+
+                            }
+                        );
                     }
                     else
                     {
-                        ret.Add(key, new List<OneOneFiveFileItemModel> { file });
+                        res.Add(key, new List<OneOneFiveDuplicateFileRemoveItem>
+                            {
+                                new OneOneFiveDuplicateFileRemoveItem()
+                                {
+                                    delete = false,
+                                    fid = file.fid,
+                                    name = file.n,
+                                    newName = file.n,
+                                    pc = file.pc,
+                                    s = file.s
+  
+                                }
+                            }
+                        );
                     }
                 }
             }
 
-            return ret.Where(x => x.Value.Count > 1).ToDictionary(x => x.Key, x => x.Value);
+            ret.data = ret.data.Where(x => x.Value.Count > 1).ToDictionary(x => x.Key, x => x.Value);
+
+            foreach (var d in ret.data)
+            {
+                foreach (var i in d.Value)
+                {
+                    string searchContent = i.name;
+
+                    if (Regex.IsMatch(i.name, pattern))
+                    {
+                        searchContent = Regex.Replace(i.name, pattern, ".");
+                    }
+
+                    List<string> localFile = new();
+                    var localSearch = await EverythingService.EverythingSearch(searchContent);
+
+                    if (localSearch != null && localSearch.results != null && localSearch.results.Any())
+                    {
+                        foreach (var f in localSearch.results)
+                        {
+                            if (long.Parse(f.size) == i.s)
+                            {
+                                localFile.Add(f.path + "\\" + f.name);
+                            }
+                        }
+
+                        i.localFile = localFile;
+                    }
+                }
+            }
+
+            return ret;
         }
 
         public async static Task DeleteSameAvNameFiles(Dictionary<string, List<OneOneFiveFileItemModel>> files, IProgress<string> progress)
@@ -757,6 +815,147 @@ namespace Services
             var files = await Get115AllFilesModel(folder, OneOneFiveSearchType.Video);
 
             var dic = files.Where(x => x.n.Split('-').Length >= 3).GroupBy(x => (x.n.Split('-')[0] + "-" + x.n.Split('-')[1]).ToUpper()).Where(x => x.Count() > 1).ToDictionary(x => x.Key, x => x.ToList());
+        }
+
+        public async static Task DeleteDuplicatedFiles(Dictionary<string, List<OneOneFiveDuplicateFileRemoveItem>> entity)
+        {
+            List<OneOneFiveFileItemModel> oneOneFiveDelete = new();
+            List<string> localDelete = new();
+            Dictionary<string, string> oneOneFiveRename = new();
+            long oneOneFiveDeleteSize = 0L;
+            long localDeleteSize = 0L;
+
+            foreach (var k in entity)
+            {
+                foreach (var d in k.Value)
+                {
+                    if (d.delete)
+                    {
+                        oneOneFiveDelete.Add(
+                            new OneOneFiveFileItemModel() 
+                            { 
+                                fid = d.fid,
+                                s = d.s
+                            }
+                        );
+
+                        oneOneFiveDeleteSize += d.s;
+
+                        if (d.localFile != null && d.localFile.Any())
+                        {
+                            foreach (var f in d.localFile)
+                            {
+                                if (!localDelete.Contains(f))
+                                {
+                                    localDelete.Add(f);
+                                    localDeleteSize += new FileInfo(f).Length;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (!d.newName.Equals(d.name))
+                        {
+                            oneOneFiveRename.Add(d.fid, d.newName.ToUpper());
+                        }
+                    }
+                }
+            }
+
+            await Delete(oneOneFiveDelete);
+
+            foreach (var f in localDelete)
+            {
+                if (File.Exists(f))
+                {
+                    File.Delete(f);
+                }
+            }
+
+            foreach (var f in oneOneFiveRename)
+            {
+                await Rename(f.Key, f.Value);
+            }
+        }
+
+        public async static Task<KeepModel> GetKeepAv(int pageSize, int page, bool force, int sizeLimit = 2)
+        {
+            KeepModel ret = new();
+            List<OneOneFiveFileItemModel> models = new();
+            List<AvModel> avdb = new();
+            List<MoveBackToLocal> avs = new();
+
+            if (force)
+            {
+                models = await RefreshOneOneFiveFinFilesCache();
+                //avdb = await JavLibraryService.RefreshJavLibraryRedis();
+            }
+            else
+            {
+                //avdb = JsonConvert.DeserializeObject<List<AvModel>>(RedisService.GetHash("javlibrary", "allavs"));
+                models = JsonConvert.DeserializeObject<List<OneOneFiveFileItemModel>>(RedisService.GetHash("115", "allfiles"));
+            }
+
+            var targetModel = models.Where(x => x.s >= sizeLimit * 1024 * 1024 * 1024).Skip((page - 1) * pageSize).Take(pageSize).ToList();
+
+            foreach (var m in targetModel)
+            {
+                var model = await JavLibraryService.GetAvModelByName(m.AvId, m.AvName.Replace("-C", "").Replace(m.ico, ""));
+                avs.Add(new MoveBackToLocal()
+                {
+                    AvId = m.n.Split('-')[0] + "-" + m.n.Split('-')[1],
+                    AvName = m.n,
+                    AvSize = m.s,
+                    AvSizeStr = FileUtility.GetAutoSizeString(m.s, 1),
+                    Fid = m.fid,
+                    AvPic = model == null ? "" : model.PicUrl,
+                    //TODO
+                    LocalHas = await EverythingService.IsLocalHas(m.AvName, m.s)
+                });
+            }
+
+            ret.total = models.Count;
+            ret.avs = avs;
+            ret.size = pageSize;
+            ret.count = (models.Count / pageSize) + 1;
+            ret.current = page;
+
+            return ret;
+        }
+
+        public async static Task<KeepModel> GetDeleteAv(int pageSize)
+        {
+            KeepModel ret = new();
+            var avs = new List<MoveBackToLocal>();
+            var files = await LocalService.GetAllLocalFile(true);
+            var total = files.Count;
+
+            files = files.Take(pageSize).ToList();
+
+            foreach (var m in files)
+            {
+                var avId = m.Name.Split('-')[0] + "-" + m.Name.Split('-')[1];
+                var name = m.Name.Replace(avId, "")[1..].Replace(m.Extension, "").Replace("-C", "");
+
+                var model = await JavLibraryService.GetAvModelByName(avId, name);
+                avs.Add(new MoveBackToLocal()
+                {
+                    AvId = avId,
+                    AvName = name,
+                    AvSize = m.Length,
+                    Fid = m.FullName,
+                    AvSizeStr = FileUtility.GetAutoSizeString(m.Length, 1),
+                    AvPic = model == null ? "" : model.PicUrl,
+                    LocalHas = true,
+                    Keep = false
+                });
+            }
+
+            ret.total = total;
+            ret.avs = avs;
+
+            return ret;
         }
     }
 }

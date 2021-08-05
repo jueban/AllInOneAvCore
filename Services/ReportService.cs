@@ -183,12 +183,6 @@ namespace Services
             {
                 Console.WriteLine(file.n);
 
-                if (file.n.Split('-').Length >= 3)
-                {
-                    file.AvId = file.n.Split('-')[0] + "-" + file.n.Split('-')[1];
-                    file.AvName = file.n.Replace(file.AvId, "").Substring(1).Replace("." + file.ico, "").Replace("-C", "");
-                }
-
                 var match = avs.FirstOrDefault(x => x.Name == file.AvName);
 
                 if (match != null)

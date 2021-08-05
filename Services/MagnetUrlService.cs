@@ -129,8 +129,9 @@ namespace Services
                         progress.Report($"正在处理 {index++} / {details.success.Count} ");
 
                         await JavbusService.GetJavBusDetail(id.URL);
+                        List<SeedMagnetSearchModel> res = new List<SeedMagnetSearchModel>();
 
-                        var res = await SearchSukebeiMag(id.AvId, id.URL);
+                        res.AddRange(await SearchSukebeiMag(id.AvId, id.URL));
                         res.AddRange(await SearchJavBusMag(id.AvId, id.URL));
 
                         ret.AddRange(res);
