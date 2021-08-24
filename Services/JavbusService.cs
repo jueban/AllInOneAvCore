@@ -200,7 +200,7 @@ namespace Services
                 }
 
                 realUlr = GetJavLibraryEntryUrl(entry, url, ++currentIndex);
-                res = await GetJavBusContent(realUlr);
+                res = await GetJavBusContent(realUlr, magOnly);
             }
 
             ret.success = retList;

@@ -22,9 +22,9 @@ namespace UnitTest
             Progress<string> progress = new();
             progress.ProgressChanged += PrintLog;
 
-            var rest = OneOneFiveService.GetM3U8("acjpxvomv83tlhtnb").Result;
+            //var rest = OneOneFiveService.GetM3U8("acjpxvomv83tlhtnb").Result;
 
-            System.Diagnostics.Process.Start("C:\\Program Files\\DAUM\\PotPlayer\\PotPlayerMini64.exe", rest);
+            //System.Diagnostics.Process.Start("C:\\Program Files\\DAUM\\PotPlayer\\PotPlayerMini64.exe", rest);
 
             //OneOneFiveService.UpdateKeepAvs().Wait();
 
@@ -33,6 +33,8 @@ namespace UnitTest
             //OneOneFiveService.DeleteSameAvNameFiles(files, progress).Wait();
 
             //LocalService.Rename(@"N:\new", progress).Wait();
+
+            MagnetUrlService.SearchJavBus("https://www.javbus.com/page", 5, "Test", progress).Wait();
 
             Console.ReadKey();
         }

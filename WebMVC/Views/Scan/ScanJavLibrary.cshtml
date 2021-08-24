@@ -12,6 +12,8 @@
 </head>
 
 <body>
+    <span style="display:none" id="jobhub">@ViewData["jobhub"].ToString()</span>
+
     <div id="app">
         <div class="container">
             <div class="btn-toolbar mb-3" role="toolbar">
@@ -79,8 +81,12 @@
             }
         })
 
+        //var jobUrl = $("#jobhub").html() + "/jobs";
+
+        var jobUrl = "http://localhost:20004/jobs";
+
         var connection = new signalR.HubConnectionBuilder()
-            .withUrl("http://localhost:20004/jobs")
+            .withUrl(jobUrl)
             .build();
 
         connection.on("ScanResult", function (message) {

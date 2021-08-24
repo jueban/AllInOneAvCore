@@ -56,10 +56,10 @@
                 keepAndDelete: function () {
                     $.ajax({ type: 'post', url: '/Wangpan/DeleteAndKeep/', data: { 'model': JSON.stringify(this.keepModel) }, async: true })
                         .done(function (data) {
-                            if (data == 1) {
-                                window.reload();
+                            if (data == 'success') {
+                                window.location.reload();
                             } else {
-                                alert(data.error_msg);
+                                alert(data);
                             }
                         });
                 },

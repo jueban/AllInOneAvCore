@@ -933,23 +933,33 @@ namespace Services
 
             files = files.Take(pageSize).ToList();
 
-            foreach (var m in files)
+            try
             {
-                var avId = m.Name.Split('-')[0] + "-" + m.Name.Split('-')[1];
-                var name = m.Name.Replace(avId, "")[1..].Replace(m.Extension, "").Replace("-C", "");
-
-                var model = await JavLibraryService.GetAvModelByName(avId, name);
-                avs.Add(new MoveBackToLocal()
+                foreach (var m in files)
                 {
-                    AvId = avId,
-                    AvName = name,
-                    AvSize = m.Length,
-                    Fid = m.FullName,
-                    AvSizeStr = FileUtility.GetAutoSizeString(m.Length, 1),
-                    AvPic = model == null ? "" : model.PicUrl,
-                    LocalHas = true,
-                    Keep = false
-                });
+                    if (m.Name.Split('-').Length >= 3)
+                    {
+                        var avId = m.Name.Split('-')[0] + "-" + m.Name.Split('-')[1];
+                        var name = m.Name.Replace(avId, "")[1..].Replace(m.Extension, "").Replace("-C", "");
+
+                        var model = await JavLibraryService.GetAvModelByName(avId, name);
+                        avs.Add(new MoveBackToLocal()
+                        {
+                            AvId = avId,
+                            AvName = name,
+                            AvSize = m.Length,
+                            Fid = m.FullName,
+                            AvSizeStr = FileUtility.GetAutoSizeString(m.Length, 1),
+                            AvPic = model == null ? "" : model.PicUrl,
+                            LocalHas = true,
+                            Keep = false
+                        });
+                    }
+                }
+            }
+            catch (Exception ee)
+            {
+                var haha = ee.ToString();
             }
 
             ret.total = total;

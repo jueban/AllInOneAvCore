@@ -6,6 +6,8 @@
 </head>
 
 <body>
+    <span style="display:none" id="api">@ViewData["api"].ToString()</span>
+
     <div style="width:30%;position:absolute;top:50%;left:40%">
         <form id="form" action="" method="post" enctype="multipart/form-data">
             <div class="row form-group">
@@ -24,6 +26,8 @@
     </div>
 
     <script>
+        var uploadUrl = $("#api").html() + "/api/upload/PostSeedFiles/";
+
         $(document).ready(function () {
             initFileInput("input-id");
         }); 
@@ -32,7 +36,7 @@
             var control = $('#' + ctrlName);
             control.fileinput({
                 language: 'zh', //设置语言
-                uploadUrl: "http://localhost:20001/api/upload/PostSeedFiles/", //上传的地址
+                uploadUrl: uploadUrl, //上传的地址
                 allowedFileExtensions: ['torrent'],//接收的文件后缀
                 maxFilesNum: 5,//上传最大的文件数量
                 uploadAsync: true, //默认异步上传

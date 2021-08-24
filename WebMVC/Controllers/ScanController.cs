@@ -37,6 +37,8 @@ namespace WebMVC.Controllers
         public IActionResult ScanJavLibrary() 
         {
             ViewData.Add("Title", "JavLibrary-扫描");
+            ViewData.Add("jobhub", SettingService.GetSetting().Result.JobHubSite);
+
             return View();
         }
 
