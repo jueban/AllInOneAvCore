@@ -742,6 +742,39 @@ namespace Services
             return 1;
         }
 
+        public static List<MyFileInfo> GetLocalAvs(string folder)
+        {
+            List<MyFileInfo> ret = new();
+
+            if (Directory.Exists(folder))
+            {
+                var files = new DirectoryInfo(folder).GetFiles("*.*", SearchOption.AllDirectories);
+
+                foreach (var file in files)
+                {
+                    if (EverythingService.Extensions.Contains(file.Extension.Replace(".", "").ToLower()) && file.Length > 1024 * 1024 * 200) 
+                    {
+                        var playHistory = SettingService.GetPlayHistory(file.Name);
+
+                        ret.Add(new MyFileInfo()
+                        {
+                            CreateDate = file.LastWriteTime,
+                            Extension = file.Extension,
+                            Folder = file.DirectoryName,
+                            FullName = file.FullName.Replace("\\", "\\\\"),
+                            Length = file.Length,
+                            LengthStr = FileUtility.GetAutoSizeString(file.Length, 1),
+                            Name = file.Name,
+                            PlayTimes = playHistory == null ? 0 : playHistory.PlayTimes,
+                            SetNotPlayed = playHistory == null ? true : playHistory.SetNotPlayed
+                        });
+                    }
+                }
+            }
+
+            return ret;
+        }
+
         private static string CreateFolder(string folder)
         {
             if (!Directory.Exists(folder))

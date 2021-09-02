@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models;
+using Newtonsoft.Json;
 using Services;
 using System;
 using System.Collections.Generic;
@@ -56,6 +57,14 @@ namespace WebMVC.Controllers
         public IActionResult RemoveDuplicate()
         {
             ViewData.Add("Title", "本地-去重");
+            return View();
+        }
+
+        public IActionResult Play(string folder)
+        {
+            ViewData.Add("Title", "本地-播放");
+            ViewData.Add("Folder", folder);
+
             return View();
         }
 
@@ -156,6 +165,23 @@ namespace WebMVC.Controllers
             }
 
             return ret;
+        }
+
+        public JsonResult GetLocalAvs(string folder)
+        {
+            var files = LocalService.GetLocalAvs(folder);
+
+            return Json(new { rows = files, count = files.Count });
+        }
+
+        [HttpPost]
+        public JsonResult PushRedis([FromBody] List<MyFileInfo> avs)
+        {
+            var key = Guid.NewGuid().ToString();
+
+            RedisService.SetHash("play", key, JsonConvert.SerializeObject(avs));
+
+            return Json(new { success = true, data = key });
         }
     }
 }

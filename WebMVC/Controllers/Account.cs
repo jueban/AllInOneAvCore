@@ -20,26 +20,26 @@ namespace WebMVC.Controllers
             _signInManager = signInManager;
         }
 
-        //public IActionResult Register()
-        //{
-        //    ViewData["Title"] = "注册";
-        //    return View();
-        //}
+        public IActionResult Register()
+        {
+            ViewData["Title"] = "注册";
+            return View();
+        }
 
-        //[HttpPost]
-        //public async Task<IActionResult> Register(LoginViewModel model)
-        //{
-        //    //先创建一个user，不包括密码
-        //    var user = new AppUser { UserName = model.UserName };
-        //    //将user和密码绑定入库
-        //    var result = await _userManager.CreateAsync(user, model.Password);
+        [HttpPost]
+        public async Task<IActionResult> Register(LoginViewModel model)
+        {
+            //先创建一个user，不包括密码
+            var user = new AppUser { UserName = model.UserName };
+            //将user和密码绑定入库
+            var result = await _userManager.CreateAsync(user, model.Password);
 
-        //    await _signInManager.SignInAsync(user, true);
-        //    if (result.Succeeded)
-        //        return Redirect("/Home/Index");
+            await _signInManager.SignInAsync(user, true);
+            if (result.Succeeded)
+                return Redirect("/Home/Index");
 
-        //    return Json(result);
-        //}
+            return Json(result);
+        }
 
         public IActionResult Login(string returnUrl)
         {

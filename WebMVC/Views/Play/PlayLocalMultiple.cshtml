@@ -1,0 +1,153 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - AllInOneAv</title>
+
+    <link rel="stylesheet" href="~/css/playlocal.css" />
+
+    <script src="~/js/vue.min.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <div v-if="ready">
+            <div class="sideNav">
+                <ul class="list-group">
+                    <li class="list-group-item list-group-item-action" v-bind:class="{active:(av.playTimes > 0 && !av.setNotePlayed)}" v-for="(av, index) in avs" v-on:click="clickItem(av)">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">{{av.name}}</h5>
+                            <small>{{av.lengthStr}}</small>
+                        </div>
+                        <p class="mb-1">{{av.folder}}</p>
+                        <small>{{av.createDate}}</small>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="content">
+                <video controls preload="auto" autoplay poster="" width="100%" height="100%" :key="['/Play/PlayLocalVideo?file=' + cur.fullName]" v-on:loadstart="savePlayHistory">
+                    <source v-bind:src="['/Play/PlayLocalVideo?file=' + cur.fullName]" type="video/mp4" id="video">
+                </video>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data: {
+                cur: {},
+                pre: {},
+                post: {},
+                avs: {},
+                ready: false,
+            },
+
+            created: function () {
+                var vm = this;
+                this.initData();
+
+                document.onkeydown = function (e) {
+                    let key = window.event.keyCode;
+                    if (key == 40) {
+                        vm.next();
+                    }
+
+                    if (key == 38) {
+                        vm.pre();
+                    }
+                };
+            },
+
+            methods: {
+                initData: function () {
+                    var vm = this;
+
+                    $.ajax({ url: "/Play/GetLocalMultiplePlayAvs?key=" + this.getQueryVariable('key'), method: "GET" })
+                        .done(function (data) {
+
+                            vm.avs = data.data;
+
+                            if (vm.avs.length > 0) {
+                                vm.cur = vm.avs[0];
+
+                                if (vm.avs.length > 1) {
+                                    vm.post = vm.avs[1];
+                                    vm.pre = vm.avs[vm.avs.length - 1];
+                                }
+                            }
+
+                            vm.ready = true;
+                        });
+                },
+
+                getQueryVariable: function (variable) {
+                    var query = window.location.search.substring(1);
+                    var vars = query.split("&");
+                    for (var i = 0; i < vars.length; i++) {
+                        var pair = vars[i].split("=");
+                        if (pair[0] == variable) {
+                            return pair[1];
+                        }
+                    }
+                    return (false);
+                },
+
+                clickItem: function (av) {
+                    var avIndex = this.avs.indexOf(av);
+
+                    this.cur = av;
+
+                    $("#video").attr('src', '/Play/PlayLocalVideo?file=' + av.fullName);
+
+                    if (avIndex + 1 < this.avs.length) {
+                        this.post = this.avs[avIndex + 1];
+                    } else {
+                        this.post = this.avs[0]
+                    }
+
+                    if (avIndex - 1 >= 0) {
+                        this.pre = this.avs[avIndex - 1];
+                    } else {
+                        this.pre = this.avs[this.avs.length - 1];
+                    }
+                },
+
+                next: function () {
+                    var avIndex = this.avs.indexOf(this.cur);
+
+                    if (avIndex + 1 < this.avs.length) {
+                        this.cur = this.avs[avIndex + 1];
+                    } else {
+                        this.cur = this.avs[0]
+                    }
+                },
+
+                pre: function () {
+                    var avIndex = this.avs.indexOf(this.cur);
+
+                    if (avIndex - 1 >= 0) {
+                        this.cur = this.avs[avIndex - 1];
+                    } else {
+                        this.cur = this.avs[this.avs.length - 1];
+                    }
+                },
+
+                savePlayHistory: function(){
+                    var vm = this;
+
+                   $.ajax({ url: "/Setting/SavePlayHistory?fileName=" + vm.cur.name, method: "GET" })
+                        .done(function (data) {
+                            if (data.status == 0) {
+                                vm.cur.playTimes = 1;
+                                vm.cur.setNotPlayed = false;
+                            }
+                        });
+                }
+            }
+        })
+    </script>
+</body>
+</html>

@@ -1,0 +1,104 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - AllInOneAv</title>
+    <link rel="stylesheet" href="~/css/bootstrap-table.min.css" />
+    <script src="~/js/bootstrap-table.min.js"></script>
+</head>
+
+<body>
+
+    <div id="toolbar">
+        <div class="btn-group" role="group" aria-label="Basic example">
+            <button type="button" class="btn btn-success" onclick="playMultiple()">播放</button>
+            <button type="button" class="btn btn-warning">删除历史</button>
+            <button type="button" class="btn btn-danger">删除</button>
+        </div>
+    </div>
+
+    <table id="avTable"></table>
+
+    <script>
+        function getQueryVariable(variable) {
+            var query = window.location.search.substring(1);
+            var vars = query.split("&");
+            for (var i = 0; i < vars.length; i++) {
+                var pair = vars[i].split("=");
+                if (pair[0] == variable) {
+                    return pair[1];
+                }
+            }
+            return (false);
+        };
+
+        $("#avTable").bootstrapTable({
+            url: '/Local/GetLocalAvs?folder=' + getQueryVariable('folder'),
+            method: 'get',
+            dataType: 'json',
+            toolbar: '#toolbar',
+            clickToSelect: true,
+            checkbox: true,
+            multipleSelectRow: true,
+            striped: true,
+            columns: [
+                {
+                    checkbox: true
+                },
+                {
+                    field: 'name',
+                    title: '名称'
+                },
+                {
+                    field: 'Played',
+                    title: '播放过',
+                    formatter: function (value, row, index) {
+                        return (row.playTimes > 0 && !row.setNotPlayed) ? '播放过' : '未播放';
+                    },
+                    cellStyle: function (value, row, index) {
+                        return (row.playTimes > 0 && !row.setNotPlayed) ? { css: { 'background-color': 'rgba(23,162,184,0.7)' } } : { css: { 'background-color': 'rgba(255,255,255,0.7)' } }
+                    }
+                },
+                {
+                    field: 'folder',
+                    title: '文件夹',
+                },
+                {
+                    field: 'lengthStr',
+                    title: '大小',
+                },
+                {
+                    field: 'createDate',
+                    title: '时间',
+                    formatter: function (value, row, index) {
+                        return value.substring(0, value.indexOf('T'));
+                    }
+                },
+                {
+                    field: 'Operation',
+                    title: '操作',
+                    formatter: function (value, row, index) {
+                        return '<a href="javascript:play(\'' + row.fullName + '\')" title="详情">播放</a>';
+                    }
+                }
+            ]
+        });
+
+        function play(av) {
+            window.open("/play/playlocal?file=" + av);
+        }
+
+        function playMultiple() {
+            var rows = $("#avTable").bootstrapTable('getSelections');
+
+            $.ajax({ url: "/Local/PushRedis", method: "POST", async: false, contentType: "application/json", dataType: "json", data: JSON.stringify(rows) })
+                .done(function (data) {
+                    if (data.success) {
+                        window.location.href = '/Play/PlayLocalMultiple?key=' + data.data;
+                    }
+                });
+        }
+    </script>
+</body>
+</html>

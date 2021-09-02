@@ -50,5 +50,20 @@ namespace Services
             settringDAL.TruncatePrefix().Wait();
             settringDAL.InsertPrefix(settings.Prefix).Wait();
         }
+
+        public static int InsertPlayHistory(PlayHistory entity)
+        {
+            return new SettingsDAL().InsertPlayHistory(entity);
+        }
+
+        public static PlayHistory GetPlayHistory(string fileName)
+        {
+            return new SettingsDAL().GetPlayHistory(fileName);
+        }
+
+        public static int SetPlayHistoryNotPlayed(string fileName)
+        {
+            return new SettingsDAL().SetPlayHistoryNotPlayed(fileName);
+        }
     }
 }

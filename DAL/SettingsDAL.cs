@@ -68,5 +68,34 @@ namespace DAL
 
             return str.Split(',').ToList();
         }
+
+        public int InsertPlayHistory(PlayHistory entity)
+        {
+            var sql = @"
+                        IF NOT EXISTS(SELECT TOP 1 * FROM PlayHistory WHERE FileName = @FileName)
+                            BEGIN
+                                INSERT INTO PlayHistory (FileName, PlayTimes, LastPlay, SetNotPlayed) VALUES (@FileName, @PlayTimes, GETDATE(), @SetNotPlayed)
+                            END
+                        ELSE
+                            BEGIN
+                                UPDATE PlayHistory SET PlayTimes = PlayTimes + 1, LastPlay = GETDATE(), SetNotPlayed = @SetNotPlayed WHERE FileName = @FileName
+                            END;";
+
+            return Execute(sql, entity);
+        }
+
+        public PlayHistory GetPlayHistory(string fileName)
+        {
+            var sql = "SELECT TOP 1 * FROM PlayHistory WHERE FileName = @fileName";
+
+            return QuerySingleOrDefault<PlayHistory>(sql, new { fileName });
+        }
+
+        public int SetPlayHistoryNotPlayed(string fileName)
+        {
+            var sql = "UPDATE PlayHistory SET SetNotPlayed = 1 WHERE FileName = @fileName";
+
+            return Execute(sql, new { fileName });
+        }
     }
 }

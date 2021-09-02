@@ -33,6 +33,10 @@ namespace Models
         public string Name { get; set; }
         public string LengthStr { get; set; }
         public bool IsChinese { get; set; }
+        public DateTime CreateDate { get; set; }
+        public string Folder { get; set; }
+        public int PlayTimes { get; set; }
+        public bool SetNotPlayed { get; set; }
     }
 
     public class MyDirectoryInfo

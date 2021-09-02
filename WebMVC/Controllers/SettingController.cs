@@ -71,5 +71,32 @@ namespace WebMVC.Controllers
                 status = Status.Ok
             };
         }
+
+        public WebResult SavePlayHistory(string fileName)
+        {
+            var ret = SettingService.InsertPlayHistory(new PlayHistory()
+            {
+                FileName = fileName,
+                PlayTimes = 1,
+                SetNotPlayed = false
+            });
+
+            return new WebResult()
+            {
+                msg = "保存成功",
+                status = ret > 0 ? Status.Ok : Status.Error
+            };
+        }
+
+        public WebResult SetPlayHistoryNotPlayer(string fileName)
+        {
+            var ret = SettingService.SetPlayHistoryNotPlayed(fileName);
+
+            return new WebResult()
+            {
+                msg = "保存成功",
+                status = ret > 0 ? Status.Ok : Status.Error
+            };
+        }
     }
 }

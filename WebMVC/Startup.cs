@@ -77,7 +77,7 @@ namespace WebMVC
             );
 
             services.AddDataProtection()
-                    .PersistKeysToFileSystem(new DirectoryInfo($@"E:\login-keys\"));
+                    .PersistKeysToFileSystem(new DirectoryInfo($@"D:\login-keys\"));
 
             services.AddCors(options =>
             {
