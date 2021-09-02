@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using log4net;
 using Microsoft.AspNetCore.Mvc;
 using Models;
+using Services;
 using Utils;
 
 namespace Hangfire.Controllers
@@ -81,6 +82,14 @@ namespace Hangfire.Controllers
         public string PingService()
         {
             RecurringJob.AddOrUpdate(() => Jobs.PingService(), Cron.MinuteInterval(30));
+
+            return "success";
+        }
+
+        [HttpGet]
+        public string GeneratePotPlayerListAndPlay(string key)
+        {
+            BackgroundJob.Enqueue(() => Jobs.GeneratePotPlayerListAndPlay(key));
 
             return "success";
         }

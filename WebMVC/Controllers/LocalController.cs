@@ -179,7 +179,7 @@ namespace WebMVC.Controllers
         {
             var key = Guid.NewGuid().ToString();
 
-            RedisService.SetHash("play", key, JsonConvert.SerializeObject(avs));
+            RedisService.SetHashAndReplace("play", key, JsonConvert.SerializeObject(avs));
 
             return Json(new { success = true, data = key });
         }

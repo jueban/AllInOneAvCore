@@ -42,6 +42,38 @@ namespace Services
         }
 
         /// <summary>
+        /// 设置hash值
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="field"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static bool SetHashAndReplace(string key, string field, string value)
+        {
+            try
+            {
+                var client = GetClient();
+
+                var ret = client.HGetAll(key);
+
+                if (ret != null && ret.Any())
+                {
+                    foreach (var r in ret)
+                    {
+                        client.HDel(key, r.Key);
+                    }
+                }
+
+                client.HSet(key, field, value);
+                return true;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
         /// 根据表名，键名，获取hash值
         /// </summary>
         /// <param name="key">表名</param>

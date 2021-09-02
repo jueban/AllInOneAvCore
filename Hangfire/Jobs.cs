@@ -1,12 +1,15 @@
 ﻿using log4net;
 using Microsoft.Extensions.Logging;
 using Models;
+using Newtonsoft.Json;
 using Services;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using Utils;
 
@@ -124,6 +127,38 @@ namespace Hangfire
                     var result = hc.GetStringAsync(site + "/ping/ping").Result;
                 }
             }
+        }
+
+        public static void GeneratePotPlayerListAndPlay(string key)
+        {
+            List<string> files = JsonConvert.DeserializeObject<List<string>>(RedisService.GetHash("play", key));
+
+            var folder = "c:\\setting\\playlist\\";
+            var fileName = DateTime.Now.ToString("yyyyMMddHHmmss") + "PlayList.dpl";
+            var sb = new StringBuilder();
+            int index = 1;
+
+            if (!Directory.Exists(folder))
+            {
+                Directory.CreateDirectory(folder);
+            }
+
+            File.Create(folder + fileName).Close();
+
+            sb.AppendLine("DAUMPLAYLIST");
+
+            foreach (var f in files)
+            {
+                sb.AppendLine(string.Format("{0}*file*{1}", index++, f));
+                sb.AppendLine("1*played*0");
+            }
+
+            using (StreamWriter sw = new StreamWriter(folder + fileName))
+            {
+                sw.WriteLine(sb.ToString());
+            }
+
+            ScheduleService.CreateOrReCreateOneTimeSchedulerAndRun("PlayPotPlayerList", "PlayPotPlayerPlayListThatGenerateByProgram", @"C:\Program Files\DAUM\PotPlayer\PotPlayerMini64.exe", folder + fileName);
         }
     }
 }

@@ -107,7 +107,7 @@ namespace WebMVC.Controllers
         {
             var guid = Guid.NewGuid().ToString();
 
-            RedisService.SetHash("scan", guid, str);
+            RedisService.SetHashAndReplace("scan", guid, str);
 
             return guid;
         }

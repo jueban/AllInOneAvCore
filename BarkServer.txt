@@ -5,4 +5,4 @@ docker run -dt --name bark -p 20005:8080 -v d:/bark/bark-data:/data finab/bark-s
 
 docker run -d --name redis-server -p 6379:6379 -v /usr/redis/redis.conf:/etc/redis/redis.conf -v /usr/redis/data/:/data redis:latest /etc/redis/redis.conf --appendonly yes --requirepass "123456" --restart=always
 
-docker exec -it myredis redis-cli -a "your password"
+docker exec -it redis-server redis-cli -a "123456"

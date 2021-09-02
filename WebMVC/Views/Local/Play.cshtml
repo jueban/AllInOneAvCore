@@ -13,6 +13,7 @@
     <div id="toolbar">
         <div class="btn-group" role="group" aria-label="Basic example">
             <button type="button" class="btn btn-success" onclick="playMultiple()">播放</button>
+            <button type="button" class="btn btn-info" onclick="potplay()">PotPlayer播放</button>
             <button type="button" class="btn btn-warning" onclick="deletePlayHistory()">删除历史</button>
             <button type="button" class="btn btn-danger" onclick="deleteFiles()">删除</button>
         </div>
@@ -165,6 +166,17 @@
                         window.location.reload();
                     }
                 });
+        }
+
+        function potplay() {
+            var fileList = [];
+            var rows = $("#avTable").bootstrapTable('getSelections');
+
+            rows.forEach((item, index) => {
+                fileList.push(item.fullName);
+            });
+
+            $.ajax({ url: "/Play/PotPlayerPlay", method: "POST", async: false, contentType: "application/json", dataType: "json", data: JSON.stringify(fileList) });
         }
     </script>
 </body>

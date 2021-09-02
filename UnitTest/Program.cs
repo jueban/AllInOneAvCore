@@ -28,7 +28,7 @@ namespace UnitTest
 
             //OneOneFiveService.UpdateKeepAvs().Wait();
 
-            OneOneFiveService.Get115Cookie().Wait();
+            //OneOneFiveService.Get115Cookie().Wait();
             //var files = OneOneFiveService.GetSameAvNameFiles().Result;
             //OneOneFiveService.DeleteSameAvNameFiles(files, progress).Wait();
 
@@ -37,6 +37,8 @@ namespace UnitTest
             //MagnetUrlService.SearchJavBus("https://www.javbus.com/page", 5, "Test", progress).Wait();
 
             //var av = new JavLibraryDAL().GetAvModelByWhere("").Result;
+
+            RedisService.SetHashAndReplace("play", "", "");
 
             Console.ReadKey();
         }
