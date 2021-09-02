@@ -98,5 +98,22 @@ namespace WebMVC.Controllers
                 status = ret > 0 ? Status.Ok : Status.Error
             };
         }
+
+        [HttpPost]
+        public WebResult SetPlayHistoryNotPlayer([FromBody]List<string> fileNames)
+        {
+            var ret = 0;
+
+            foreach (var fileName in fileNames)
+            {
+                ret += SettingService.SetPlayHistoryNotPlayed(fileName);
+            }
+
+            return new WebResult()
+            {
+                msg = "保存成功",
+                status = ret > 0 ? Status.Ok : Status.Error
+            };
+        }
     }
 }
