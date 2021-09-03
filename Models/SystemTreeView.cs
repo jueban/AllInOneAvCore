@@ -37,6 +37,10 @@ namespace Models
         public string Folder { get; set; }
         public int PlayTimes { get; set; }
         public bool SetNotPlayed { get; set; }
+        public List<string> Thumnails { get; set; }
+        public string NewFullName { get; set; }
+        public bool ChangeName { get; set; }
+        public bool IsDelete { get; set; }
     }
 
     public class MyDirectoryInfo

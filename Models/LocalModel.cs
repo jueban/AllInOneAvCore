@@ -18,6 +18,7 @@ namespace Models
         public int avDbId { get; set; }
         public string rootFolder { get; set; }
         public string moveFile { get; set; }
+        public string oriFile { get; set; }
     }
 
     public class ManualRenameResultModel : WebResult

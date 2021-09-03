@@ -106,23 +106,7 @@ namespace WebMVC.Controllers
         [HttpPost]
         public async Task<JsonResult> GetJavLibrarySearchResult([FromBody] string content)
         {
-            Progress<string> progress = new();
-            var ret = await JavLibraryService.GetSearchJavLibrary(content, progress);
-
-            foreach (var av in ret)
-            {
-                JavLibraryService.SaveCommonJavLibraryModel(JsonHelper.Deserialize<List<CommonModel>>(av.Infos)).Wait();
-                var id = await JavLibraryService.SaveJavLibraryAvModel(av);
-
-                if (id > 0)
-                {
-                    av.Id = id;
-                }
-                else
-                {
-                    av.Id = new JavLibraryDAL().GetAvModelByWhere($" AND Url = '{av.Url}'").Result.FirstOrDefault().Id;
-                }
-            }
+            var ret = await LocalService.GetJavLibrarySearchResult(content);
 
             return Json(ret);
         }
@@ -132,7 +116,7 @@ namespace WebMVC.Controllers
         {
             ManualRenameResultModel ret = new();
 
-            var res = LocalService.ManualRemove(model);
+            var res = LocalService.ManualRename(model).Result;
 
             ret.status = res ? Status.Ok : Status.Error;
 

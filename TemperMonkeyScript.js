@@ -45,3 +45,56 @@
     });
 })();
 
+
+//Jav老司机添加以下
+function getLocalAnd115Check(avId, div) {
+    let promise1 = request(`http://localhost:20001/api/Everything/EverythingSearch?content=${avId}`);
+    promise1.then((result) => {
+        let resultJson = JSON.parse(result.responseText);
+        if (resultJson.results.length > 0) {
+            var first = resultJson.results[0];
+            div.after("<span style='color:red;'>" + first.location + " " + first.sizeStr + " " + first.chinese + "</span>");
+        } else {
+            div.after("<span style='color:red;'>没有找到</span>");
+        }
+    });
+}
+
+//MT还要更改
+//@connect *
+
+function request(url, referrerStr, timeoutInt) {
+    return new Promise((resolve, reject) => {
+        console.log(`发起网址请求：${url}`);
+        GM_xmlhttpRequest({
+            url,
+            method: 'GET',
+            headers: {
+                "Cache-Control": "no-cache",
+                referrer: referrerStr
+            },
+            timeout: timeoutInt > 0 ? timeoutInt : 20000,
+            onload: response => { //console.log(url + " reqTime:" + (new Date() - time1));
+                response.loadstuts = true;
+                resolve(response);
+            },
+            onabort: response => {
+                console.log(url + " abort");
+                response.loadstuts = false;
+                resolve(response);
+            },
+            onerror: response => {
+                console.log(url + " error");
+                console.log(response);
+                response.loadstuts = false;
+                resolve(response);
+            },
+            ontimeout: response => {
+                console.log(`${url} ${timeoutInt}ms timeout`);
+                response.loadstuts = false;
+                response.finalUrl = url;
+                resolve(response);
+            },
+        });
+    });
+}

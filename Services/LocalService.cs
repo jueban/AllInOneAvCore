@@ -226,7 +226,9 @@ namespace Services
 
             progress.Report($"共加载 {avs.Count} 条缓存并开始处理前缀");
 
-            allPrefix = new SettingsDAL().GetPrefix().Result.OrderByDescending(x => x.Length).ToList();
+            var setting = await new SettingsDAL().GetPrefix();
+
+            allPrefix = setting.OrderByDescending(x => x.Length).ToList();
 
             progress.Report($"共加载 {allPrefix.Count} 条前缀");
 
@@ -470,12 +472,97 @@ namespace Services
         {
             (string name, List<AvModel> av) ret = new();
 
-            var imgFolder = SettingService.GetSetting().Result.JavLibraryImageFolder;
+            var setting = await SettingService.GetSetting();
+
+            var imgFolder = setting.JavLibraryImageFolder;
+
             string name = "";
             var fi = new FileInfo(fileName);
 
-            var allPrefix = new SettingsDAL().GetPrefix().Result.OrderByDescending(x => x.Length).ToList();
+            var allPrefix = await new SettingsDAL().GetPrefix();
+
+            allPrefix = allPrefix.OrderByDescending(x => x.Length).ToList();
+
             var fileNameWithoutFormat = fi.Name.Replace(fi.Extension, "");
+
+            foreach (var prefix in allPrefix)
+            {
+                if (fileNameWithoutFormat.Contains(prefix, StringComparison.OrdinalIgnoreCase))
+                {
+                    var pattern = prefix + "{1}-?\\d{1,5}";
+                    var possibleId = Regex.Match(fileNameWithoutFormat, pattern, RegexOptions.IgnoreCase).Value;
+
+                    if (possibleId.Contains("-"))
+                    {
+                        name = possibleId;
+                    }
+                    else
+                    {
+                        bool isFirst = true;
+                        StringBuilder sb = new StringBuilder();
+
+                        foreach (var c in possibleId)
+                        {
+                            if (c >= '0' && c <= '9')
+                            {
+                                if (isFirst)
+                                {
+                                    sb.Append("-");
+                                    isFirst = false;
+                                }
+                            }
+                            sb.Append(c);
+                        }
+
+                        name = sb.ToString();
+                    }
+
+                    break;
+                }
+            }
+
+            ret.name = name.ToUpper();
+
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                var avs = await new JavLibraryDAL().GetAvModelByWhere($" AND AvId='{name}'");
+
+                if (avs != null && avs.Any())
+                {
+                    //foreach (var av in avs)
+                    //{
+                    //    av.PicUrl = "file://" + (imgFolder + av.AvId + "-" + av.Name + ".jpg").Replace("\\", "/");
+                    //}
+                    ret.av = avs;
+                }
+                else
+                {
+                    ret.av = new List<AvModel>();
+                }
+            }
+            else
+            {
+                ret.av = new List<AvModel>();
+            }
+
+            return ret;
+        }
+
+        public static async Task<(string name, List<AvModel> av)> GetPossibleAvNameAndInfoByNameWithoutExtension(string onlyName)
+        {
+            (string name, List<AvModel> av) ret = new();
+
+            var setting = await SettingService.GetSetting();
+
+            var imgFolder = setting.JavLibraryImageFolder;
+
+            string name = "";
+
+            var allPrefix = await new SettingsDAL().GetPrefix();
+
+            allPrefix = allPrefix.OrderByDescending(x => x.Length).ToList();
+
+            var fileNameWithoutFormat = onlyName;
 
             foreach (var prefix in allPrefix)
             {
@@ -549,8 +636,7 @@ namespace Services
             return ret;
         }
 
-
-        public static bool ManualRemove(ManualRenameModel model)
+        public async static Task<bool> ManualRename(ManualRenameModel model)
         {
             bool ret = false;
 
@@ -559,7 +645,7 @@ namespace Services
             var targetFolder = CreateNeededFolder(model.rootFolder, model.location);
             targetFolder = targetFolder.EndsWith("\\") ? targetFolder : targetFolder + "\\";
 
-            var av = new JavLibraryDAL().GetAvModelById(model.avDbId).Result;
+            var av = await new JavLibraryDAL().GetAvModelById(model.avDbId);
 
             if (av != null)
             {
@@ -769,6 +855,192 @@ namespace Services
                             SetNotPlayed = playHistory == null ? true : playHistory.SetNotPlayed
                         });
                     }
+                }
+            }
+
+            return ret;
+        }
+
+        public static async Task<Dictionary<string, List<MyFileInfo>>> GetCombinePrepareData(string folder, bool includeThumnail, string ffmpeg, string thumlocation, int thumnailCount)
+        {
+            var setting = await SettingService.GetSetting();
+            var ignore = setting.CannotMergeFileTag;
+            Dictionary<string, List<MyFileInfo>> ret = new();
+
+            if (Directory.Exists(folder))
+            {
+                var files = new DirectoryInfo(folder).GetFiles();
+
+                foreach (var file in files)
+                {
+                    var nameArray = file.Name.Split('-');
+
+                    if (nameArray.Length >= 3 && !file.Name.Contains(ignore))
+                    {
+                        var key = nameArray[0] + "-" + nameArray[1];
+
+                        if (ret.ContainsKey(key))
+                        {
+                            ret[key].Add(new MyFileInfo()
+                            {
+                                CreateDate = file.CreationTime,
+                                Extension = file.Extension,
+                                Folder = file.DirectoryName,
+                                FullName = file.FullName,
+                                IsChinese = file.Name.Contains("-C.", StringComparison.OrdinalIgnoreCase),
+                                Length = file.Length,
+                                LengthStr = FileUtility.GetAutoSizeString(file.Length, 1),
+                                Name = file.Name,
+                                Thumnails = new List<string>()
+                            });
+                        }
+                        else
+                        {
+                            ret.Add(key, new List<MyFileInfo> { 
+                                new MyFileInfo()
+                                {
+                                    CreateDate = file.CreationTime,
+                                    Extension = file.Extension,
+                                    Folder = file.DirectoryName,
+                                    FullName = file.FullName,
+                                    IsChinese = file.Name.Contains("-C.", StringComparison.OrdinalIgnoreCase),
+                                    Length = file.Length,
+                                    LengthStr = FileUtility.GetAutoSizeString(file.Length, 1),
+                                    Name = file.Name,
+                                    Thumnails = new List<string>()
+                                } 
+                            });
+                        }
+                    }
+                }
+            }
+
+            ret = ret.Where(x => x.Value.Count > 1).ToDictionary(x => x.Key, x => x.Value);
+
+            if (includeThumnail)
+            {
+                foreach (var r in ret)
+                {
+                    foreach (var f in r.Value)
+                    {
+                        f.Thumnails.AddRange(await FileUtility.GetThumbnails(f.FullName, ffmpeg, thumlocation, f.Name, thumnailCount, false));
+                    }
+                }
+            }
+
+            return ret;
+        }
+
+        public static string CombinePrepareDataClear(Dictionary<string, List<MyFileInfo>> entity)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            List<string> deleteFiles = new();
+            List<MyFileInfo> renameFiles = new();
+
+            foreach (var e in entity)
+            {
+                foreach (var i in e.Value)
+                {
+                    if (i.ChangeName)
+                    {
+                        renameFiles.Add(i);
+                    }
+                    else
+                    {
+                        if (i.IsDelete)
+                        {
+                            deleteFiles.Add(i.FullName);
+                        }
+                    }
+                }
+            }
+
+            foreach (var d in deleteFiles)
+            {
+                try
+                {
+                    File.Delete(d);
+                }
+                catch
+                {
+                    sb.AppendLine($"删除文件 {d} 失败");
+                }
+            }
+
+            foreach (var r in renameFiles)
+            {
+                try
+                {
+                    if (!r.FullName.Equals(r.NewFullName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        File.Move(r.FullName, r.NewFullName);
+                    }
+                }
+                catch
+                {
+                    sb.AppendLine($"重命名文件 {r.FullName} 到 {r.NewFullName} 失败");
+                }
+            }
+
+            return sb.ToString();
+        }
+
+        public static string RealGenerateAutoCombineFile(Dictionary<string, List<string>> files, string folder)
+        {
+            StringBuilder retSb = new StringBuilder();
+
+            foreach (var list in files)
+            {
+                try
+                {
+                    var file = folder + list.Key + "-" + DateTime.Now.ToString("yyyyMMddhhmmss") + ".txt";
+
+                    if (File.Exists(file))
+                    {
+                        File.Delete(file);
+                    }
+
+                    File.CreateText(file).Close();
+
+                    StreamWriter sw = new StreamWriter(file);
+                    StringBuilder sb = new StringBuilder();
+
+                    foreach (var f in list.Value)
+                    {
+                        sb.AppendLine(string.Format("file '{0}'", f));
+                    }
+
+                    sw.WriteLine(sb.ToString());
+                    sw.Close();
+                }
+                catch
+                {
+                    retSb.AppendLine($"生成文件 {list.Key} 失败");
+                }
+            }
+
+            return retSb.ToString();
+        }
+
+        public async static Task<List<AvModel>> GetJavLibrarySearchResult(string content)
+        {
+            Progress<string> progress = new();
+            var ret = await JavLibraryService.GetSearchJavLibrary(content, progress);
+
+            foreach (var av in ret)
+            {
+                await JavLibraryService.SaveCommonJavLibraryModel(JsonHelper.Deserialize<List<CommonModel>>(av.Infos));
+                var id = await JavLibraryService.SaveJavLibraryAvModel(av);
+
+                if (id > 0)
+                {
+                    av.Id = id;
+                }
+                else
+                {
+                    var model = await new JavLibraryDAL().GetAvModelByWhere($" AND Url = '{av.Url}'");
+                    av.Id = model.FirstOrDefault().Id;
                 }
             }
 

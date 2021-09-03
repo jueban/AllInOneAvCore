@@ -36,12 +36,17 @@ namespace Services
             string userAgent = "";
             CookieContainer ret = null;
 
-            var mode = SettingService.GetSetting().Result.JavLibrarySettings.CookieMode;
+            var setting = await SettingService.GetSetting();
+
+            var mode = setting.JavLibrarySettings.CookieMode;
             
             if(mode == JavLibraryGetCookieMode.MockBroswer)
             {
                 //TODO 如果有需要JavLibraryCookie的接口调用失败（认为Cookie失效）则删除数据库中Cookie记录，走False分支
-                if(new JavLibraryDAL().GetJavLibraryCookie().Result != null)
+
+                var cookie = await new JavLibraryDAL().GetJavLibraryCookie();
+
+                if (cookie != null)
                 {
                     var res = await GetJavChromeCookieFromDB();
 
@@ -765,7 +770,9 @@ namespace Services
         //打开Chrome浏览器等待油猴脚本调用API存入Cookie，并退出（有bug）
         private async static Task<(CookieContainer cc, string userAgent)> GetJavCookieChromeProcess()
         {
-            var chromeLocation = SettingService.GetSetting().Result.CommonSettings.ChromeLocation;
+            var setting = await SettingService.GetSetting();
+
+            var chromeLocation = setting.CommonSettings.ChromeLocation;
 
             if (File.Exists(chromeLocation))
             {
