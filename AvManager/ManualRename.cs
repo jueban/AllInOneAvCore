@@ -57,7 +57,7 @@ namespace AvManager
 
                 lvi.SubItems.Insert(1, new ListViewItem.ListViewSubItem()
                 {
-                    Text = fi.Name
+                    Text = fi.Name.Replace(fi.Extension, "")
                 });
 
                 lvi.Tag = fi;
@@ -148,7 +148,7 @@ namespace AvManager
 
         private void ManualRename_KeyDown(object sender, KeyEventArgs e)
         {
-            if (CommonHelper.CheckFolderChoose(ManualRenameMatchText) && ManualRenameListView.SelectedItems.Count > 0)
+            if (ManualRenameListView.SelectedItems.Count > 0)
             {
                 var file = ((FileInfo)ManualRenameListView.SelectedItems[0].Tag);
 
@@ -173,7 +173,7 @@ namespace AvManager
         #endregion
 
         #region 方法
-        private void ResetInfos()
+        private async void ResetInfos()
         {
             ManualRenameMainMainPanel.Controls.Clear();
 
@@ -183,18 +183,20 @@ namespace AvManager
             ManualRenameChineseCB.Checked = false;
             ManualRenameFinalText.Text = ManualRenameListView.SelectedItems[0].SubItems[1].Text;
 
-            Match(ManualRenameListView.SelectedItems[0].SubItems[1].Text);
+            var possibleName = await LocalService.GetPossibleAvName(ManualRenameListView.SelectedItems[0].SubItems[1].Text);
+
+            Match(possibleName);
         }
 
-        private async void Match(string file)
+        private async void Match(string avId)
         {
-            var ret = await LocalService.GetPossibleAvNameAndInfoByNameWithoutExtension(file);
+            var avModel = await JavLibraryService.GetAvModelByAvId(avId);
 
-            ManualRenameMatchText.Text = string.IsNullOrEmpty(ret.name) ? ManualRenameListView.SelectedItems[0].SubItems[1].Text : ret.name;
+            ManualRenameMatchText.Text = !string.IsNullOrEmpty(avId) ? avId : ManualRenameListView.SelectedItems[0].SubItems[1].Text;
 
-            if (ret.av != null && ret.av.Any())
+            if (avModel != null && avModel.Any())
             {
-                ShowAv(ret.av);
+                ShowAv(avModel);
             }
         }
 

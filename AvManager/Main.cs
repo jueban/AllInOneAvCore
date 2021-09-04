@@ -5,10 +5,12 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Utils;
@@ -17,10 +19,68 @@ namespace AvManager
 {
     public partial class Main : Form
     {
+        private bool IsCurrentCombineFinish = false;
+        private Process p;
+        public delegate void ProcessPb(ProgressBar pb, int value);
+        private CancellationTokenSource AutoCombineCts = new();
+        private CancellationTokenSource CombinePrepareCts = new();
+
         public Main()
         {
+            Control.CheckForIllegalCrossThreadCalls = false;
             InitializeComponent();
         }
+
+        #region 全局
+        private void Main_KeyDown(object sender, KeyEventArgs e)
+        {
+            //准备合并页面
+            if (TabControl.SelectedIndex == 2)
+            {
+                if (e.KeyCode == Keys.Space)
+                {
+                    e.Handled = true;
+
+                    if (CombinePrepareTree.SelectedNode != null && CombinePrepareTree.SelectedNode.Level != 0)
+                    {
+                        Process.Start(Setting.POTPLAYEREXEFILELOCATION, @"" + ((MyFileInfo)CombinePrepareTree.SelectedNode.Tag).FullName);
+                    }
+                }
+            }
+        }
+
+        private void TabControl_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (TabControl.SelectedIndex == 3)
+            {
+                ShowAutoCombineList();
+            }
+        }
+
+        private void JDuBar(ProgressBar jd, int v)
+        {
+            if (jd.InvokeRequired)
+            {
+                jd.Invoke(new ProcessPb(JDuBar), jd, v);
+            }
+            else
+            {
+                if (v < jd.Maximum && v >= 0)
+                {
+                    jd.Value = v;
+                }
+                else
+                {
+                    jd.Value = jd.Maximum;
+                }
+            }
+        }
+
+        private void Main_Load(object sender, EventArgs e)
+        {
+
+        }
+        #endregion
 
         #region 托盘相关
         private void NotifyIcon_MouseClick(object sender, MouseEventArgs e)
@@ -79,6 +139,8 @@ namespace AvManager
         private void RemoveFolderText_Click(object sender, EventArgs e)
         {
             CommonHelper.ChooseFolder(FolderBrowserDialog, RemoveFolderText);
+
+            RemoveFolderInfoText.Text = "";
         }
 
         /// <summary>
@@ -112,6 +174,8 @@ namespace AvManager
         private void RenameText_Click(object sender, EventArgs e)
         {
             CommonHelper.ChooseFolder(FolderBrowserDialog, RenameText);
+
+            RenameInfoText.Text = "";
         }
 
         private async void RenameBtn_Click(object sender, EventArgs e)
@@ -152,18 +216,34 @@ namespace AvManager
         private void CombinePrepareText_Click(object sender, EventArgs e)
         {
             CommonHelper.ChooseFolder(FolderBrowserDialog, CombinePrepareText);
+
+            CombinePrepareTree.Nodes.Clear();
+            CombinePreparePB.Maximum = 0;
+            CombinePreparePB.Value = 0;
         }
 
         private async void ShowCombinePrepareData()
         {
+            Progress<(int, int)> progress = new();
+
+            progress.ProgressChanged += UpdateCombinePreparePB;
+
+            CombinePrepareTree.Nodes.Clear();
+
             if (CommonHelper.CheckFolderChoose(CombinePrepareText))
             {
                 var includeThumnail = CombinePrepareCB.Checked;
 
-                var duplicate = await LocalService.GetCombinePrepareData(CombinePrepareText.Text, includeThumnail, Setting.FFMPEGLOCATION, Setting.THUMNAILLOCATION, 5);
+                var duplicate = await LocalService.GetCombinePrepareData(CombinePrepareText.Text, includeThumnail, Setting.FFMPEGLOCATION, Setting.THUMNAILLOCATION, 5, CombinePrepareCts.Token, progress);
 
                 ShowCombinePrepareTree(duplicate);
             }
+        }
+
+        private void UpdateCombinePreparePB(object sender, (int, int) e)
+        {
+            CombinePreparePB.Maximum = e.Item1;
+            CombinePreparePB.Value = e.Item2;
         }
 
         /// <summary>
@@ -394,6 +474,199 @@ namespace AvManager
             {
                 MessageBox.Show("操作成功", "提示");
             }
+        }
+        #endregion
+
+        #region 自动合并
+        private void ShowAutoCombineList()
+        {
+            if (Directory.Exists(Setting.AUTOCOMBINEFILELOCATION))
+            {
+                var files = Directory.GetFiles(Setting.AUTOCOMBINEFILELOCATION);
+
+                ShowPreviewTree(files);
+            }
+        }
+
+        private void ShowPreviewTree(string[] files)
+        {
+            AutoCombineListView.Items.Clear();
+
+            AutoCombineListView.BeginUpdate();
+
+            foreach (var file in files)
+            {
+                ListViewItem lvi = new ListViewItem();
+                var list = new List<FileInfo>();
+                lvi.SubItems[0].Text = file;
+
+                StreamReader sr = new StreamReader(file);
+
+                while (!sr.EndOfStream)
+                {
+                    var line = sr.ReadLine();
+
+                    if (!string.IsNullOrEmpty(line))
+                    {
+                        var fileName = line.Substring(line.IndexOf("'") + 1);
+                        fileName = fileName.Substring(0, fileName.LastIndexOf("'"));
+
+                        if (File.Exists(fileName))
+                        {
+                            list.Add(new FileInfo(fileName));
+                        }
+                    }
+                }
+
+                sr.Close();
+
+                lvi.SubItems.Add(new ListViewItem.ListViewSubItem() { 
+                    Text = FileUtility.GetAutoSizeString(list.Sum(x => x.Length), 1)
+                });
+
+                lvi.Tag = list;
+
+                AutoCombineListView.Items.Add(lvi);
+            }
+
+            AutoCombineListView.EndUpdate();
+        }
+
+        private void AutoCombineSaveText_Click(object sender, EventArgs e)
+        {
+            CommonHelper.ChooseFolder(FolderBrowserDialog, AutoCombineSaveText);
+        }
+
+        private void AutoCombineStartBtn_Click(object sender, EventArgs e)
+        {
+            AutoCombineCurrentPB.Value = 0;
+            AutoCombineTotalPB.Value = 0;
+            IsCurrentCombineFinish = false;
+            AutoCombineInfoText.Text = "";
+
+            if (CommonHelper.CheckFolderChoose(AutoCombineSaveText) && AutoCombineListView.Items.Count > 0)
+            {
+                Dictionary<string, List<FileInfo>> autoCombine = new();
+
+                foreach (ListViewItem lvi in AutoCombineListView.Items)
+                {
+                    List<FileInfo> tempList = new List<FileInfo>();
+                    tempList.AddRange(((List<FileInfo>)lvi.Tag));
+
+                    autoCombine.Add(lvi.SubItems[0].Text, tempList);
+                }
+
+                StartAutoCombine(autoCombine);
+            }
+        }
+
+        private void AutoCombineDeleteBtn_Click(object sender, EventArgs e)
+        {
+            if (AutoCombineListView.Items.Count > 0 && AutoCombineListView.SelectedItems.Count > 0)
+            {
+                Dictionary<string, List<FileInfo>> deleteFiles = new();
+
+                foreach (ListViewItem lvi in AutoCombineListView.SelectedItems)
+                {
+                    List<FileInfo> tempList = new List<FileInfo>();
+                    tempList.AddRange(((List<FileInfo>)lvi.Tag));
+
+                    deleteFiles.Add(lvi.SubItems[0].Text, tempList);
+                }
+
+                var ret = MessageBox.Show($"确定要删除 {deleteFiles.Values.Sum(x => x.Count)} 个文件，总大小 {FileUtility.GetAutoSizeString(deleteFiles.Values.Sum(x => x.ToList().Sum(y => y.Length)),1 )} ?", "警告", MessageBoxButtons.YesNo);
+
+                if (ret == DialogResult.Yes)
+                {
+                    foreach (var file in deleteFiles)
+                    {
+                        File.Delete(file.Key);
+
+                        foreach (var f in file.Value)
+                        {
+                            File.Delete(f.FullName);
+                        }
+                    }
+                }
+            }
+        }
+
+        private async void StartAutoCombine(Dictionary<string, List<FileInfo>> autoCombine) 
+        {
+            Progress<int> progress = new();
+
+            progress.ProgressChanged += SetAutoCombineCurrentPBMax;
+
+            int index = 1;
+            AutoCombineTotalPB.Maximum = autoCombine.Count;
+
+            foreach (var a in autoCombine)
+            {
+                p = new Process();
+                LocalService.Output += OutputAuto;
+
+                JDuBar(AutoCombineCurrentPB, 0);
+
+                List<string> files = new List<string>();
+
+                a.Value.ForEach(x => files.Add(x.FullName));
+
+                try
+                {
+                    await LocalService.AutoCombineVideosUsingFFMPEG(files, a.Key, Setting.FFMPEGLOCATION, AutoCombineSaveText.Text + "\\", p, progress, AutoCombineCts.Token);
+                }
+                catch (OperationCanceledException)
+                { 
+                    MessageBox.Show("任务取消");
+                    return;
+                }
+
+                if (IsCurrentCombineFinish)
+                {
+                    //TODO删除文件
+                    IsCurrentCombineFinish = false;
+
+                    AutoCombineListView.Items[index - 1].BackColor = Color.Green;
+                }
+                else
+                {
+                    IsCurrentCombineFinish = false;
+
+                    AutoCombineListView.Items[index - 1].BackColor = Color.Red;
+                }
+
+                JDuBar(AutoCombineTotalPB, index++);
+            }
+        }
+
+        private void SetAutoCombineCurrentPBMax(object sender, int e)
+        {
+            AutoCombineCurrentPB.Maximum = e;
+        }
+
+        private void OutputAuto(object sendProcess, DataReceivedEventArgs output)
+        {
+            if (!String.IsNullOrEmpty(output.Data))
+            {
+                if (output.Data.StartsWith("frame"))
+                {
+                    var time = output.Data.Substring(output.Data.IndexOf("time="), 16).Replace("time=", "");
+                    var process = LocalService.ConvertDurationToInt(time);
+
+                    AutoCombineInfoText.AppendText(output.Data);
+
+                    JDuBar(AutoCombineCurrentPB, process);
+                }
+                else if (output.Data.StartsWith("video:"))
+                {
+                    IsCurrentCombineFinish = true;
+                }
+            }
+        }
+
+        private void AutoCombineCancelBtn_Click(object sender, EventArgs e)
+        {
+            AutoCombineCts.Cancel();
         }
         #endregion
     }

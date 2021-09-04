@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -38,7 +39,7 @@ namespace UnitTest
 
             //var av = new JavLibraryDAL().GetAvModelByWhere("").Result;
 
-            RedisService.SetHashAndReplace("play", "", "");
+            //RedisService.SetHashAndReplace("play", "", "");
 
             Console.ReadKey();
         }

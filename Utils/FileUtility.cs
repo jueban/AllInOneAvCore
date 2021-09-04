@@ -458,7 +458,7 @@ namespace Utils
 
     public static class ProcessExtensions
     {
-        public static Task WaitForExitAsync(this Process process, CancellationToken cancellationToken = default(CancellationToken))
+        public static Task WaitForExitAsyncExtension(this Process process, CancellationToken cancellationToken = default(CancellationToken))
         {
             var tcs = new TaskCompletionSource<object>();
             process.EnableRaisingEvents = true;

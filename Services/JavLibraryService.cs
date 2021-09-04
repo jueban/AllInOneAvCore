@@ -661,6 +661,13 @@ namespace Services
             return ret;
         }
 
+        public static async Task<List<AvModel>> GetAvModelByAvId(string avId)
+        {
+            var model = await new JavLibraryDAL().GetAvModelByWhere(string.Format(" AND AvId = '{0}' ", avId));
+
+            return model;
+        }
+
         public static async Task<AvModel> GetAvModelByName(string avId, string name)
         {
             var model = await new JavLibraryDAL().GetAvModelByWhere(string.Format(" AND AvId = '{0}' AND Name = '{1}'", avId, name));

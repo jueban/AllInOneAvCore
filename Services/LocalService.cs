@@ -2,10 +2,12 @@
 using Models;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using Utils;
 
@@ -13,6 +15,8 @@ namespace Services
 {
     public class LocalService
     {
+        public static event DataReceivedEventHandler Output;
+
         public static List<string> GetLocalDrives()
         {
             return Environment.GetLogicalDrives().ToList();
@@ -548,7 +552,7 @@ namespace Services
             return ret;
         }
 
-        public static async Task<(string name, List<AvModel> av)> GetPossibleAvNameAndInfoByNameWithoutExtension(string onlyName)
+        public static async Task<string> GetPossibleAvName(string onlyName)
         {
             (string name, List<AvModel> av) ret = new();
 
@@ -600,31 +604,7 @@ namespace Services
                 }
             }
 
-            ret.name = name.ToUpper();
-
-            if (!string.IsNullOrWhiteSpace(name))
-            {
-                var avs = await new JavLibraryDAL().GetAvModelByWhere($" AND AvId='{name}'");
-
-                if (avs != null && avs.Any())
-                {
-                    //foreach (var av in avs)
-                    //{
-                    //    av.PicUrl = "file://" + (imgFolder + av.AvId + "-" + av.Name + ".jpg").Replace("\\", "/");
-                    //}
-                    ret.av = avs;
-                }
-                else
-                {
-                    ret.av = new List<AvModel>();
-                }
-            }
-            else
-            {
-                ret.av = new List<AvModel>();
-            }
-
-            return ret;
+            return name.ToUpper();
         }
 
         public static async Task<List<AvModel>> GetPossibleAvMatch(string avId)
@@ -861,7 +841,7 @@ namespace Services
             return ret;
         }
 
-        public static async Task<Dictionary<string, List<MyFileInfo>>> GetCombinePrepareData(string folder, bool includeThumnail, string ffmpeg, string thumlocation, int thumnailCount)
+        public static async Task<Dictionary<string, List<MyFileInfo>>> GetCombinePrepareData(string folder, bool includeThumnail, string ffmpeg, string thumlocation, int thumnailCount, CancellationToken token, IProgress<(int, int)> progress)
         {
             var setting = await SettingService.GetSetting();
             var ignore = setting.CannotMergeFileTag;
@@ -917,6 +897,10 @@ namespace Services
 
             ret = ret.Where(x => x.Value.Count > 1).ToDictionary(x => x.Key, x => x.Value);
 
+            progress.Report((ret.Count, 0));
+
+            int index = 1;
+
             if (includeThumnail)
             {
                 foreach (var r in ret)
@@ -924,8 +908,16 @@ namespace Services
                     foreach (var f in r.Value)
                     {
                         f.Thumnails.AddRange(await FileUtility.GetThumbnails(f.FullName, ffmpeg, thumlocation, f.Name, thumnailCount, false));
+
+                        token.ThrowIfCancellationRequested();
                     }
+
+                    progress.Report((ret.Count, index++));
                 }
+            }
+            else
+            {
+                progress.Report((ret.Count, ret.Count));
             }
 
             return ret;
@@ -1047,6 +1039,86 @@ namespace Services
             return ret;
         }
 
+        public static async Task AutoCombineVideosUsingFFMPEG(List<string> files, string combineFile, string ffmpeg, string saveLocation, Process p, IProgress<int> progress, CancellationToken token)
+        {
+            var current = CalculateTotalTimeForAuto(files, ffmpeg);
+            progress.Report(current);
+
+            FileInfo first = new FileInfo(files.FirstOrDefault());
+            var targetFile = first.Name.Substring(0, first.Name.LastIndexOf("-")) + ".mp4";
+
+            var fileName = saveLocation + targetFile;
+
+            if (File.Exists(fileName))
+            {
+                File.Delete(fileName);
+            }
+
+            await StartCombineAuto(combineFile, fileName, ffmpeg, p, token);
+
+            var haha = "";
+        }
+
+        public static string GetVideoDuration(string fName, string ffmpegLocation)
+        {
+            string duration = "";
+
+            try
+            {
+                string fullName = fName;
+                string fileName = FileUtility.GetFileName(fName, false);
+                string command_line = " -i \"" + fullName + "\"";
+
+                FileUtility.ExcuteProcess(ffmpegLocation, command_line, (s, t) => duration += (t.Data));
+
+                duration = duration.Substring(duration.IndexOf("Duration") + 10);
+                duration = duration.Substring(0, duration.IndexOf(","));
+
+                var hour = int.Parse(duration.Split(':')[0]);
+                var min = int.Parse(duration.Split(':')[1]);
+                var sec = int.Parse(duration.Split(':')[2].Substring(0, duration.Split(':')[2].IndexOf(".")));
+            }
+            catch (Exception ee)
+            {
+                return "-";
+            }
+            return duration;
+        }
+
+        public static int ConvertDurationToInt(string duration)
+        {
+            int ret = 0;
+            try
+            {
+                int hour = 0;
+                int minute = 0;
+                int second = 0;
+
+                var strArray = duration.Split(':');
+                if (strArray.Length == 3)
+                {
+                    var secondArray = strArray[2].Split('.');
+                    hour = int.Parse(strArray[0]) * 3600;
+                    minute = int.Parse(strArray[1]) * 60;
+
+                    if (secondArray.Length == 2)
+                    {
+                        second = int.Parse(secondArray[0]);
+                    }
+                }
+
+                ret += hour;
+                ret += minute;
+                ret += second;
+            }
+            catch
+            {
+                ret = 0;
+            }
+
+            return ret;
+        }
+
         private static string CreateFolder(string folder)
         {
             if (!Directory.Exists(folder))
@@ -1057,6 +1129,41 @@ namespace Services
             {
                 return folder;
             }
+        }
+
+        private static int CalculateTotalTimeForAuto(List<string> files, string ffmpeg)
+        {
+            int ret = 0;
+
+            foreach (var file in files)
+            {
+                var fi = new FileInfo(file);
+                var duration = GetVideoDuration(fi.FullName, ffmpeg);
+
+                ret += ConvertDurationToInt(duration);
+            }
+
+            return ret;
+        }
+
+        public static async Task StartCombineAuto(string combineFile, string fileName, string ffmpeg, Process process, CancellationToken token)
+        {
+            var p = process;//建立外部调用线程
+            p.StartInfo.UseShellExecute = false;
+            p.StartInfo.CreateNoWindow = true;
+            p.StartInfo.FileName = ffmpeg;//要调用外部程序的绝对路径
+
+            p.StartInfo.Arguments = string.Format("-f concat -safe 0 -i \"{0}\" -c:v hevc_nvenc -preset:v fast \"{1}\"", combineFile, fileName);
+            p.StartInfo.UseShellExecute = false;//不使用操作系统外壳程序启动线程(一定为FALSE,详细的请看MSDN)
+            p.StartInfo.RedirectStandardError = true;//把外部程序错误输出写到StandardError流中(这个一定要注意,FFMPEG的所有输出信息,都为错误输出流,用StandardOutput是捕获不到任何消息的...这是我耗费了2个多月得出来的经验...mencoder就是用standardOutput来捕获的)
+            p.ErrorDataReceived += Output;//外部程序(这里是FFMPEG)输出流时候产生的事件,这里是把流的处理过程转移到下面的方法中,详细请查阅MSDN
+
+            p.Start();//启动线程
+            p.BeginErrorReadLine();//开始异步读取
+            await p.WaitForExitAsyncExtension(token);
+            p.Close();
+            p.Dispose();
+            p = null;
         }
     }
 }
