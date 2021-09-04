@@ -57,11 +57,11 @@ namespace AvManager
             this.CombinePreparePB = new System.Windows.Forms.ProgressBar();
             this.CombinePrepareUpperPanel = new System.Windows.Forms.Panel();
             this.CombinePrepareGenerateBtn = new System.Windows.Forms.Button();
+            this.CombinePrepareCB = new System.Windows.Forms.CheckBox();
             this.CombinePrepareClearBtn = new System.Windows.Forms.Button();
             this.CombinePrepareListBtn = new System.Windows.Forms.Button();
-            this.CombinePrepareCB = new System.Windows.Forms.CheckBox();
             this.CombinePrepareText = new System.Windows.Forms.TextBox();
-            this.AutoCombine = new System.Windows.Forms.TabPage();
+            this.AutoCombineTab = new System.Windows.Forms.TabPage();
             this.AutoCombineMainPanel = new System.Windows.Forms.Panel();
             this.AutoCombineMainMainPanel = new System.Windows.Forms.Panel();
             this.AutoCombineListView = new System.Windows.Forms.ListView();
@@ -77,6 +77,13 @@ namespace AvManager
             this.AutoCombineCancelBtn = new System.Windows.Forms.Button();
             this.AutoCombineStartBtn = new System.Windows.Forms.Button();
             this.AutoCombineSaveText = new System.Windows.Forms.TextBox();
+            this.ClearTab = new System.Windows.Forms.TabPage();
+            this.ClearMainPanel = new System.Windows.Forms.Panel();
+            this.ClearTreeView = new System.Windows.Forms.TreeView();
+            this.ClearUpperPanel = new System.Windows.Forms.Panel();
+            this.ClearClearBtn = new System.Windows.Forms.Button();
+            this.ClearRefreshBtn = new System.Windows.Forms.Button();
+            this.ClearInteliCB = new System.Windows.Forms.CheckBox();
             this.OpenFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.FolderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
             this.CombinePrepareTreeNodeMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
@@ -95,12 +102,15 @@ namespace AvManager
             this.CombinePrepareMainMainPanel.SuspendLayout();
             this.CombinePrepareMainBottomPanel.SuspendLayout();
             this.CombinePrepareUpperPanel.SuspendLayout();
-            this.AutoCombine.SuspendLayout();
+            this.AutoCombineTab.SuspendLayout();
             this.AutoCombineMainPanel.SuspendLayout();
             this.AutoCombineMainMainPanel.SuspendLayout();
             this.AutoCombineMainRightPanel.SuspendLayout();
             this.AutoCombineBottomPanel.SuspendLayout();
             this.AutoCombineUpperPanel.SuspendLayout();
+            this.ClearTab.SuspendLayout();
+            this.ClearMainPanel.SuspendLayout();
+            this.ClearUpperPanel.SuspendLayout();
             this.CombinePrepareTreeNodeMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -143,7 +153,8 @@ namespace AvManager
             this.TabControl.Controls.Add(this.RemoveFolderTab);
             this.TabControl.Controls.Add(this.RenameTab);
             this.TabControl.Controls.Add(this.CombinePrepareTab);
-            this.TabControl.Controls.Add(this.AutoCombine);
+            this.TabControl.Controls.Add(this.AutoCombineTab);
+            this.TabControl.Controls.Add(this.ClearTab);
             this.TabControl.Dock = System.Windows.Forms.DockStyle.Fill;
             this.TabControl.Location = new System.Drawing.Point(0, 0);
             this.TabControl.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
@@ -401,6 +412,19 @@ namespace AvManager
             this.CombinePrepareGenerateBtn.UseVisualStyleBackColor = true;
             this.CombinePrepareGenerateBtn.Click += new System.EventHandler(this.CombinePrepareGenerateBtn_Click);
             // 
+            // CombinePrepareCB
+            // 
+            this.CombinePrepareCB.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.CombinePrepareCB.AutoSize = true;
+            this.CombinePrepareCB.Location = new System.Drawing.Point(912, 12);
+            this.CombinePrepareCB.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.CombinePrepareCB.Name = "CombinePrepareCB";
+            this.CombinePrepareCB.Size = new System.Drawing.Size(80, 32);
+            this.CombinePrepareCB.TabIndex = 1;
+            this.CombinePrepareCB.Text = "截屏";
+            this.CombinePrepareCB.UseVisualStyleBackColor = true;
+            // 
             // CombinePrepareClearBtn
             // 
             this.CombinePrepareClearBtn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -427,19 +451,6 @@ namespace AvManager
             this.CombinePrepareListBtn.UseVisualStyleBackColor = true;
             this.CombinePrepareListBtn.Click += new System.EventHandler(this.CombinePrepareListBtn_Click);
             // 
-            // CombinePrepareCB
-            // 
-            this.CombinePrepareCB.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.CombinePrepareCB.AutoSize = true;
-            this.CombinePrepareCB.Location = new System.Drawing.Point(912, 12);
-            this.CombinePrepareCB.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
-            this.CombinePrepareCB.Name = "CombinePrepareCB";
-            this.CombinePrepareCB.Size = new System.Drawing.Size(80, 32);
-            this.CombinePrepareCB.TabIndex = 1;
-            this.CombinePrepareCB.Text = "截屏";
-            this.CombinePrepareCB.UseVisualStyleBackColor = true;
-            // 
             // CombinePrepareText
             // 
             this.CombinePrepareText.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -453,18 +464,18 @@ namespace AvManager
             this.CombinePrepareText.TabIndex = 0;
             this.CombinePrepareText.Click += new System.EventHandler(this.CombinePrepareText_Click);
             // 
-            // AutoCombine
+            // AutoCombineTab
             // 
-            this.AutoCombine.Controls.Add(this.AutoCombineMainPanel);
-            this.AutoCombine.Controls.Add(this.AutoCombineBottomPanel);
-            this.AutoCombine.Controls.Add(this.AutoCombineUpperPanel);
-            this.AutoCombine.Location = new System.Drawing.Point(4, 37);
-            this.AutoCombine.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
-            this.AutoCombine.Name = "AutoCombine";
-            this.AutoCombine.Size = new System.Drawing.Size(1478, 700);
-            this.AutoCombine.TabIndex = 3;
-            this.AutoCombine.Text = "自动合并";
-            this.AutoCombine.UseVisualStyleBackColor = true;
+            this.AutoCombineTab.Controls.Add(this.AutoCombineMainPanel);
+            this.AutoCombineTab.Controls.Add(this.AutoCombineBottomPanel);
+            this.AutoCombineTab.Controls.Add(this.AutoCombineUpperPanel);
+            this.AutoCombineTab.Location = new System.Drawing.Point(4, 37);
+            this.AutoCombineTab.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.AutoCombineTab.Name = "AutoCombineTab";
+            this.AutoCombineTab.Size = new System.Drawing.Size(1478, 700);
+            this.AutoCombineTab.TabIndex = 3;
+            this.AutoCombineTab.Text = "自动合并";
+            this.AutoCombineTab.UseVisualStyleBackColor = true;
             // 
             // AutoCombineMainPanel
             // 
@@ -631,6 +642,88 @@ namespace AvManager
             this.AutoCombineSaveText.TabIndex = 0;
             this.AutoCombineSaveText.Click += new System.EventHandler(this.AutoCombineSaveText_Click);
             // 
+            // ClearTab
+            // 
+            this.ClearTab.Controls.Add(this.ClearMainPanel);
+            this.ClearTab.Controls.Add(this.ClearUpperPanel);
+            this.ClearTab.Location = new System.Drawing.Point(4, 37);
+            this.ClearTab.Name = "ClearTab";
+            this.ClearTab.Size = new System.Drawing.Size(1478, 700);
+            this.ClearTab.TabIndex = 4;
+            this.ClearTab.Text = "整理";
+            this.ClearTab.UseVisualStyleBackColor = true;
+            // 
+            // ClearMainPanel
+            // 
+            this.ClearMainPanel.Controls.Add(this.ClearTreeView);
+            this.ClearMainPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ClearMainPanel.Location = new System.Drawing.Point(0, 59);
+            this.ClearMainPanel.Name = "ClearMainPanel";
+            this.ClearMainPanel.Size = new System.Drawing.Size(1478, 641);
+            this.ClearMainPanel.TabIndex = 1;
+            // 
+            // ClearTreeView
+            // 
+            this.ClearTreeView.CheckBoxes = true;
+            this.ClearTreeView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ClearTreeView.FullRowSelect = true;
+            this.ClearTreeView.LabelEdit = true;
+            this.ClearTreeView.Location = new System.Drawing.Point(0, 0);
+            this.ClearTreeView.Name = "ClearTreeView";
+            this.ClearTreeView.Size = new System.Drawing.Size(1478, 641);
+            this.ClearTreeView.TabIndex = 0;
+            this.ClearTreeView.AfterLabelEdit += new System.Windows.Forms.NodeLabelEditEventHandler(this.ClearTreeView_AfterLabelEdit);
+            this.ClearTreeView.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.ClearTreeView_AfterCheck);
+            this.ClearTreeView.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.ClearTreeView_NodeMouseDoubleClick);
+            // 
+            // ClearUpperPanel
+            // 
+            this.ClearUpperPanel.Controls.Add(this.ClearClearBtn);
+            this.ClearUpperPanel.Controls.Add(this.ClearRefreshBtn);
+            this.ClearUpperPanel.Controls.Add(this.ClearInteliCB);
+            this.ClearUpperPanel.Dock = System.Windows.Forms.DockStyle.Top;
+            this.ClearUpperPanel.Location = new System.Drawing.Point(0, 0);
+            this.ClearUpperPanel.Name = "ClearUpperPanel";
+            this.ClearUpperPanel.Size = new System.Drawing.Size(1478, 59);
+            this.ClearUpperPanel.TabIndex = 0;
+            // 
+            // ClearClearBtn
+            // 
+            this.ClearClearBtn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.ClearClearBtn.Location = new System.Drawing.Point(1339, 5);
+            this.ClearClearBtn.Name = "ClearClearBtn";
+            this.ClearClearBtn.Size = new System.Drawing.Size(131, 48);
+            this.ClearClearBtn.TabIndex = 2;
+            this.ClearClearBtn.Text = "整理";
+            this.ClearClearBtn.UseVisualStyleBackColor = true;
+            this.ClearClearBtn.Click += new System.EventHandler(this.ClearClearBtn_Click);
+            // 
+            // ClearRefreshBtn
+            // 
+            this.ClearRefreshBtn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.ClearRefreshBtn.Location = new System.Drawing.Point(138, 3);
+            this.ClearRefreshBtn.Name = "ClearRefreshBtn";
+            this.ClearRefreshBtn.Size = new System.Drawing.Size(131, 50);
+            this.ClearRefreshBtn.TabIndex = 1;
+            this.ClearRefreshBtn.Text = "刷新";
+            this.ClearRefreshBtn.UseVisualStyleBackColor = true;
+            this.ClearRefreshBtn.Click += new System.EventHandler(this.ClearRefreshBtn_Click);
+            // 
+            // ClearInteliCB
+            // 
+            this.ClearInteliCB.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.ClearInteliCB.AutoSize = true;
+            this.ClearInteliCB.Location = new System.Drawing.Point(8, 13);
+            this.ClearInteliCB.Name = "ClearInteliCB";
+            this.ClearInteliCB.Size = new System.Drawing.Size(122, 32);
+            this.ClearInteliCB.TabIndex = 0;
+            this.ClearInteliCB.Text = "智能勾选";
+            this.ClearInteliCB.UseVisualStyleBackColor = true;
+            this.ClearInteliCB.CheckedChanged += new System.EventHandler(this.ClearInteliCB_CheckedChanged);
+            // 
             // OpenFileDialog
             // 
             this.OpenFileDialog.FileName = "openFileDialog1";
@@ -663,6 +756,7 @@ namespace AvManager
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "AvManager";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Main_FormClosing);
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Main_FormClosed);
             this.Load += new System.EventHandler(this.Main_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Main_KeyDown);
             this.Resize += new System.EventHandler(this.Main_Resize);
@@ -685,7 +779,7 @@ namespace AvManager
             this.CombinePrepareMainBottomPanel.ResumeLayout(false);
             this.CombinePrepareUpperPanel.ResumeLayout(false);
             this.CombinePrepareUpperPanel.PerformLayout();
-            this.AutoCombine.ResumeLayout(false);
+            this.AutoCombineTab.ResumeLayout(false);
             this.AutoCombineMainPanel.ResumeLayout(false);
             this.AutoCombineMainMainPanel.ResumeLayout(false);
             this.AutoCombineMainRightPanel.ResumeLayout(false);
@@ -693,6 +787,10 @@ namespace AvManager
             this.AutoCombineBottomPanel.ResumeLayout(false);
             this.AutoCombineUpperPanel.ResumeLayout(false);
             this.AutoCombineUpperPanel.PerformLayout();
+            this.ClearTab.ResumeLayout(false);
+            this.ClearMainPanel.ResumeLayout(false);
+            this.ClearUpperPanel.ResumeLayout(false);
+            this.ClearUpperPanel.PerformLayout();
             this.CombinePrepareTreeNodeMenu.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -731,7 +829,7 @@ namespace AvManager
         private System.Windows.Forms.TextBox RenameText;
         private System.Windows.Forms.Button RenameBtn;
         private System.Windows.Forms.Button RenameManualBtn;
-        private System.Windows.Forms.TabPage AutoCombine;
+        private System.Windows.Forms.TabPage AutoCombineTab;
         private System.Windows.Forms.Panel AutoCombineUpperPanel;
         private System.Windows.Forms.Panel AutoCombineBottomPanel;
         private System.Windows.Forms.Panel AutoCombineMainPanel;
@@ -750,6 +848,13 @@ namespace AvManager
         private System.Windows.Forms.Panel CombinePrepareMainMainPanel;
         private System.Windows.Forms.Panel CombinePrepareMainBottomPanel;
         private System.Windows.Forms.ProgressBar CombinePreparePB;
+        private System.Windows.Forms.TabPage ClearTab;
+        private System.Windows.Forms.Panel ClearUpperPanel;
+        private System.Windows.Forms.Panel ClearMainPanel;
+        private System.Windows.Forms.CheckBox ClearInteliCB;
+        private System.Windows.Forms.Button ClearRefreshBtn;
+        private System.Windows.Forms.Button ClearClearBtn;
+        private System.Windows.Forms.TreeView ClearTreeView;
     }
 }
 

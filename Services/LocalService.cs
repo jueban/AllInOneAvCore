@@ -688,7 +688,9 @@ namespace Services
 
         public static async Task<Dictionary<string, List<MyFileInfo>>> GetDuplicateAvFile()
         {
-            var ignore = SettingService.GetSetting().Result.CannotMergeFileTag;
+            var setting = await SettingService.GetSetting();
+
+            var ignore = setting.CannotMergeFileTag;
             Dictionary<string, List<MyFileInfo>> ret = new();
 
             var files = await GetAllLocalMyFile();

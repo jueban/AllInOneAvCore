@@ -47,6 +47,20 @@ namespace AvManager
                     }
                 }
             }
+
+            //整理页面
+            if (TabControl.SelectedIndex == 4)
+            {
+                if (e.KeyCode == Keys.Space)
+                {
+                    e.Handled = true;
+
+                    if (ClearTreeView.SelectedNode != null && ClearTreeView.SelectedNode.Level != 0)
+                    {
+                        Process.Start(Setting.POTPLAYEREXEFILELOCATION, @"" + ((MyFileInfo)ClearTreeView.SelectedNode.Tag).FullName);
+                    }
+                }
+            }
         }
 
         private void TabControl_SelectedIndexChanged(object sender, EventArgs e)
@@ -132,6 +146,13 @@ namespace AvManager
                 Dispose();
                 Environment.Exit(Environment.ExitCode);
             }
+        }
+
+        private void Main_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            NotifyIcon.Visible = false;
+            Close();
+            Dispose();
         }
         #endregion
 
@@ -350,7 +371,7 @@ namespace AvManager
         /// <param name="e"></param>
         private void CombinePrepareTree_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
         {
-            if (e.Button == MouseButtons.Right && e.Clicks == 1 && e.Node.Parent == null)
+            if (e.Button == MouseButtons.Right && e.Clicks == 1 && e.Node.Level == 0)
             {
                 CombinePrepareTreeNodeMenu.Show(MousePosition.X, MousePosition.Y);
             }
@@ -669,5 +690,227 @@ namespace AvManager
             AutoCombineCts.Cancel();
         }
         #endregion
+
+        #region 整理
+        private void ClearRefreshBtn_Click(object sender, EventArgs e)
+        {
+            ShowClearTree();
+        }
+
+        private void ClearClearBtn_Click(object sender, EventArgs e)
+        {
+            Dictionary<string, List<MyFileInfo>> data = new();
+
+            foreach (TreeNode tr in ClearTreeView.Nodes)
+            {
+                if (tr.Level == 0)
+                {
+                    var tempList = new List<MyFileInfo>();
+
+                    foreach (TreeNode subTr in tr.Nodes)
+                    {
+                        var tempTag = (MyFileInfo)subTr.Tag;
+
+                        tempList.Add(tempTag);
+                    }
+
+                    data.Add(tr.Text, tempList);
+                }
+            }
+
+            int deleteCount = 0;
+            int renameCount = 0;
+            long deleteSize = 0;
+
+            foreach (var d in data)
+            {
+                foreach (var i in d.Value)
+                {
+                    if (i.ChangeName)
+                    {
+                        renameCount++;
+                    }
+
+                    if (i.IsDelete)
+                    {
+                        deleteCount++;
+                        deleteSize += i.Length;
+                    }
+                }
+            }
+
+            var res = MessageBox.Show($"确定要重命名 {renameCount} 个文件，并且删除 {deleteCount} 个文件，总大小 {FileUtility.GetAutoSizeString(deleteSize, 1)} ?", "警告", MessageBoxButtons.YesNo);
+
+            if (res == DialogResult.Yes)
+            {
+                var ret = LocalService.CombinePrepareDataClear(data);
+
+                if (string.IsNullOrEmpty(ret))
+                {
+                    res = MessageBox.Show("操作成功", "提示", MessageBoxButtons.OK);
+                }
+                else
+                {
+                    res = MessageBox.Show($"操作失败 {ret}", "提示", MessageBoxButtons.OK);
+                }
+
+                if (res == DialogResult.OK)
+                {
+                    ShowClearTree();
+                }
+            }
+        }
+
+        private void ClearInteliCB_CheckedChanged(object sender, EventArgs e)
+        {
+            if (ClearTreeView.Nodes.Count > 0)
+            {
+                if (ClearInteliCB.Checked)
+                {
+                    foreach (TreeNode parent in ClearTreeView.Nodes)
+                    {
+                        if (parent.Level == 0)
+                        {
+                            Dictionary<MyFileInfo, TreeNode> tempFiles = new();
+
+                            foreach (TreeNode child in parent.Nodes)
+                            {
+                                tempFiles.Add(((MyFileInfo)child.Tag), child);
+                            }
+
+                            //有中文就选中其他删除,如果没有保留文件大小最大的
+                            var chineseKey = tempFiles.Keys.FirstOrDefault(x => x.IsChinese == true);
+
+                            if (chineseKey != null)
+                            {
+                                foreach (var key in tempFiles)
+                                {
+                                    if (key.Key != chineseKey)
+                                    {
+                                        ((MyFileInfo)key.Value.Tag).IsDelete = true;
+                                        key.Value.Checked = true;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                var biggestSize = tempFiles.Keys.Max(x => x.Length);
+                                var biggestKey = tempFiles.Keys.FirstOrDefault(x => x.Length == biggestSize);
+
+                                foreach (var key in tempFiles)
+                                {
+                                    if (key.Key != biggestKey)
+                                    {
+                                        ((MyFileInfo)key.Value.Tag).IsDelete = true;
+                                        key.Value.Checked = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (TreeNode tn in ClearTreeView.Nodes)
+                    {
+                        if (tn.Level == 0)
+                        {
+                            foreach (TreeNode sub in tn.Nodes)
+                            {
+                                ((MyFileInfo)sub.Tag).IsDelete = false;
+                                sub.Checked = false;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private async void ShowClearTree()
+        {
+            ClearTreeView.Nodes.Clear();
+            ClearInteliCB.Checked = false;
+
+            var avs = await LocalService.GetDuplicateAvFile();
+
+            if (avs != null && avs.Any())
+            {
+                foreach (var group in avs)
+                {
+                    TreeNode tempRoot = new(group.Key);
+
+                    foreach (var item in group.Value)
+                    {
+                        var tempNode = new TreeNode()
+                        {
+                            Text = item.LengthStr + " " + item.FullName,
+                            Tag = item,
+                            BackColor = item.IsChinese ? Color.Green : Color.White
+                        };
+
+                        tempRoot.Nodes.Add(tempNode);
+                    }
+
+                    tempRoot.Expand();
+                    ClearTreeView.Nodes.Add(tempRoot);
+                }
+
+                ClearTreeView.EndUpdate();
+            }
+            else
+            {
+                MessageBox.Show("没有重名文件");
+            }
+        }
+
+        private void ClearTreeView_AfterCheck(object sender, TreeViewEventArgs e)
+        {
+            if (e.Action == TreeViewAction.ByMouse && e.Node.Parent == null)
+            {
+                e.Node.Checked = false;
+                return;
+            }
+
+            if (e.Action == TreeViewAction.ByMouse)
+            {
+                var currentTag = (MyFileInfo)e.Node.Tag;
+
+                if (e.Node.Checked)
+                {
+                    currentTag.IsDelete = true;
+                }
+                else
+                {
+                    currentTag.IsDelete = false;
+                }
+            }
+        }
+
+        private void ClearTreeView_AfterLabelEdit(object sender, NodeLabelEditEventArgs e)
+        {
+            if (!string.IsNullOrEmpty(e.Label))
+            {
+                MyFileInfo currentTag = (MyFileInfo)e.Node.Tag;
+
+                if (!currentTag.FullName.Equals(e.Label.Replace(currentTag.LengthStr, "").Trim(), StringComparison.OrdinalIgnoreCase))
+                {
+                    currentTag.NewFullName = e.Label.Replace(currentTag.LengthStr, "").Trim();
+                    currentTag.ChangeName = true;
+                    e.Node.Text = currentTag.LengthStr + " " + currentTag.NewFullName;
+                    e.Node.BackColor = Color.Yellow;
+                }
+                else
+                {
+                    currentTag.ChangeName = false;
+                    e.Node.BackColor = Color.White;
+                }
+            }
+        }
+
+        private void ClearTreeView_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
+        {
+            e.Node.BeginEdit();
+        }
     }
+    #endregion
 }
