@@ -19,19 +19,22 @@ namespace AvManager
 {
     public partial class Main : Form
     {
+        #region 变量
+        public delegate void ProcessPb(ProgressBar pb, int value);
         private bool IsCurrentCombineFinish = false;
         private Process p;
-        public delegate void ProcessPb(ProgressBar pb, int value);
         private CancellationTokenSource AutoCombineCts = new();
         private CancellationTokenSource CombinePrepareCts = new();
+        private bool OnlyCancelCurrentCombineTask = false;
+        #endregion
 
+        #region 全局
         public Main()
         {
             Control.CheckForIllegalCrossThreadCalls = false;
             InitializeComponent();
         }
 
-        #region 全局
         private void Main_KeyDown(object sender, KeyEventArgs e)
         {
             //准备合并页面
@@ -58,6 +61,74 @@ namespace AvManager
                     if (ClearTreeView.SelectedNode != null && ClearTreeView.SelectedNode.Level != 0)
                     {
                         Process.Start(Setting.POTPLAYEREXEFILELOCATION, @"" + ((MyFileInfo)ClearTreeView.SelectedNode.Tag).FullName);
+                    }
+                }
+            }
+
+            //播放文件夹
+            if (TabControl.SelectedIndex == 5)
+            {
+                if (e.KeyCode == Keys.Back)
+                {
+                    if (PlayFolderListView.SelectedItems.Count > 0)
+                    {
+                        foreach (ListViewItem lvi in PlayFolderListView.SelectedItems)
+                        {
+                            var file = (FileInfo)lvi.Tag;
+    
+                            SettingService.SetPlayHistoryNotPlayed(file.Name);
+
+                            lvi.BackColor = Color.White;
+                        }
+                    }
+                }
+
+                if (e.KeyCode == Keys.Space)
+                {
+                    e.Handled = true;
+
+                    if (PlayFolderListView.SelectedItems.Count > 0)
+                    {
+                        if (PlayFolderListView.SelectedItems.Count > 1)
+                        {
+                            List<string> files = new();
+
+                            foreach (ListViewItem lvi in PlayFolderListView.SelectedItems)
+                            {
+                                var file = (FileInfo)lvi.Tag;
+                                files.Add(file.FullName);
+
+                                SettingService.InsertPlayHistory(new PlayHistory()
+                                {
+                                    FileName = file.Name,
+                                    PlayTimes = 1,
+                                    LastPlay = DateTime.Now,
+                                    SetNotPlayed = false
+                                });
+
+                                lvi.BackColor = Color.Green;
+                            }
+
+                            var playList = LocalService.GeneratePotPlayerPlayList(files, Setting.POTPLAYERPLAYLISTLOCATION);
+
+                            Process.Start(Setting.POTPLAYEREXEFILELOCATION, playList);
+
+                        }
+                        else
+                        {
+                            var file = (FileInfo)PlayFolderListView.SelectedItems[0].Tag;
+                            Process.Start(Setting.POTPLAYEREXEFILELOCATION, @"" + file.FullName);
+
+                            SettingService.InsertPlayHistory(new PlayHistory()
+                            {
+                                FileName = file.Name,
+                                PlayTimes = 1,
+                                LastPlay = DateTime.Now,
+                                SetNotPlayed = false
+                            });
+
+                            PlayFolderListView.SelectedItems[0].BackColor = Color.Green;
+                        }
                     }
                 }
             }
@@ -637,9 +708,12 @@ namespace AvManager
                     await LocalService.AutoCombineVideosUsingFFMPEG(files, a.Key, Setting.FFMPEGLOCATION, AutoCombineSaveText.Text + "\\", p, progress, AutoCombineCts.Token);
                 }
                 catch (OperationCanceledException)
-                { 
-                    MessageBox.Show("任务取消");
-                    return;
+                {
+                    if (!OnlyCancelCurrentCombineTask)
+                    {
+                        MessageBox.Show("任务取消");
+                        return;
+                    }
                 }
 
                 if (IsCurrentCombineFinish)
@@ -651,6 +725,7 @@ namespace AvManager
                 }
                 else
                 {
+                    //TODO删除文件
                     IsCurrentCombineFinish = false;
 
                     AutoCombineListView.Items[index - 1].BackColor = Color.Red;
@@ -677,6 +752,12 @@ namespace AvManager
                     AutoCombineInfoText.AppendText(output.Data);
 
                     JDuBar(AutoCombineCurrentPB, process);
+
+                    if (AutoCombineCurrentPB.Value - AutoCombineCurrentPB.Maximum >= 100)
+                    {
+                        OnlyCancelCurrentCombineTask = true;
+                        AutoCombineCts.Cancel();
+                    }
                 }
                 else if (output.Data.StartsWith("video:"))
                 {
@@ -910,6 +991,110 @@ namespace AvManager
         private void ClearTreeView_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
         {
             e.Node.BeginEdit();
+        }
+        #endregion
+
+        #region 播放文件夹
+        private void PlayFolderTxt_MouseClick(object sender, MouseEventArgs e)
+        {
+            CommonHelper.ChooseFolder(FolderBrowserDialog, PlayFolderTxt);
+        }
+
+        private void PlayFolderBtn_Click(object sender, EventArgs e)
+        {
+            if (CommonHelper.CheckFolderChoose(PlayFolderTxt))
+            {
+                ShowPlayFolderListView();
+            }
+        }
+
+        private void PlayFolderListView_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            if (PlayFolderListView.SelectedItems.Count > 0)
+            {
+                var file = (FileInfo)PlayFolderListView.SelectedItems[0].Tag;
+                Process.Start(Setting.POTPLAYEREXEFILELOCATION, file.FullName);
+                SettingService.InsertPlayHistory(new PlayHistory()
+                {
+                    FileName = file.Name,
+                    PlayTimes = 1,
+                    LastPlay = DateTime.Now,
+                    SetNotPlayed = false
+                });
+
+                PlayFolderListView.SelectedItems[0].BackColor = Color.Green;
+            }
+        }
+
+        private void PlayFolderListView_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right && e.Clicks == 1 && PlayFolderListView.SelectedItems.Count > 0)
+            {
+                List<FileInfo> list = new();
+
+                foreach (ListViewItem lvi in PlayFolderListView.SelectedItems)
+                {
+                    list.Add(((FileInfo)lvi.Tag));
+                }
+
+                var ret = MessageBox.Show($"确定要删除 {list.Count} 个文件，总大小 {FileUtility.GetAutoSizeString(list.Sum(x => x.Length), 1)} ?", "警告", MessageBoxButtons.YesNo);
+
+                if (ret == DialogResult.Yes)
+                {
+                    list.ForEach(x => x.Delete());
+
+                    ShowPlayFolderListView();
+                }
+            }
+        }
+
+        private async void ShowPlayFolderListView()
+        {
+            PlayFolderListView.Items.Clear();
+
+            var setting = await SettingService.GetSetting();
+            var exclude = setting.ExcludeFolder;
+            var filters = setting.AvNameFilter.Split(',').ToList();
+
+            int limitSize = 200;
+            List<FileInfo> files = new List<FileInfo>();
+
+            FileUtility.GetFilesRecursive(PlayFolderTxt.Text, exclude, filters, EverythingService.Extensions, files, limitSize);
+
+            PlayFolderListView.BeginUpdate();
+
+            foreach (var file in files)
+            {
+                ListViewItem lvi = new(file.Directory.Name);
+
+                lvi.Tag = file;
+
+                lvi.SubItems.Add(new ListViewItem.ListViewSubItem()
+                {
+                    Text = file.Name
+                });
+
+                lvi.SubItems.Add(new ListViewItem.ListViewSubItem()
+                {
+                    Text = FileUtility.GetAutoSizeString(file.Length, 1)
+                });
+
+                lvi.SubItems.Add(new ListViewItem.ListViewSubItem()
+                {
+                    Text = file.LastWriteTime.ToString("yyyy-MM-dd HH:mm:ss")
+                });
+
+                var playHistory = SettingService.GetPlayHistory(file.Name);
+
+                if (playHistory != null && playHistory.SetNotPlayed == false)
+                {
+                    lvi.BackColor = Color.Green;
+                }
+
+                PlayFolderListView.Items.Add(lvi);
+            }
+
+            PlayFolderListView.EndUpdate();
         }
     }
     #endregion

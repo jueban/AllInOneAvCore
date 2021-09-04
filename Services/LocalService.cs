@@ -1167,5 +1167,35 @@ namespace Services
             p.Dispose();
             p = null;
         }
+
+        public static string GeneratePotPlayerPlayList(List<string> files, string playListFolder)
+        {
+            var folder = playListFolder;
+            var fileName = DateTime.Now.ToString("yyyyMMddHHmmss") + "PlayList.dpl";
+            var sb = new StringBuilder();
+            int index = 1;
+
+            if (!Directory.Exists(folder))
+            {
+                Directory.CreateDirectory(folder);
+            }
+
+            File.Create(folder + fileName).Close();
+
+            sb.AppendLine("DAUMPLAYLIST");
+
+            foreach (var f in files)
+            {
+                sb.AppendLine(string.Format("{0}*file*{1}", index++, f));
+                sb.AppendLine("1*played*0");
+            }
+
+            using (StreamWriter sw = new StreamWriter(folder + fileName))
+            {
+                sw.WriteLine(sb.ToString());
+            }
+
+            return folder + fileName;
+        }
     }
 }

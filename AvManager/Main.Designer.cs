@@ -84,10 +84,22 @@ namespace AvManager
             this.ClearClearBtn = new System.Windows.Forms.Button();
             this.ClearRefreshBtn = new System.Windows.Forms.Button();
             this.ClearInteliCB = new System.Windows.Forms.CheckBox();
+            this.PlayFolderTab = new System.Windows.Forms.TabPage();
+            this.PlayFolderListView = new System.Windows.Forms.ListView();
+            this.PlayFolderListViewFolder = new System.Windows.Forms.ColumnHeader();
+            this.PlayFolderListViewName = new System.Windows.Forms.ColumnHeader();
+            this.PlayFolderListViewSize = new System.Windows.Forms.ColumnHeader();
+            this.PlayFolderListViewDate = new System.Windows.Forms.ColumnHeader();
+            this.PlayFolderUpperPanel = new System.Windows.Forms.Panel();
+            this.PlayFolderBtn = new System.Windows.Forms.Button();
+            this.PlayFolderTxt = new System.Windows.Forms.TextBox();
+            this.OneOneFive = new System.Windows.Forms.TabPage();
             this.OpenFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.FolderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
             this.CombinePrepareTreeNodeMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.截图ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.MoveisTab = new System.Windows.Forms.TabPage();
+            this.SettingTab = new System.Windows.Forms.TabPage();
             this.NotifyIconExitMenu.SuspendLayout();
             this.MainPanel.SuspendLayout();
             this.TabControl.SuspendLayout();
@@ -111,6 +123,8 @@ namespace AvManager
             this.ClearTab.SuspendLayout();
             this.ClearMainPanel.SuspendLayout();
             this.ClearUpperPanel.SuspendLayout();
+            this.PlayFolderTab.SuspendLayout();
+            this.PlayFolderUpperPanel.SuspendLayout();
             this.CombinePrepareTreeNodeMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -155,6 +169,10 @@ namespace AvManager
             this.TabControl.Controls.Add(this.CombinePrepareTab);
             this.TabControl.Controls.Add(this.AutoCombineTab);
             this.TabControl.Controls.Add(this.ClearTab);
+            this.TabControl.Controls.Add(this.PlayFolderTab);
+            this.TabControl.Controls.Add(this.OneOneFive);
+            this.TabControl.Controls.Add(this.MoveisTab);
+            this.TabControl.Controls.Add(this.SettingTab);
             this.TabControl.Dock = System.Windows.Forms.DockStyle.Fill;
             this.TabControl.Location = new System.Drawing.Point(0, 0);
             this.TabControl.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
@@ -724,6 +742,98 @@ namespace AvManager
             this.ClearInteliCB.UseVisualStyleBackColor = true;
             this.ClearInteliCB.CheckedChanged += new System.EventHandler(this.ClearInteliCB_CheckedChanged);
             // 
+            // PlayFolderTab
+            // 
+            this.PlayFolderTab.Controls.Add(this.PlayFolderListView);
+            this.PlayFolderTab.Controls.Add(this.PlayFolderUpperPanel);
+            this.PlayFolderTab.Location = new System.Drawing.Point(4, 37);
+            this.PlayFolderTab.Name = "PlayFolderTab";
+            this.PlayFolderTab.Size = new System.Drawing.Size(1478, 700);
+            this.PlayFolderTab.TabIndex = 5;
+            this.PlayFolderTab.Text = "播放文件夹";
+            this.PlayFolderTab.UseVisualStyleBackColor = true;
+            // 
+            // PlayFolderListView
+            // 
+            this.PlayFolderListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.PlayFolderListViewFolder,
+            this.PlayFolderListViewName,
+            this.PlayFolderListViewSize,
+            this.PlayFolderListViewDate});
+            this.PlayFolderListView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.PlayFolderListView.FullRowSelect = true;
+            this.PlayFolderListView.HideSelection = false;
+            this.PlayFolderListView.Location = new System.Drawing.Point(0, 59);
+            this.PlayFolderListView.Name = "PlayFolderListView";
+            this.PlayFolderListView.Size = new System.Drawing.Size(1478, 641);
+            this.PlayFolderListView.TabIndex = 1;
+            this.PlayFolderListView.UseCompatibleStateImageBehavior = false;
+            this.PlayFolderListView.View = System.Windows.Forms.View.Details;
+            this.PlayFolderListView.MouseClick += new System.Windows.Forms.MouseEventHandler(this.PlayFolderListView_MouseClick);
+            this.PlayFolderListView.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.PlayFolderListView_MouseDoubleClick);
+            // 
+            // PlayFolderListViewFolder
+            // 
+            this.PlayFolderListViewFolder.Text = "文件夹";
+            this.PlayFolderListViewFolder.Width = 300;
+            // 
+            // PlayFolderListViewName
+            // 
+            this.PlayFolderListViewName.Text = "名称";
+            this.PlayFolderListViewName.Width = 500;
+            // 
+            // PlayFolderListViewSize
+            // 
+            this.PlayFolderListViewSize.Text = "大小";
+            this.PlayFolderListViewSize.Width = 120;
+            // 
+            // PlayFolderListViewDate
+            // 
+            this.PlayFolderListViewDate.Text = "日期";
+            this.PlayFolderListViewDate.Width = 200;
+            // 
+            // PlayFolderUpperPanel
+            // 
+            this.PlayFolderUpperPanel.Controls.Add(this.PlayFolderBtn);
+            this.PlayFolderUpperPanel.Controls.Add(this.PlayFolderTxt);
+            this.PlayFolderUpperPanel.Dock = System.Windows.Forms.DockStyle.Top;
+            this.PlayFolderUpperPanel.Location = new System.Drawing.Point(0, 0);
+            this.PlayFolderUpperPanel.Name = "PlayFolderUpperPanel";
+            this.PlayFolderUpperPanel.Size = new System.Drawing.Size(1478, 59);
+            this.PlayFolderUpperPanel.TabIndex = 0;
+            // 
+            // PlayFolderBtn
+            // 
+            this.PlayFolderBtn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.PlayFolderBtn.Location = new System.Drawing.Point(1339, 3);
+            this.PlayFolderBtn.Name = "PlayFolderBtn";
+            this.PlayFolderBtn.Size = new System.Drawing.Size(131, 49);
+            this.PlayFolderBtn.TabIndex = 1;
+            this.PlayFolderBtn.Text = "确认";
+            this.PlayFolderBtn.UseVisualStyleBackColor = true;
+            this.PlayFolderBtn.Click += new System.EventHandler(this.PlayFolderBtn_Click);
+            // 
+            // PlayFolderTxt
+            // 
+            this.PlayFolderTxt.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.PlayFolderTxt.Location = new System.Drawing.Point(8, 12);
+            this.PlayFolderTxt.Name = "PlayFolderTxt";
+            this.PlayFolderTxt.Size = new System.Drawing.Size(1306, 34);
+            this.PlayFolderTxt.TabIndex = 0;
+            this.PlayFolderTxt.MouseClick += new System.Windows.Forms.MouseEventHandler(this.PlayFolderTxt_MouseClick);
+            // 
+            // OneOneFive
+            // 
+            this.OneOneFive.Location = new System.Drawing.Point(4, 37);
+            this.OneOneFive.Name = "OneOneFive";
+            this.OneOneFive.Size = new System.Drawing.Size(1478, 700);
+            this.OneOneFive.TabIndex = 6;
+            this.OneOneFive.Text = "115相关";
+            this.OneOneFive.UseVisualStyleBackColor = true;
+            // 
             // OpenFileDialog
             // 
             this.OpenFileDialog.FileName = "openFileDialog1";
@@ -742,6 +852,24 @@ namespace AvManager
             this.截图ToolStripMenuItem.Size = new System.Drawing.Size(126, 34);
             this.截图ToolStripMenuItem.Text = "截图";
             this.截图ToolStripMenuItem.Click += new System.EventHandler(this.截图ToolStripMenuItem_Click);
+            // 
+            // MoveisTab
+            // 
+            this.MoveisTab.Location = new System.Drawing.Point(4, 37);
+            this.MoveisTab.Name = "MoveisTab";
+            this.MoveisTab.Size = new System.Drawing.Size(1478, 700);
+            this.MoveisTab.TabIndex = 7;
+            this.MoveisTab.Text = "影片库";
+            this.MoveisTab.UseVisualStyleBackColor = true;
+            // 
+            // SettingTab
+            // 
+            this.SettingTab.Location = new System.Drawing.Point(4, 37);
+            this.SettingTab.Name = "SettingTab";
+            this.SettingTab.Size = new System.Drawing.Size(1478, 700);
+            this.SettingTab.TabIndex = 8;
+            this.SettingTab.Text = "设置";
+            this.SettingTab.UseVisualStyleBackColor = true;
             // 
             // Main
             // 
@@ -791,6 +919,9 @@ namespace AvManager
             this.ClearMainPanel.ResumeLayout(false);
             this.ClearUpperPanel.ResumeLayout(false);
             this.ClearUpperPanel.PerformLayout();
+            this.PlayFolderTab.ResumeLayout(false);
+            this.PlayFolderUpperPanel.ResumeLayout(false);
+            this.PlayFolderUpperPanel.PerformLayout();
             this.CombinePrepareTreeNodeMenu.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -855,6 +986,18 @@ namespace AvManager
         private System.Windows.Forms.Button ClearRefreshBtn;
         private System.Windows.Forms.Button ClearClearBtn;
         private System.Windows.Forms.TreeView ClearTreeView;
+        private System.Windows.Forms.TabPage PlayFolderTab;
+        private System.Windows.Forms.Panel PlayFolderUpperPanel;
+        private System.Windows.Forms.TextBox PlayFolderTxt;
+        private System.Windows.Forms.Button PlayFolderBtn;
+        private System.Windows.Forms.ListView PlayFolderListView;
+        private System.Windows.Forms.ColumnHeader PlayFolderListViewFolder;
+        private System.Windows.Forms.ColumnHeader PlayFolderListViewName;
+        private System.Windows.Forms.ColumnHeader PlayFolderListViewSize;
+        private System.Windows.Forms.ColumnHeader PlayFolderListViewDate;
+        private System.Windows.Forms.TabPage OneOneFive;
+        private System.Windows.Forms.TabPage MoveisTab;
+        private System.Windows.Forms.TabPage SettingTab;
     }
 }
 
