@@ -56,7 +56,7 @@
                 initData: function () {
                     var vm = this;
 
-                    $.ajax({ url: "/Scan/GetJavBusData", method: "GET" })
+                    $.ajax({ url: "/Scan/GetJavBusData", method: "GET", async: true})
                         .done(function (data) { vm.drops = data; });
                 },
 

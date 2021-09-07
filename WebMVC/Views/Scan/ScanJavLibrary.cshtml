@@ -62,7 +62,7 @@
                 initData: function () {
                     var vm = this;
 
-                    $.ajax({ url: "/Scan/GetJavLibraryData", method: "GET" })
+                    $.ajax({ url: "/Scan/GetJavLibraryData", method: "GET", async: true })
                         .done(function (data) { vm.drops = data; });
                 },
 

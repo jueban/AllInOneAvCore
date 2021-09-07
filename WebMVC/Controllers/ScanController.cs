@@ -68,23 +68,23 @@ namespace WebMVC.Controllers
             return Redirect("ScanResult");
         }
 
-        public ScanPageModel GetJavLibraryData()
+        public async Task<ScanPageModel> GetJavLibraryData()
         {
-            var ret = MagnetUrlService.GetScanPageMode(WebScanUrlSite.JavLibrary);
+            var ret = await MagnetUrlService.GetScanPageMode(WebScanUrlSite.JavLibrary);
 
             return ret;
         }
 
-        public ScanPageModel GetJavBusData()
+        public async Task<ScanPageModel> GetJavBusData()
         {
-            var ret = MagnetUrlService.GetScanPageMode(WebScanUrlSite.JavBus);
+            var ret = await MagnetUrlService.GetScanPageMode(WebScanUrlSite.JavBus);
 
             return ret;
         }
 
-        public List<ScanResult> GetScanResult()
+        public async Task<List<ScanResult>> GetScanResult()
         {
-            var ret = new ScanDAL().GetSeedMagnetSearchModelAll().Result;
+            var ret = await new ScanDAL().GetSeedMagnetSearchModelAll();
 
             return ret;
         }

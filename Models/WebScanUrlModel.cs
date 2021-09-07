@@ -48,6 +48,7 @@ public class AvModel
     public DateTime? ReleaseDate { get; set; }
     public DateTime CreateTime { get; set; }
     public DateTime UpdateTime { get; set; }
+    public string LocalPic { get; set; }
     [JsonIgnore]
     public List<CommonModel> InfoObj
     {

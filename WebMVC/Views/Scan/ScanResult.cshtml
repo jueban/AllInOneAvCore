@@ -50,7 +50,7 @@
                 initData: function () {
                     var vm = this;
 
-                    $.ajax({ url: "/Scan/GetScanResult", method: "GET" })
+                    $.ajax({ url: "/Scan/GetScanResult", method: "GET", async: true })
                         .done(function (data) { vm.items = data });
                 }
             }

@@ -41,7 +41,7 @@ namespace Services
             return (WebScanUrlSite.None, -1, "", "");
         }
 
-        public async static Task<List<SeedMagnetSearchModel>> SearchJavLibrary(string url, int page, string name, string order, IProgress<string> progress)
+        public async static Task<List<SeedMagnetSearchModel>> SearchJavLibrary(string url, int page, string name, string order, IProgress<string> progress, string updateUiKey = "", IProgress<(string, int, int)> intProgess = null)
         {
             var startTime = DateTime.Now;
             Random ran = new();
@@ -57,6 +57,8 @@ namespace Services
             progress.Report($"创建ScanResult ID --> {sr.Id}");
 
             List<SeedMagnetSearchModel> ret = new List<SeedMagnetSearchModel>();
+
+            int pageIndex = 1;
 
             foreach (var subUrl in url.Split(','))
             {
@@ -85,6 +87,11 @@ namespace Services
                 catch (Exception)
                 {
 
+                }
+
+                if (intProgess != null)
+                {
+                    intProgess.Report(new(updateUiKey, url.Split(',').Length, pageIndex++));
                 }
             }
 
@@ -393,7 +400,7 @@ namespace Services
             return ret;
         }
 
-        public static ScanPageModel GetScanPageMode(WebScanUrlSite site)
+        public async static Task<ScanPageModel> GetScanPageMode(WebScanUrlSite site)
         {
             ScanPageModel ret = new()
             {
@@ -406,12 +413,12 @@ namespace Services
 
             if (site == WebScanUrlSite.JavLibrary)
             {
-                DoJavLibraryPageMode(ret).Wait();
+                await DoJavLibraryPageMode(ret);
             }
 
             if (site == WebScanUrlSite.JavBus)
             {
-                DoJavBusPageMode(ret).Wait();
+                await DoJavBusPageMode(ret);
             }
 
             return ret;
@@ -421,6 +428,7 @@ namespace Services
         {
             List<ShowMagnetSearchResult> ret = new List<ShowMagnetSearchResult>();
             var scanResult = await new ScanDAL().GetSeedMagnetSearchModelById(id);
+            var setting = await SettingService.GetSetting();
 
             if (!string.IsNullOrEmpty(scanResult.MagUrl) && scanResult.MagUrlObj != null)
             {
@@ -430,12 +438,12 @@ namespace Services
 
                 if (scanResult.Url.Contains("javlibrary", StringComparison.OrdinalIgnoreCase))
                 {
-                    avModelList = new JavLibraryDAL().GetAvModelByWhere("").Result;
+                    avModelList = await new JavLibraryDAL().GetAvModelByWhere("");
                 }
 
                 if (scanResult.Url.Contains("javbus", StringComparison.OrdinalIgnoreCase))
                 {
-                    avModelList = new JavBusDAL().GetAvModelByWhere("").Result;
+                    avModelList = await new JavBusDAL().GetAvModelByWhere("");
                 }
 
                 var oneOneFiveAllFiles = JsonConvert.DeserializeObject<List<OneOneFiveFileItemModel>>(RedisService.GetHash("115", "allfiles"));
@@ -446,6 +454,16 @@ namespace Services
 
                     if (avModel != null)
                     {
+                        if (scanResult.Url.Contains("javbus", StringComparison.OrdinalIgnoreCase))
+                        {
+                            avModel.LocalPic = setting.JavBusImageFolder + avModel.AvId + "-" + avModel.Name + ".jpg";
+                        }
+
+                        if (scanResult.Url.Contains("javlibrary", StringComparison.OrdinalIgnoreCase))
+                        {
+                            avModel.LocalPic = setting.JavLibraryImageFolder + avModel.AvId + "-" + avModel.Name + ".jpg";
+                        }
+
                         ShowMagnetSearchResult temp = new ShowMagnetSearchResult();
 
                         var magList = d.Value.Where(x => x.Title.Contains(avModel.AvId, StringComparison.OrdinalIgnoreCase)).ToList();

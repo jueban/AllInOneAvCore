@@ -1,4 +1,5 @@
 ﻿using AvManager.Helper;
+using DAL;
 using Models;
 using Services;
 using System;
@@ -26,6 +27,7 @@ namespace AvManager
         private CancellationTokenSource AutoCombineCts = new();
         private CancellationTokenSource CombinePrepareCts = new();
         private bool OnlyCancelCurrentCombineTask = false;
+        private bool IsManualChangeSearchListBox = true;
         #endregion
 
         #region 全局
@@ -66,7 +68,7 @@ namespace AvManager
             }
 
             //播放文件夹
-            if (TabControl.SelectedIndex == 5)
+            if (TabControl.SelectedIndex == 6)
             {
                 if (e.KeyCode == Keys.Back)
                 {
@@ -136,9 +138,16 @@ namespace AvManager
 
         private void TabControl_SelectedIndexChanged(object sender, EventArgs e)
         {
+            //自动合并相关
             if (TabControl.SelectedIndex == 3)
             {
                 ShowAutoCombineList();
+            }
+
+            //搜索相关
+            if (TabControl.SelectedIndex == 5)
+            {
+                SearchSiteComboBox.SelectedIndex = 0;
             }
         }
 
@@ -1063,7 +1072,7 @@ namespace AvManager
 
             PlayFolderListView.BeginUpdate();
 
-            foreach (var file in files)
+            foreach (var file in files.OrderByDescending(x => x.LastWriteTime))
             {
                 ListViewItem lvi = new(file.Directory.Name);
 
@@ -1096,6 +1105,308 @@ namespace AvManager
 
             PlayFolderListView.EndUpdate();
         }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            MagetSearch search = new();
+            search.ShowDialog();
+        }
+
+        private async void PlayFolderMoveBtn_Click(object sender, EventArgs e)
+        {
+            if (PlayFolderListView.SelectedItems.Count > 0)
+            {
+                var choose = FolderBrowserDialog.ShowDialog();
+
+                if ((choose == DialogResult.Yes || choose == DialogResult.OK) && FolderBrowserDialog.SelectedPath != null)
+                {
+                    List<FileInfo> list = new();
+
+                    foreach (ListViewItem lvi in PlayFolderListView.SelectedItems)
+                    {
+                        list.Add(((FileInfo)lvi.Tag));
+                    }
+
+                    var ret = MessageBox.Show($"是否要移动 {PlayFolderListView.SelectedItems.Count} 个文件，大小 {FileUtility.GetAutoSizeString(list.Sum(x => x.Length), 1)} ?", "警告", MessageBoxButtons.YesNo);
+
+                    if (ret == DialogResult.Yes)
+                    {
+                        await Task.Run(() =>
+                        {
+                            FileUtility.TransferFileUsingSystem(list.Select(x => x.FullName).ToList(), FolderBrowserDialog.SelectedPath, true, false);
+                        });
+                    }
+
+                    ShowPlayFolderListView();
+                }
+            }
+        }
+        #endregion
+
+        #region 搜索相关
+        private void SearchUpdateBtn_Click(object sender, EventArgs e)
+        {
+            InitSearchUI();
+        }
+
+        private async void SearchSearchBtn_Click(object sender, EventArgs e)
+        {
+            ScanPageModel param = new();
+            Progress<string> stringProgress = new();
+            Progress<(string, int, int)> intProgress = new();
+            intProgress.ProgressChanged += SearchProgressChanged;
+
+            param.Page = (int)SearchPageUpDown.Value;
+            param.Order = SearchAscRadio.Checked ? "ASC" : "DESC";           
+
+            foreach (ListBox lb in SearchUpperTablePanel.Controls)
+            {
+                if (lb.SelectedItems.Count > 0)
+                {
+                    foreach (ListBoxItem lbi in lb.SelectedItems)
+                    {
+                        param.Url += (string)lbi.Tag + ",";
+                        param.Name += lbi.Title + ",";
+                    }
+
+                    param.Url = param.Url[0..^1];
+
+                    param.Name = param.Name[0..^1];
+                    if (param.Name.Length > 20)
+                    {
+                        param.Name = param.Name[0..20] + "...";
+                    }
+                }
+            }
+
+            ListViewItem lvi = new();
+            ProgressBar pb = new();
+            var key = (SearchListView.Items.Count + 1) + "temp";
+
+            lvi.SubItems[0].Text = param.Name;
+            lvi.SubItems.Add(0 + "");
+            lvi.SubItems.Add("");
+            lvi.SubItems.Add(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+            lvi.SubItems.Add(key);
+
+            SearchListView.Items.Add(lvi);
+
+            Rectangle r = lvi.SubItems[2].Bounds;
+            pb.SetBounds(r.X, r.Y, r.Width, r.Height);
+            pb.Minimum = 0;
+            pb.Maximum = param.Url.Split(',').Length;
+            pb.Value = 0;
+            pb.Name = key;
+            SearchListView.Controls.Add(pb);
+
+            if (SearchSiteComboBox.Text == "JavLibrary")
+            {
+                await MagnetUrlService.SearchJavLibrary(param.Url, param.Page, param.Name, param.Order, stringProgress, key, intProgress);
+            }
+            else if (SearchSiteComboBox.Text == "JavBus")
+            {
+                await MagnetUrlService.SearchJavBus(param.Url, param.Page, param.Name, stringProgress);
+            }
+        }
+
+        private void SearchProgressChanged(object sender, (string, int, int) e)
+        {
+            ProgressBar pb;
+
+            pb = SearchListView.Controls.OfType<ProgressBar>().FirstOrDefault(x => x.Name == e.Item1);
+            if (pb != null)
+            {
+                pb.Value = e.Item3;
+            }
+        }
+
+        private void SearchListView_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            if (e.Clicks == 2 && e.Button == MouseButtons.Left && SearchListView.SelectedItems.Count > 0)
+            {
+                var result = ((ScanResult)SearchListView.SelectedItems[0].Tag);
+
+                if (result != null)
+                {
+                    MagetSearch ms = new(result.Id);
+                    ms.ShowDialog();
+                }
+            }
+        }
+
+        private async void SearchListView_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (e.Clicks == 1 && e.Button == MouseButtons.Right && SearchListView.SelectedItems.Count > 0)
+            {
+                var result = ((ScanResult)SearchListView.SelectedItems[0].Tag);
+
+                if (result != null)
+                {
+                    await new ScanDAL().DeleteSeedMagnetSearchModelById(result.Id);
+                }
+            }
+        }
+
+        private void SearchPageListBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (IsManualChangeSearchListBox)
+            {
+                IsManualChangeSearchListBox = false;
+                SearchActressListBox.ClearSelected();
+                SearchCategoryListBox.ClearSelected();
+                SearchPrefixListBox.ClearSelected();
+            }
+            IsManualChangeSearchListBox = true;
+        }
+
+        private void SearchActressListBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (IsManualChangeSearchListBox)
+            {
+                IsManualChangeSearchListBox = false;
+                SearchPageListBox.ClearSelected();
+                SearchCategoryListBox.ClearSelected();
+                SearchPrefixListBox.ClearSelected();
+            }
+            IsManualChangeSearchListBox = true;
+        }
+
+        private void SearchCategoryListBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (IsManualChangeSearchListBox)
+            {
+                IsManualChangeSearchListBox = false;
+                SearchActressListBox.ClearSelected();
+                SearchPageListBox.ClearSelected();
+                SearchPrefixListBox.ClearSelected();
+            }
+            IsManualChangeSearchListBox = true;
+        }
+
+        private void SearchPrefixListBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (IsManualChangeSearchListBox)
+            {
+                IsManualChangeSearchListBox = false;
+                SearchActressListBox.ClearSelected();
+                SearchCategoryListBox.ClearSelected();
+                SearchPageListBox.ClearSelected();
+            }
+            IsManualChangeSearchListBox = true;
+        }
+
+        private void SearchSiteComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            UpdateSearchListBox();
+        }
+
+        private void InitSearchUI()
+        {
+            UpdateSearchListBox();
+        }
+
+        private async void UpdateSearchListBox()
+        {
+            if (string.IsNullOrEmpty(SearchSiteComboBox.Text))
+            {
+                return;
+            }
+
+            var enumValue = (WebScanUrlSite)Enum.Parse(typeof(WebScanUrlSite), SearchSiteComboBox.Text);
+
+            var favi = await MagnetUrlService.GetScanPageMode(enumValue);
+
+            var pageDrop = favi.Drops.Where(x => x.Title == "选择页面").ToList();
+            var actressDrop = favi.Drops.Where(x => x.Title == "选择演员").ToList();
+            var catrgoryDrop = favi.Drops.Where(x => x.Title == "选择类别").ToList();
+            var prefixDrop = favi.Drops.Where(x => x.Title == "选择前缀").ToList();
+
+            SearchPageListBox.DisplayMember = "Title";
+            SearchPageListBox.ValueMember = "Tag";
+
+            SearchCategoryListBox.DisplayMember = "Title";
+            SearchCategoryListBox.ValueMember = "Tag";
+
+            SearchActressListBox.DisplayMember = "Title";
+            SearchActressListBox.ValueMember = "Tag";
+
+            SearchPrefixListBox.DisplayMember = "Title";
+            SearchPrefixListBox.ValueMember = "Tag";
+
+            SearchPageListBox.Items.Clear();
+            SearchCategoryListBox.Items.Clear();
+            SearchActressListBox.Items.Clear();
+            SearchPrefixListBox.Items.Clear();
+
+            foreach (var drop in pageDrop)
+            {
+                foreach (var sub in drop.Items)
+                {
+                    SearchPageListBox.Items.Add(new ListBoxItem{ Title = sub.Text, Tag = sub.Value });
+                }
+            }
+
+            foreach (var drop in actressDrop)
+            {
+                foreach (var sub in drop.Items)
+                {
+                    SearchCategoryListBox.Items.Add(new ListBoxItem { Title = sub.Text, Tag = sub.Value });
+                }
+            }
+
+            foreach (var drop in catrgoryDrop)
+            {
+                foreach (var sub in drop.Items)
+                {
+                    SearchActressListBox.Items.Add(new ListBoxItem { Title = sub.Text, Tag = sub.Value });
+                }
+            }
+
+            foreach (var drop in prefixDrop)
+            {
+                foreach (var sub in drop.Items)
+                {
+                    SearchPrefixListBox.Items.Add(new ListBoxItem { Title = sub.Text, Tag = sub.Value });
+                }
+            }
+
+            ShowSearchListView();
+        }
+
+        private async void ShowSearchListView()
+        {
+            SearchListView.Controls.Clear();
+            SearchListView.Items.Clear();
+
+            var items = await new ScanDAL().GetSeedMagnetSearchModelAll();
+
+            SearchListView.BeginUpdate();
+
+            foreach (var item in items.OrderBy(x => x.StartTime))
+            {
+                ListViewItem lvi = new();
+                ProgressBar pb = new();
+
+                lvi.SubItems[0].Text = item.Name;
+                lvi.SubItems.Add(item.MagUrlObj.Count + "");
+                lvi.SubItems.Add("");
+                lvi.SubItems.Add(item.DateStr);
+                lvi.SubItems.Add(item.Id + "");
+                lvi.Tag = item;
+
+                SearchListView.Items.Add(lvi);
+
+                Rectangle r = lvi.SubItems[2].Bounds;
+                pb.SetBounds(r.X, r.Y, r.Width, r.Height);
+                pb.Minimum = 1;
+                pb.Maximum = 10;
+                pb.Value = 10;
+                pb.Name = item.Id + "";
+                SearchListView.Controls.Add(pb);
+            }
+
+            SearchListView.EndUpdate();
+        }
+        #endregion
     }
-    #endregion
 }

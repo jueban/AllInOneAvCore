@@ -30,9 +30,9 @@ namespace AvManager
         private void InitializeComponent()
         {
             this.AvItemBottomPanel = new System.Windows.Forms.Panel();
+            this.AvItemInfoLabel = new System.Windows.Forms.Label();
             this.AvItemMainPanel = new System.Windows.Forms.Panel();
             this.AvItemPicBox = new System.Windows.Forms.PictureBox();
-            this.AvItemInfoLabel = new System.Windows.Forms.Label();
             this.AvItemBottomPanel.SuspendLayout();
             this.AvItemMainPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.AvItemPicBox)).BeginInit();
@@ -42,48 +42,53 @@ namespace AvManager
             // 
             this.AvItemBottomPanel.Controls.Add(this.AvItemInfoLabel);
             this.AvItemBottomPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.AvItemBottomPanel.Location = new System.Drawing.Point(0, 164);
+            this.AvItemBottomPanel.Location = new System.Drawing.Point(0, 270);
+            this.AvItemBottomPanel.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.AvItemBottomPanel.Name = "AvItemBottomPanel";
-            this.AvItemBottomPanel.Size = new System.Drawing.Size(244, 29);
+            this.AvItemBottomPanel.Size = new System.Drawing.Size(453, 48);
             this.AvItemBottomPanel.TabIndex = 0;
+            // 
+            // AvItemInfoLabel
+            // 
+            this.AvItemInfoLabel.AutoSize = true;
+            this.AvItemInfoLabel.Location = new System.Drawing.Point(6, 10);
+            this.AvItemInfoLabel.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
+            this.AvItemInfoLabel.Name = "AvItemInfoLabel";
+            this.AvItemInfoLabel.Size = new System.Drawing.Size(73, 28);
+            this.AvItemInfoLabel.TabIndex = 1;
+            this.AvItemInfoLabel.Text = "label1";
             // 
             // AvItemMainPanel
             // 
             this.AvItemMainPanel.Controls.Add(this.AvItemPicBox);
             this.AvItemMainPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.AvItemMainPanel.Location = new System.Drawing.Point(0, 0);
+            this.AvItemMainPanel.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.AvItemMainPanel.Name = "AvItemMainPanel";
-            this.AvItemMainPanel.Size = new System.Drawing.Size(244, 164);
+            this.AvItemMainPanel.Size = new System.Drawing.Size(453, 270);
             this.AvItemMainPanel.TabIndex = 0;
             // 
             // AvItemPicBox
             // 
             this.AvItemPicBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.AvItemPicBox.Location = new System.Drawing.Point(0, 0);
+            this.AvItemPicBox.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.AvItemPicBox.Name = "AvItemPicBox";
-            this.AvItemPicBox.Size = new System.Drawing.Size(244, 164);
+            this.AvItemPicBox.Size = new System.Drawing.Size(453, 270);
             this.AvItemPicBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.AvItemPicBox.TabIndex = 0;
             this.AvItemPicBox.TabStop = false;
             this.AvItemPicBox.Click += new System.EventHandler(this.AvItemPicBox_Click);
             // 
-            // AvItemInfoLabel
-            // 
-            this.AvItemInfoLabel.AutoSize = true;
-            this.AvItemInfoLabel.Location = new System.Drawing.Point(3, 6);
-            this.AvItemInfoLabel.Name = "AvItemInfoLabel";
-            this.AvItemInfoLabel.Size = new System.Drawing.Size(43, 17);
-            this.AvItemInfoLabel.TabIndex = 1;
-            this.AvItemInfoLabel.Text = "label1";
-            // 
             // AvItem
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(13F, 28F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.AvItemMainPanel);
             this.Controls.Add(this.AvItemBottomPanel);
+            this.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.Name = "AvItem";
-            this.Size = new System.Drawing.Size(244, 193);
+            this.Size = new System.Drawing.Size(453, 318);
             this.Load += new System.EventHandler(this.AvItem_Load);
             this.AvItemBottomPanel.ResumeLayout(false);
             this.AvItemBottomPanel.PerformLayout();
