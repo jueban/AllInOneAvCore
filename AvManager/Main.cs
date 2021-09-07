@@ -1,6 +1,7 @@
 ﻿using AvManager.Helper;
 using DAL;
 using Models;
+using Newtonsoft.Json;
 using Services;
 using System;
 using System.Collections.Generic;
@@ -148,6 +149,12 @@ namespace AvManager
             if (TabControl.SelectedIndex == 5)
             {
                 SearchSiteComboBox.SelectedIndex = 0;
+            }
+
+            //设置相关
+            if (TabControl.SelectedIndex == 9)
+            {
+                InitSetting();
             }
         }
 
@@ -1406,6 +1413,94 @@ namespace AvManager
             }
 
             SearchListView.EndUpdate();
+        }
+        #endregion
+
+        #region 设置
+        private async void SettingCookieCombo_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            Progress<string> progress = new();
+            var setting = await SettingService.GetSetting();
+
+            var enumValue = (JavLibraryGetCookieMode)Enum.Parse(typeof(JavLibraryGetCookieMode), SettingCookieCombo.Text);
+            setting.JavLibrarySettings.CookieMode = enumValue;
+
+            await SettingService.SaveSetting(setting, progress);
+
+            InitSetting();
+        }
+
+        private async void SettingMagnetSiteCombo_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            Progress<string> progress = new();
+            var setting = await SettingService.GetSetting();
+
+            var enumValue = (SearchSeedSiteEnum)Enum.Parse(typeof(SearchSeedSiteEnum), SettingMagnetSiteCombo.Text);
+            setting.MagSearchSite = enumValue;
+
+            await SettingService.SaveSetting(setting, progress);
+
+            InitSetting();
+        }
+
+        private async void SettingSaveFaviBtn_Click(object sender, EventArgs e)
+        {
+            if (!string.IsNullOrEmpty(SettingPreText.Text))
+            {
+                var res = await MagnetUrlService.GetFaviUrl(SettingPreText.Text);
+
+                await MagnetUrlService.SaveFaviUrl(res);
+
+                InitSetting();
+            }
+        }
+
+        private async void SettingSavePrefixBtn_Click(object sender, EventArgs e)
+        {
+            if (!string.IsNullOrEmpty(SettingPreText.Text))
+            {
+                Progress<string> progress = new();
+                var setting = await SettingService.GetSetting();
+
+                setting.Prefix += "," + SettingPreText.Text;
+
+                await SettingService.SaveSetting(setting, progress);
+
+                InitSetting();
+            }
+        }
+
+        private async void SettingSaveBarkBtn_Click(object sender, EventArgs e)
+        {
+            if (!string.IsNullOrEmpty(SettingBarkText.Text))
+            {
+                Progress<string> progress = new();
+                var setting = await SettingService.GetSetting();
+
+                setting.BarkId = SettingBarkText.Text;
+
+                await SettingService.SaveSetting(setting, progress);
+
+                InitSetting();
+            }
+        }
+
+        private async void InitSetting()
+        {
+            var setting = await SettingService.GetSetting();
+
+            SettingPreText.Text = "";
+            SettingFaviText.Text = "";
+
+            SettingCookieCombo.SelectedIndexChanged -= SettingCookieCombo_SelectedIndexChanged;
+            SettingMagnetSiteCombo.SelectedIndexChanged -= SettingMagnetSiteCombo_SelectedIndexChanged;
+
+            SettingCookieCombo.Text = setting.JavLibrarySettings.CookieMode.ToString();
+            SettingMagnetSiteCombo.Text = setting.MagSearchSite.ToString();
+            SettingBarkText.Text = setting.BarkId;
+
+            SettingCookieCombo.SelectedIndexChanged += SettingCookieCombo_SelectedIndexChanged;
+            SettingMagnetSiteCombo.SelectedIndexChanged += SettingMagnetSiteCombo_SelectedIndexChanged;
         }
         #endregion
     }

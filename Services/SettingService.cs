@@ -45,10 +45,10 @@ namespace Services
             }
 
             var settringDAL = new SettingsDAL();
-            settringDAL.InitSetting(JsonHelper.SerializeWithUtf8(settings)).Wait();
+            await settringDAL.InitSetting(JsonHelper.SerializeWithUtf8(settings));
 
-            settringDAL.TruncatePrefix().Wait();
-            settringDAL.InsertPrefix(settings.Prefix).Wait();
+            await settringDAL.TruncatePrefix();
+            await settringDAL.InsertPrefix(settings.Prefix);
         }
 
         public static int InsertPlayHistory(PlayHistory entity)

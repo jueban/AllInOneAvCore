@@ -98,6 +98,7 @@ namespace AvManager
             this.SearchActressListBox = new System.Windows.Forms.ListBox();
             this.SearchPageListBox = new System.Windows.Forms.ListBox();
             this.SearchUpperLeftPanel = new System.Windows.Forms.Panel();
+            this.SearchUpdateBtn = new System.Windows.Forms.Button();
             this.SearchSearchBtn = new System.Windows.Forms.Button();
             this.SearchPageUpDown = new System.Windows.Forms.NumericUpDown();
             this.SearchPageLabel = new System.Windows.Forms.Label();
@@ -118,11 +119,24 @@ namespace AvManager
             this.OneOneFive = new System.Windows.Forms.TabPage();
             this.MoveisTab = new System.Windows.Forms.TabPage();
             this.SettingTab = new System.Windows.Forms.TabPage();
+            this.SettingMainPanel = new System.Windows.Forms.Panel();
+            this.SettingSaveBarkBtn = new System.Windows.Forms.Button();
+            this.SettingBarkText = new System.Windows.Forms.TextBox();
+            this.SettingBarkLabel = new System.Windows.Forms.Label();
+            this.SettingSavePrefixBtn = new System.Windows.Forms.Button();
+            this.SettingPreText = new System.Windows.Forms.TextBox();
+            this.SettingPrefixLabel = new System.Windows.Forms.Label();
+            this.SettingSaveFaviBtn = new System.Windows.Forms.Button();
+            this.SettingFaviText = new System.Windows.Forms.TextBox();
+            this.SettingFaviLabel = new System.Windows.Forms.Label();
+            this.SettingMagnetSiteLabel = new System.Windows.Forms.Label();
+            this.SettingCookieLabel = new System.Windows.Forms.Label();
+            this.SettingMagnetSiteCombo = new System.Windows.Forms.ComboBox();
+            this.SettingCookieCombo = new System.Windows.Forms.ComboBox();
             this.OpenFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.FolderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
             this.CombinePrepareTreeNodeMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.截图ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.SearchUpdateBtn = new System.Windows.Forms.Button();
             this.NotifyIconExitMenu.SuspendLayout();
             this.MainPanel.SuspendLayout();
             this.TabControl.SuspendLayout();
@@ -154,6 +168,8 @@ namespace AvManager
             ((System.ComponentModel.ISupportInitialize)(this.SearchPageUpDown)).BeginInit();
             this.PlayFolderTab.SuspendLayout();
             this.PlayFolderUpperPanel.SuspendLayout();
+            this.SettingTab.SuspendLayout();
+            this.SettingMainPanel.SuspendLayout();
             this.CombinePrepareTreeNodeMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -906,6 +922,16 @@ namespace AvManager
             this.SearchUpperLeftPanel.Size = new System.Drawing.Size(171, 153);
             this.SearchUpperLeftPanel.TabIndex = 0;
             // 
+            // SearchUpdateBtn
+            // 
+            this.SearchUpdateBtn.Location = new System.Drawing.Point(8, 111);
+            this.SearchUpdateBtn.Name = "SearchUpdateBtn";
+            this.SearchUpdateBtn.Size = new System.Drawing.Size(75, 28);
+            this.SearchUpdateBtn.TabIndex = 9;
+            this.SearchUpdateBtn.Text = "更新";
+            this.SearchUpdateBtn.UseVisualStyleBackColor = true;
+            this.SearchUpdateBtn.Click += new System.EventHandler(this.SearchUpdateBtn_Click);
+            // 
             // SearchSearchBtn
             // 
             this.SearchSearchBtn.Location = new System.Drawing.Point(91, 111);
@@ -1114,6 +1140,7 @@ namespace AvManager
             // 
             // SettingTab
             // 
+            this.SettingTab.Controls.Add(this.SettingMainPanel);
             this.SettingTab.Location = new System.Drawing.Point(4, 26);
             this.SettingTab.Margin = new System.Windows.Forms.Padding(2);
             this.SettingTab.Name = "SettingTab";
@@ -1121,6 +1148,148 @@ namespace AvManager
             this.SettingTab.TabIndex = 8;
             this.SettingTab.Text = "设置";
             this.SettingTab.UseVisualStyleBackColor = true;
+            // 
+            // SettingMainPanel
+            // 
+            this.SettingMainPanel.Controls.Add(this.SettingSaveBarkBtn);
+            this.SettingMainPanel.Controls.Add(this.SettingBarkText);
+            this.SettingMainPanel.Controls.Add(this.SettingBarkLabel);
+            this.SettingMainPanel.Controls.Add(this.SettingSavePrefixBtn);
+            this.SettingMainPanel.Controls.Add(this.SettingPreText);
+            this.SettingMainPanel.Controls.Add(this.SettingPrefixLabel);
+            this.SettingMainPanel.Controls.Add(this.SettingSaveFaviBtn);
+            this.SettingMainPanel.Controls.Add(this.SettingFaviText);
+            this.SettingMainPanel.Controls.Add(this.SettingFaviLabel);
+            this.SettingMainPanel.Controls.Add(this.SettingMagnetSiteLabel);
+            this.SettingMainPanel.Controls.Add(this.SettingCookieLabel);
+            this.SettingMainPanel.Controls.Add(this.SettingMagnetSiteCombo);
+            this.SettingMainPanel.Controls.Add(this.SettingCookieCombo);
+            this.SettingMainPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.SettingMainPanel.Location = new System.Drawing.Point(0, 0);
+            this.SettingMainPanel.Name = "SettingMainPanel";
+            this.SettingMainPanel.Size = new System.Drawing.Size(792, 420);
+            this.SettingMainPanel.TabIndex = 0;
+            // 
+            // SettingSaveBarkBtn
+            // 
+            this.SettingSaveBarkBtn.Location = new System.Drawing.Point(464, 208);
+            this.SettingSaveBarkBtn.Name = "SettingSaveBarkBtn";
+            this.SettingSaveBarkBtn.Size = new System.Drawing.Size(75, 31);
+            this.SettingSaveBarkBtn.TabIndex = 12;
+            this.SettingSaveBarkBtn.Text = "保存";
+            this.SettingSaveBarkBtn.UseVisualStyleBackColor = true;
+            this.SettingSaveBarkBtn.Click += new System.EventHandler(this.SettingSaveBarkBtn_Click);
+            // 
+            // SettingBarkText
+            // 
+            this.SettingBarkText.Location = new System.Drawing.Point(91, 212);
+            this.SettingBarkText.Name = "SettingBarkText";
+            this.SettingBarkText.Size = new System.Drawing.Size(352, 23);
+            this.SettingBarkText.TabIndex = 11;
+            // 
+            // SettingBarkLabel
+            // 
+            this.SettingBarkLabel.AutoSize = true;
+            this.SettingBarkLabel.Location = new System.Drawing.Point(9, 212);
+            this.SettingBarkLabel.Name = "SettingBarkLabel";
+            this.SettingBarkLabel.Size = new System.Drawing.Size(71, 17);
+            this.SettingBarkLabel.TabIndex = 10;
+            this.SettingBarkLabel.Text = "BarkId设置";
+            // 
+            // SettingSavePrefixBtn
+            // 
+            this.SettingSavePrefixBtn.Location = new System.Drawing.Point(464, 156);
+            this.SettingSavePrefixBtn.Name = "SettingSavePrefixBtn";
+            this.SettingSavePrefixBtn.Size = new System.Drawing.Size(75, 31);
+            this.SettingSavePrefixBtn.TabIndex = 9;
+            this.SettingSavePrefixBtn.Text = "保存";
+            this.SettingSavePrefixBtn.UseVisualStyleBackColor = true;
+            this.SettingSavePrefixBtn.Click += new System.EventHandler(this.SettingSavePrefixBtn_Click);
+            // 
+            // SettingPreText
+            // 
+            this.SettingPreText.Location = new System.Drawing.Point(91, 160);
+            this.SettingPreText.Name = "SettingPreText";
+            this.SettingPreText.Size = new System.Drawing.Size(352, 23);
+            this.SettingPreText.TabIndex = 8;
+            // 
+            // SettingPrefixLabel
+            // 
+            this.SettingPrefixLabel.AutoSize = true;
+            this.SettingPrefixLabel.Location = new System.Drawing.Point(9, 160);
+            this.SettingPrefixLabel.Name = "SettingPrefixLabel";
+            this.SettingPrefixLabel.Size = new System.Drawing.Size(56, 17);
+            this.SettingPrefixLabel.TabIndex = 7;
+            this.SettingPrefixLabel.Text = "添加前缀";
+            // 
+            // SettingSaveFaviBtn
+            // 
+            this.SettingSaveFaviBtn.Location = new System.Drawing.Point(464, 105);
+            this.SettingSaveFaviBtn.Name = "SettingSaveFaviBtn";
+            this.SettingSaveFaviBtn.Size = new System.Drawing.Size(75, 31);
+            this.SettingSaveFaviBtn.TabIndex = 6;
+            this.SettingSaveFaviBtn.Text = "保存";
+            this.SettingSaveFaviBtn.UseVisualStyleBackColor = true;
+            this.SettingSaveFaviBtn.Click += new System.EventHandler(this.SettingSaveFaviBtn_Click);
+            // 
+            // SettingFaviText
+            // 
+            this.SettingFaviText.Location = new System.Drawing.Point(91, 109);
+            this.SettingFaviText.Name = "SettingFaviText";
+            this.SettingFaviText.Size = new System.Drawing.Size(352, 23);
+            this.SettingFaviText.TabIndex = 5;
+            // 
+            // SettingFaviLabel
+            // 
+            this.SettingFaviLabel.AutoSize = true;
+            this.SettingFaviLabel.Location = new System.Drawing.Point(9, 109);
+            this.SettingFaviLabel.Name = "SettingFaviLabel";
+            this.SettingFaviLabel.Size = new System.Drawing.Size(80, 17);
+            this.SettingFaviLabel.TabIndex = 4;
+            this.SettingFaviLabel.Text = "添加搜藏页面";
+            // 
+            // SettingMagnetSiteLabel
+            // 
+            this.SettingMagnetSiteLabel.AutoSize = true;
+            this.SettingMagnetSiteLabel.Location = new System.Drawing.Point(8, 62);
+            this.SettingMagnetSiteLabel.Name = "SettingMagnetSiteLabel";
+            this.SettingMagnetSiteLabel.Size = new System.Drawing.Size(80, 17);
+            this.SettingMagnetSiteLabel.TabIndex = 3;
+            this.SettingMagnetSiteLabel.Text = "种子搜索网站";
+            // 
+            // SettingCookieLabel
+            // 
+            this.SettingCookieLabel.AutoSize = true;
+            this.SettingCookieLabel.Location = new System.Drawing.Point(8, 17);
+            this.SettingCookieLabel.Name = "SettingCookieLabel";
+            this.SettingCookieLabel.Size = new System.Drawing.Size(73, 17);
+            this.SettingCookieLabel.TabIndex = 2;
+            this.SettingCookieLabel.Text = "Cookie模式";
+            // 
+            // SettingMagnetSiteCombo
+            // 
+            this.SettingMagnetSiteCombo.FormattingEnabled = true;
+            this.SettingMagnetSiteCombo.Items.AddRange(new object[] {
+            "SukebeiSi",
+            "SukebeiPro",
+            "SukebeiNet"});
+            this.SettingMagnetSiteCombo.Location = new System.Drawing.Point(91, 59);
+            this.SettingMagnetSiteCombo.Name = "SettingMagnetSiteCombo";
+            this.SettingMagnetSiteCombo.Size = new System.Drawing.Size(121, 25);
+            this.SettingMagnetSiteCombo.TabIndex = 1;
+            this.SettingMagnetSiteCombo.SelectedIndexChanged += new System.EventHandler(this.SettingMagnetSiteCombo_SelectedIndexChanged);
+            // 
+            // SettingCookieCombo
+            // 
+            this.SettingCookieCombo.FormattingEnabled = true;
+            this.SettingCookieCombo.Items.AddRange(new object[] {
+            "Easy",
+            "MockBroswer"});
+            this.SettingCookieCombo.Location = new System.Drawing.Point(91, 14);
+            this.SettingCookieCombo.Name = "SettingCookieCombo";
+            this.SettingCookieCombo.Size = new System.Drawing.Size(121, 25);
+            this.SettingCookieCombo.TabIndex = 0;
+            this.SettingCookieCombo.SelectedIndexChanged += new System.EventHandler(this.SettingCookieCombo_SelectedIndexChanged);
             // 
             // OpenFileDialog
             // 
@@ -1140,16 +1309,6 @@ namespace AvManager
             this.截图ToolStripMenuItem.Size = new System.Drawing.Size(100, 22);
             this.截图ToolStripMenuItem.Text = "截图";
             this.截图ToolStripMenuItem.Click += new System.EventHandler(this.截图ToolStripMenuItem_Click);
-            // 
-            // SearchUpdateBtn
-            // 
-            this.SearchUpdateBtn.Location = new System.Drawing.Point(8, 111);
-            this.SearchUpdateBtn.Name = "SearchUpdateBtn";
-            this.SearchUpdateBtn.Size = new System.Drawing.Size(75, 28);
-            this.SearchUpdateBtn.TabIndex = 9;
-            this.SearchUpdateBtn.Text = "更新";
-            this.SearchUpdateBtn.UseVisualStyleBackColor = true;
-            this.SearchUpdateBtn.Click += new System.EventHandler(this.SearchUpdateBtn_Click);
             // 
             // Main
             // 
@@ -1208,6 +1367,9 @@ namespace AvManager
             this.PlayFolderTab.ResumeLayout(false);
             this.PlayFolderUpperPanel.ResumeLayout(false);
             this.PlayFolderUpperPanel.PerformLayout();
+            this.SettingTab.ResumeLayout(false);
+            this.SettingMainPanel.ResumeLayout(false);
+            this.SettingMainPanel.PerformLayout();
             this.CombinePrepareTreeNodeMenu.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -1307,6 +1469,20 @@ namespace AvManager
         private System.Windows.Forms.ColumnHeader SearchListViewDate;
         private System.Windows.Forms.ColumnHeader SearchListViewCount;
         private System.Windows.Forms.Button SearchUpdateBtn;
+        private System.Windows.Forms.Panel SettingMainPanel;
+        private System.Windows.Forms.Label SettingMagnetSiteLabel;
+        private System.Windows.Forms.Label SettingCookieLabel;
+        private System.Windows.Forms.ComboBox SettingMagnetSiteCombo;
+        private System.Windows.Forms.ComboBox SettingCookieCombo;
+        private System.Windows.Forms.Label SettingFaviLabel;
+        private System.Windows.Forms.TextBox SettingFaviText;
+        private System.Windows.Forms.Button SettingSaveFaviBtn;
+        private System.Windows.Forms.Button SettingSavePrefixBtn;
+        private System.Windows.Forms.TextBox SettingPreText;
+        private System.Windows.Forms.Label SettingPrefixLabel;
+        private System.Windows.Forms.Button SettingSaveBarkBtn;
+        private System.Windows.Forms.TextBox SettingBarkText;
+        private System.Windows.Forms.Label SettingBarkLabel;
     }
 }
 
