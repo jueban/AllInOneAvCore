@@ -1191,7 +1191,7 @@ namespace Services
                 sb.AppendLine("1*played*0");
             }
 
-            using (StreamWriter sw = new StreamWriter(folder + fileName))
+            using (StreamWriter sw = new(folder + fileName))
             {
                 sw.WriteLine(sb.ToString());
             }
@@ -1201,7 +1201,7 @@ namespace Services
 
         public static async Task<List<VideoModel>> GetVideoModelAllFromRedis()
         {
-            List<VideoModel> ret = new List<VideoModel>();
+            List<VideoModel> ret = new();
 
             if (RedisService.HExists("video", "all"))
             {

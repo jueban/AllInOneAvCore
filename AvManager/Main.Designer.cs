@@ -132,6 +132,8 @@ namespace AvManager
             this.VideoLastBtn = new System.Windows.Forms.Button();
             this.VideoFirstBtn = new System.Windows.Forms.Button();
             this.VideoUpperPanel = new System.Windows.Forms.Panel();
+            this.VideoPageSizeLable = new System.Windows.Forms.Label();
+            this.VideoPageSizeUpDown = new System.Windows.Forms.NumericUpDown();
             this.VideoDirectorLabel = new System.Windows.Forms.Label();
             this.VideoPrefixLabel = new System.Windows.Forms.Label();
             this.VideoDirectorCombo = new System.Windows.Forms.ComboBox();
@@ -160,6 +162,7 @@ namespace AvManager
             this.FolderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
             this.CombinePrepareTreeNodeMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.截图ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.VideoMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.NotifyIconExitMenu.SuspendLayout();
             this.MainPanel.SuspendLayout();
             this.TabControl.SuspendLayout();
@@ -195,6 +198,7 @@ namespace AvManager
             this.VideoMainPanel.SuspendLayout();
             this.VideoBottomPanel.SuspendLayout();
             this.VideoUpperPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.VideoPageSizeUpDown)).BeginInit();
             this.SettingTab.SuspendLayout();
             this.SettingMainPanel.SuspendLayout();
             this.CombinePrepareTreeNodeMenu.SuspendLayout();
@@ -260,7 +264,7 @@ namespace AvManager
             this.RemoveFolderTab.Location = new System.Drawing.Point(4, 26);
             this.RemoveFolderTab.Name = "RemoveFolderTab";
             this.RemoveFolderTab.Padding = new System.Windows.Forms.Padding(3);
-            this.RemoveFolderTab.Size = new System.Drawing.Size(902, 420);
+            this.RemoveFolderTab.Size = new System.Drawing.Size(954, 420);
             this.RemoveFolderTab.TabIndex = 0;
             this.RemoveFolderTab.Text = "去文件夹";
             this.RemoveFolderTab.UseVisualStyleBackColor = true;
@@ -271,7 +275,7 @@ namespace AvManager
             this.RemoveFolderMainPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.RemoveFolderMainPanel.Location = new System.Drawing.Point(3, 39);
             this.RemoveFolderMainPanel.Name = "RemoveFolderMainPanel";
-            this.RemoveFolderMainPanel.Size = new System.Drawing.Size(896, 378);
+            this.RemoveFolderMainPanel.Size = new System.Drawing.Size(948, 378);
             this.RemoveFolderMainPanel.TabIndex = 1;
             // 
             // RemoveFolderInfoText
@@ -282,7 +286,7 @@ namespace AvManager
             this.RemoveFolderInfoText.Name = "RemoveFolderInfoText";
             this.RemoveFolderInfoText.ReadOnly = true;
             this.RemoveFolderInfoText.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.RemoveFolderInfoText.Size = new System.Drawing.Size(896, 378);
+            this.RemoveFolderInfoText.Size = new System.Drawing.Size(948, 378);
             this.RemoveFolderInfoText.TabIndex = 0;
             // 
             // RemoveFolderUpperPanel
@@ -292,14 +296,14 @@ namespace AvManager
             this.RemoveFolderUpperPanel.Dock = System.Windows.Forms.DockStyle.Top;
             this.RemoveFolderUpperPanel.Location = new System.Drawing.Point(3, 3);
             this.RemoveFolderUpperPanel.Name = "RemoveFolderUpperPanel";
-            this.RemoveFolderUpperPanel.Size = new System.Drawing.Size(896, 36);
+            this.RemoveFolderUpperPanel.Size = new System.Drawing.Size(948, 36);
             this.RemoveFolderUpperPanel.TabIndex = 0;
             // 
             // RemoveFolderConfirmBtn
             // 
             this.RemoveFolderConfirmBtn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.RemoveFolderConfirmBtn.Location = new System.Drawing.Point(816, 5);
+            this.RemoveFolderConfirmBtn.Location = new System.Drawing.Point(868, 5);
             this.RemoveFolderConfirmBtn.Name = "RemoveFolderConfirmBtn";
             this.RemoveFolderConfirmBtn.Size = new System.Drawing.Size(75, 27);
             this.RemoveFolderConfirmBtn.TabIndex = 1;
@@ -315,7 +319,7 @@ namespace AvManager
             this.RemoveFolderText.Location = new System.Drawing.Point(3, 8);
             this.RemoveFolderText.Name = "RemoveFolderText";
             this.RemoveFolderText.PlaceholderText = "点击选择需要去文件夹的目录，文件会移动到所选目录下的\'movefiles\'文件夹";
-            this.RemoveFolderText.Size = new System.Drawing.Size(805, 23);
+            this.RemoveFolderText.Size = new System.Drawing.Size(857, 23);
             this.RemoveFolderText.TabIndex = 0;
             this.RemoveFolderText.Click += new System.EventHandler(this.RemoveFolderText_Click);
             // 
@@ -325,7 +329,7 @@ namespace AvManager
             this.RenameTab.Controls.Add(this.RenameUpperPanel);
             this.RenameTab.Location = new System.Drawing.Point(4, 26);
             this.RenameTab.Name = "RenameTab";
-            this.RenameTab.Size = new System.Drawing.Size(902, 420);
+            this.RenameTab.Size = new System.Drawing.Size(954, 420);
             this.RenameTab.TabIndex = 2;
             this.RenameTab.Text = "重命名";
             this.RenameTab.UseVisualStyleBackColor = true;
@@ -336,7 +340,7 @@ namespace AvManager
             this.RenameMainPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.RenameMainPanel.Location = new System.Drawing.Point(0, 36);
             this.RenameMainPanel.Name = "RenameMainPanel";
-            this.RenameMainPanel.Size = new System.Drawing.Size(902, 384);
+            this.RenameMainPanel.Size = new System.Drawing.Size(954, 384);
             this.RenameMainPanel.TabIndex = 1;
             // 
             // RenameInfoText
@@ -346,7 +350,7 @@ namespace AvManager
             this.RenameInfoText.Multiline = true;
             this.RenameInfoText.Name = "RenameInfoText";
             this.RenameInfoText.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.RenameInfoText.Size = new System.Drawing.Size(902, 384);
+            this.RenameInfoText.Size = new System.Drawing.Size(954, 384);
             this.RenameInfoText.TabIndex = 0;
             // 
             // RenameUpperPanel
@@ -357,14 +361,14 @@ namespace AvManager
             this.RenameUpperPanel.Dock = System.Windows.Forms.DockStyle.Top;
             this.RenameUpperPanel.Location = new System.Drawing.Point(0, 0);
             this.RenameUpperPanel.Name = "RenameUpperPanel";
-            this.RenameUpperPanel.Size = new System.Drawing.Size(902, 36);
+            this.RenameUpperPanel.Size = new System.Drawing.Size(954, 36);
             this.RenameUpperPanel.TabIndex = 0;
             // 
             // RenameManualBtn
             // 
             this.RenameManualBtn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.RenameManualBtn.Location = new System.Drawing.Point(819, 5);
+            this.RenameManualBtn.Location = new System.Drawing.Point(871, 5);
             this.RenameManualBtn.Name = "RenameManualBtn";
             this.RenameManualBtn.Size = new System.Drawing.Size(75, 26);
             this.RenameManualBtn.TabIndex = 2;
@@ -376,7 +380,7 @@ namespace AvManager
             // 
             this.RenameBtn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.RenameBtn.Location = new System.Drawing.Point(738, 5);
+            this.RenameBtn.Location = new System.Drawing.Point(790, 5);
             this.RenameBtn.Name = "RenameBtn";
             this.RenameBtn.Size = new System.Drawing.Size(75, 26);
             this.RenameBtn.TabIndex = 1;
@@ -392,7 +396,7 @@ namespace AvManager
             this.RenameText.Location = new System.Drawing.Point(3, 7);
             this.RenameText.Name = "RenameText";
             this.RenameText.PlaceholderText = "点击选择需要重命名的目录，唯一确定的放入Fin，需要手动处理的放入TempFin";
-            this.RenameText.Size = new System.Drawing.Size(724, 23);
+            this.RenameText.Size = new System.Drawing.Size(776, 23);
             this.RenameText.TabIndex = 0;
             this.RenameText.Click += new System.EventHandler(this.RenameText_Click);
             // 
@@ -403,7 +407,7 @@ namespace AvManager
             this.CombinePrepareTab.Location = new System.Drawing.Point(4, 26);
             this.CombinePrepareTab.Name = "CombinePrepareTab";
             this.CombinePrepareTab.Padding = new System.Windows.Forms.Padding(3);
-            this.CombinePrepareTab.Size = new System.Drawing.Size(902, 420);
+            this.CombinePrepareTab.Size = new System.Drawing.Size(954, 420);
             this.CombinePrepareTab.TabIndex = 1;
             this.CombinePrepareTab.Text = "合并准备";
             this.CombinePrepareTab.UseVisualStyleBackColor = true;
@@ -415,7 +419,7 @@ namespace AvManager
             this.CombinePrepareMainPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.CombinePrepareMainPanel.Location = new System.Drawing.Point(3, 39);
             this.CombinePrepareMainPanel.Name = "CombinePrepareMainPanel";
-            this.CombinePrepareMainPanel.Size = new System.Drawing.Size(896, 378);
+            this.CombinePrepareMainPanel.Size = new System.Drawing.Size(948, 378);
             this.CombinePrepareMainPanel.TabIndex = 1;
             // 
             // CombinePrepareMainMainPanel
@@ -425,7 +429,7 @@ namespace AvManager
             this.CombinePrepareMainMainPanel.Location = new System.Drawing.Point(0, 0);
             this.CombinePrepareMainMainPanel.Margin = new System.Windows.Forms.Padding(2);
             this.CombinePrepareMainMainPanel.Name = "CombinePrepareMainMainPanel";
-            this.CombinePrepareMainMainPanel.Size = new System.Drawing.Size(896, 342);
+            this.CombinePrepareMainMainPanel.Size = new System.Drawing.Size(948, 342);
             this.CombinePrepareMainMainPanel.TabIndex = 2;
             // 
             // CombinePrepareTree
@@ -436,7 +440,7 @@ namespace AvManager
             this.CombinePrepareTree.LabelEdit = true;
             this.CombinePrepareTree.Location = new System.Drawing.Point(0, 0);
             this.CombinePrepareTree.Name = "CombinePrepareTree";
-            this.CombinePrepareTree.Size = new System.Drawing.Size(896, 342);
+            this.CombinePrepareTree.Size = new System.Drawing.Size(948, 342);
             this.CombinePrepareTree.TabIndex = 0;
             this.CombinePrepareTree.AfterLabelEdit += new System.Windows.Forms.NodeLabelEditEventHandler(this.CombinePrepareTree_AfterLabelEdit);
             this.CombinePrepareTree.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.CombinePrepareTree_AfterCheck);
@@ -450,7 +454,7 @@ namespace AvManager
             this.CombinePrepareMainBottomPanel.Location = new System.Drawing.Point(0, 342);
             this.CombinePrepareMainBottomPanel.Margin = new System.Windows.Forms.Padding(2);
             this.CombinePrepareMainBottomPanel.Name = "CombinePrepareMainBottomPanel";
-            this.CombinePrepareMainBottomPanel.Size = new System.Drawing.Size(896, 36);
+            this.CombinePrepareMainBottomPanel.Size = new System.Drawing.Size(948, 36);
             this.CombinePrepareMainBottomPanel.TabIndex = 1;
             // 
             // CombinePreparePB
@@ -471,14 +475,14 @@ namespace AvManager
             this.CombinePrepareUpperPanel.Dock = System.Windows.Forms.DockStyle.Top;
             this.CombinePrepareUpperPanel.Location = new System.Drawing.Point(3, 3);
             this.CombinePrepareUpperPanel.Name = "CombinePrepareUpperPanel";
-            this.CombinePrepareUpperPanel.Size = new System.Drawing.Size(896, 36);
+            this.CombinePrepareUpperPanel.Size = new System.Drawing.Size(948, 36);
             this.CombinePrepareUpperPanel.TabIndex = 0;
             // 
             // CombinePrepareGenerateBtn
             // 
             this.CombinePrepareGenerateBtn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.CombinePrepareGenerateBtn.Location = new System.Drawing.Point(815, 3);
+            this.CombinePrepareGenerateBtn.Location = new System.Drawing.Point(867, 3);
             this.CombinePrepareGenerateBtn.Name = "CombinePrepareGenerateBtn";
             this.CombinePrepareGenerateBtn.Size = new System.Drawing.Size(75, 27);
             this.CombinePrepareGenerateBtn.TabIndex = 2;
@@ -491,7 +495,7 @@ namespace AvManager
             this.CombinePrepareCB.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.CombinePrepareCB.AutoSize = true;
-            this.CombinePrepareCB.Location = new System.Drawing.Point(590, 7);
+            this.CombinePrepareCB.Location = new System.Drawing.Point(642, 7);
             this.CombinePrepareCB.Name = "CombinePrepareCB";
             this.CombinePrepareCB.Size = new System.Drawing.Size(51, 21);
             this.CombinePrepareCB.TabIndex = 1;
@@ -502,7 +506,7 @@ namespace AvManager
             // 
             this.CombinePrepareClearBtn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.CombinePrepareClearBtn.Location = new System.Drawing.Point(733, 3);
+            this.CombinePrepareClearBtn.Location = new System.Drawing.Point(785, 3);
             this.CombinePrepareClearBtn.Name = "CombinePrepareClearBtn";
             this.CombinePrepareClearBtn.Size = new System.Drawing.Size(75, 27);
             this.CombinePrepareClearBtn.TabIndex = 1;
@@ -514,7 +518,7 @@ namespace AvManager
             // 
             this.CombinePrepareListBtn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.CombinePrepareListBtn.Location = new System.Drawing.Point(652, 3);
+            this.CombinePrepareListBtn.Location = new System.Drawing.Point(704, 3);
             this.CombinePrepareListBtn.Name = "CombinePrepareListBtn";
             this.CombinePrepareListBtn.Size = new System.Drawing.Size(75, 27);
             this.CombinePrepareListBtn.TabIndex = 0;
@@ -530,7 +534,7 @@ namespace AvManager
             this.CombinePrepareText.Location = new System.Drawing.Point(3, 6);
             this.CombinePrepareText.Name = "CombinePrepareText";
             this.CombinePrepareText.PlaceholderText = "点击选择合并文件所在的目录，勾选为删除，双击重命名,点击‘整理’完成重命名及删除";
-            this.CombinePrepareText.Size = new System.Drawing.Size(590, 23);
+            this.CombinePrepareText.Size = new System.Drawing.Size(642, 23);
             this.CombinePrepareText.TabIndex = 0;
             this.CombinePrepareText.Click += new System.EventHandler(this.CombinePrepareText_Click);
             // 
@@ -541,7 +545,7 @@ namespace AvManager
             this.AutoCombineTab.Controls.Add(this.AutoCombineUpperPanel);
             this.AutoCombineTab.Location = new System.Drawing.Point(4, 26);
             this.AutoCombineTab.Name = "AutoCombineTab";
-            this.AutoCombineTab.Size = new System.Drawing.Size(902, 420);
+            this.AutoCombineTab.Size = new System.Drawing.Size(954, 420);
             this.AutoCombineTab.TabIndex = 3;
             this.AutoCombineTab.Text = "自动合并";
             this.AutoCombineTab.UseVisualStyleBackColor = true;
@@ -553,7 +557,7 @@ namespace AvManager
             this.AutoCombineMainPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.AutoCombineMainPanel.Location = new System.Drawing.Point(0, 36);
             this.AutoCombineMainPanel.Name = "AutoCombineMainPanel";
-            this.AutoCombineMainPanel.Size = new System.Drawing.Size(902, 348);
+            this.AutoCombineMainPanel.Size = new System.Drawing.Size(954, 348);
             this.AutoCombineMainPanel.TabIndex = 2;
             // 
             // AutoCombineMainMainPanel
@@ -562,7 +566,7 @@ namespace AvManager
             this.AutoCombineMainMainPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.AutoCombineMainMainPanel.Location = new System.Drawing.Point(0, 0);
             this.AutoCombineMainMainPanel.Name = "AutoCombineMainMainPanel";
-            this.AutoCombineMainMainPanel.Size = new System.Drawing.Size(702, 348);
+            this.AutoCombineMainMainPanel.Size = new System.Drawing.Size(754, 348);
             this.AutoCombineMainMainPanel.TabIndex = 2;
             // 
             // AutoCombineListView
@@ -575,7 +579,7 @@ namespace AvManager
             this.AutoCombineListView.HideSelection = false;
             this.AutoCombineListView.Location = new System.Drawing.Point(0, 0);
             this.AutoCombineListView.Name = "AutoCombineListView";
-            this.AutoCombineListView.Size = new System.Drawing.Size(702, 348);
+            this.AutoCombineListView.Size = new System.Drawing.Size(754, 348);
             this.AutoCombineListView.TabIndex = 0;
             this.AutoCombineListView.UseCompatibleStateImageBehavior = false;
             this.AutoCombineListView.View = System.Windows.Forms.View.Details;
@@ -594,7 +598,7 @@ namespace AvManager
             // 
             this.AutoCombineMainRightPanel.Controls.Add(this.AutoCombineInfoText);
             this.AutoCombineMainRightPanel.Dock = System.Windows.Forms.DockStyle.Right;
-            this.AutoCombineMainRightPanel.Location = new System.Drawing.Point(702, 0);
+            this.AutoCombineMainRightPanel.Location = new System.Drawing.Point(754, 0);
             this.AutoCombineMainRightPanel.Name = "AutoCombineMainRightPanel";
             this.AutoCombineMainRightPanel.Size = new System.Drawing.Size(200, 348);
             this.AutoCombineMainRightPanel.TabIndex = 1;
@@ -616,7 +620,7 @@ namespace AvManager
             this.AutoCombineBottomPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.AutoCombineBottomPanel.Location = new System.Drawing.Point(0, 384);
             this.AutoCombineBottomPanel.Name = "AutoCombineBottomPanel";
-            this.AutoCombineBottomPanel.Size = new System.Drawing.Size(902, 36);
+            this.AutoCombineBottomPanel.Size = new System.Drawing.Size(954, 36);
             this.AutoCombineBottomPanel.TabIndex = 1;
             // 
             // AutoCombineCurrentPB
@@ -626,14 +630,14 @@ namespace AvManager
             | System.Windows.Forms.AnchorStyles.Right)));
             this.AutoCombineCurrentPB.Location = new System.Drawing.Point(9, 4);
             this.AutoCombineCurrentPB.Name = "AutoCombineCurrentPB";
-            this.AutoCombineCurrentPB.Size = new System.Drawing.Size(804, 13);
+            this.AutoCombineCurrentPB.Size = new System.Drawing.Size(856, 13);
             this.AutoCombineCurrentPB.TabIndex = 3;
             // 
             // AutoCombineDeleteBtn
             // 
             this.AutoCombineDeleteBtn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.AutoCombineDeleteBtn.Location = new System.Drawing.Point(819, 6);
+            this.AutoCombineDeleteBtn.Location = new System.Drawing.Point(871, 6);
             this.AutoCombineDeleteBtn.Name = "AutoCombineDeleteBtn";
             this.AutoCombineDeleteBtn.Size = new System.Drawing.Size(75, 27);
             this.AutoCombineDeleteBtn.TabIndex = 2;
@@ -648,7 +652,7 @@ namespace AvManager
             | System.Windows.Forms.AnchorStyles.Right)));
             this.AutoCombineTotalPB.Location = new System.Drawing.Point(9, 19);
             this.AutoCombineTotalPB.Name = "AutoCombineTotalPB";
-            this.AutoCombineTotalPB.Size = new System.Drawing.Size(804, 13);
+            this.AutoCombineTotalPB.Size = new System.Drawing.Size(856, 13);
             this.AutoCombineTotalPB.TabIndex = 0;
             // 
             // AutoCombineUpperPanel
@@ -659,14 +663,14 @@ namespace AvManager
             this.AutoCombineUpperPanel.Dock = System.Windows.Forms.DockStyle.Top;
             this.AutoCombineUpperPanel.Location = new System.Drawing.Point(0, 0);
             this.AutoCombineUpperPanel.Name = "AutoCombineUpperPanel";
-            this.AutoCombineUpperPanel.Size = new System.Drawing.Size(902, 36);
+            this.AutoCombineUpperPanel.Size = new System.Drawing.Size(954, 36);
             this.AutoCombineUpperPanel.TabIndex = 0;
             // 
             // AutoCombineCancelBtn
             // 
             this.AutoCombineCancelBtn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.AutoCombineCancelBtn.Location = new System.Drawing.Point(819, 5);
+            this.AutoCombineCancelBtn.Location = new System.Drawing.Point(871, 5);
             this.AutoCombineCancelBtn.Name = "AutoCombineCancelBtn";
             this.AutoCombineCancelBtn.Size = new System.Drawing.Size(75, 27);
             this.AutoCombineCancelBtn.TabIndex = 2;
@@ -678,7 +682,7 @@ namespace AvManager
             // 
             this.AutoCombineStartBtn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.AutoCombineStartBtn.Location = new System.Drawing.Point(732, 5);
+            this.AutoCombineStartBtn.Location = new System.Drawing.Point(784, 5);
             this.AutoCombineStartBtn.Name = "AutoCombineStartBtn";
             this.AutoCombineStartBtn.Size = new System.Drawing.Size(75, 27);
             this.AutoCombineStartBtn.TabIndex = 1;
@@ -694,7 +698,7 @@ namespace AvManager
             this.AutoCombineSaveText.Location = new System.Drawing.Point(3, 8);
             this.AutoCombineSaveText.Name = "AutoCombineSaveText";
             this.AutoCombineSaveText.PlaceholderText = "点击选择合并后文件保存目录，自动读取AutoCombie目录中合并文件";
-            this.AutoCombineSaveText.Size = new System.Drawing.Size(724, 23);
+            this.AutoCombineSaveText.Size = new System.Drawing.Size(776, 23);
             this.AutoCombineSaveText.TabIndex = 0;
             this.AutoCombineSaveText.Click += new System.EventHandler(this.AutoCombineSaveText_Click);
             // 
@@ -705,7 +709,7 @@ namespace AvManager
             this.ClearTab.Location = new System.Drawing.Point(4, 26);
             this.ClearTab.Margin = new System.Windows.Forms.Padding(2);
             this.ClearTab.Name = "ClearTab";
-            this.ClearTab.Size = new System.Drawing.Size(902, 420);
+            this.ClearTab.Size = new System.Drawing.Size(954, 420);
             this.ClearTab.TabIndex = 4;
             this.ClearTab.Text = "整理";
             this.ClearTab.UseVisualStyleBackColor = true;
@@ -717,7 +721,7 @@ namespace AvManager
             this.ClearMainPanel.Location = new System.Drawing.Point(0, 36);
             this.ClearMainPanel.Margin = new System.Windows.Forms.Padding(2);
             this.ClearMainPanel.Name = "ClearMainPanel";
-            this.ClearMainPanel.Size = new System.Drawing.Size(902, 384);
+            this.ClearMainPanel.Size = new System.Drawing.Size(954, 384);
             this.ClearMainPanel.TabIndex = 1;
             // 
             // ClearTreeView
@@ -729,7 +733,7 @@ namespace AvManager
             this.ClearTreeView.Location = new System.Drawing.Point(0, 0);
             this.ClearTreeView.Margin = new System.Windows.Forms.Padding(2);
             this.ClearTreeView.Name = "ClearTreeView";
-            this.ClearTreeView.Size = new System.Drawing.Size(902, 384);
+            this.ClearTreeView.Size = new System.Drawing.Size(954, 384);
             this.ClearTreeView.TabIndex = 0;
             this.ClearTreeView.AfterLabelEdit += new System.Windows.Forms.NodeLabelEditEventHandler(this.ClearTreeView_AfterLabelEdit);
             this.ClearTreeView.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.ClearTreeView_AfterCheck);
@@ -744,14 +748,14 @@ namespace AvManager
             this.ClearUpperPanel.Location = new System.Drawing.Point(0, 0);
             this.ClearUpperPanel.Margin = new System.Windows.Forms.Padding(2);
             this.ClearUpperPanel.Name = "ClearUpperPanel";
-            this.ClearUpperPanel.Size = new System.Drawing.Size(902, 36);
+            this.ClearUpperPanel.Size = new System.Drawing.Size(954, 36);
             this.ClearUpperPanel.TabIndex = 0;
             // 
             // ClearClearBtn
             // 
             this.ClearClearBtn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.ClearClearBtn.Location = new System.Drawing.Point(827, 3);
+            this.ClearClearBtn.Location = new System.Drawing.Point(879, 3);
             this.ClearClearBtn.Margin = new System.Windows.Forms.Padding(2);
             this.ClearClearBtn.Name = "ClearClearBtn";
             this.ClearClearBtn.Size = new System.Drawing.Size(71, 29);
@@ -794,7 +798,7 @@ namespace AvManager
             this.MagnetTab.Location = new System.Drawing.Point(4, 26);
             this.MagnetTab.Margin = new System.Windows.Forms.Padding(2);
             this.MagnetTab.Name = "MagnetTab";
-            this.MagnetTab.Size = new System.Drawing.Size(902, 420);
+            this.MagnetTab.Size = new System.Drawing.Size(954, 420);
             this.MagnetTab.TabIndex = 9;
             this.MagnetTab.Text = "搜索相关";
             this.MagnetTab.UseVisualStyleBackColor = true;
@@ -806,7 +810,7 @@ namespace AvManager
             this.SearchMainPanel.Location = new System.Drawing.Point(0, 153);
             this.SearchMainPanel.Margin = new System.Windows.Forms.Padding(2);
             this.SearchMainPanel.Name = "SearchMainPanel";
-            this.SearchMainPanel.Size = new System.Drawing.Size(902, 267);
+            this.SearchMainPanel.Size = new System.Drawing.Size(954, 267);
             this.SearchMainPanel.TabIndex = 1;
             // 
             // SearchListView
@@ -822,7 +826,7 @@ namespace AvManager
             this.SearchListView.Location = new System.Drawing.Point(0, 0);
             this.SearchListView.Margin = new System.Windows.Forms.Padding(2);
             this.SearchListView.Name = "SearchListView";
-            this.SearchListView.Size = new System.Drawing.Size(902, 267);
+            this.SearchListView.Size = new System.Drawing.Size(954, 267);
             this.SearchListView.TabIndex = 0;
             this.SearchListView.UseCompatibleStateImageBehavior = false;
             this.SearchListView.View = System.Windows.Forms.View.Details;
@@ -857,7 +861,7 @@ namespace AvManager
             this.SearchUpperPanel.Location = new System.Drawing.Point(0, 0);
             this.SearchUpperPanel.Margin = new System.Windows.Forms.Padding(2);
             this.SearchUpperPanel.Name = "SearchUpperPanel";
-            this.SearchUpperPanel.Size = new System.Drawing.Size(902, 153);
+            this.SearchUpperPanel.Size = new System.Drawing.Size(954, 153);
             this.SearchUpperPanel.TabIndex = 0;
             // 
             // SearchUpperTablePanel
@@ -877,7 +881,7 @@ namespace AvManager
             this.SearchUpperTablePanel.Name = "SearchUpperTablePanel";
             this.SearchUpperTablePanel.RowCount = 1;
             this.SearchUpperTablePanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.SearchUpperTablePanel.Size = new System.Drawing.Size(731, 153);
+            this.SearchUpperTablePanel.Size = new System.Drawing.Size(783, 153);
             this.SearchUpperTablePanel.TabIndex = 1;
             // 
             // SearchPrefixListBox
@@ -885,11 +889,11 @@ namespace AvManager
             this.SearchPrefixListBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.SearchPrefixListBox.FormattingEnabled = true;
             this.SearchPrefixListBox.ItemHeight = 17;
-            this.SearchPrefixListBox.Location = new System.Drawing.Point(548, 2);
+            this.SearchPrefixListBox.Location = new System.Drawing.Point(587, 2);
             this.SearchPrefixListBox.Margin = new System.Windows.Forms.Padding(2);
             this.SearchPrefixListBox.Name = "SearchPrefixListBox";
             this.SearchPrefixListBox.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-            this.SearchPrefixListBox.Size = new System.Drawing.Size(181, 149);
+            this.SearchPrefixListBox.Size = new System.Drawing.Size(194, 149);
             this.SearchPrefixListBox.TabIndex = 3;
             this.SearchPrefixListBox.SelectedIndexChanged += new System.EventHandler(this.SearchPrefixListBox_SelectedIndexChanged);
             // 
@@ -898,11 +902,11 @@ namespace AvManager
             this.SearchCategoryListBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.SearchCategoryListBox.FormattingEnabled = true;
             this.SearchCategoryListBox.ItemHeight = 17;
-            this.SearchCategoryListBox.Location = new System.Drawing.Point(366, 2);
+            this.SearchCategoryListBox.Location = new System.Drawing.Point(392, 2);
             this.SearchCategoryListBox.Margin = new System.Windows.Forms.Padding(2);
             this.SearchCategoryListBox.Name = "SearchCategoryListBox";
             this.SearchCategoryListBox.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-            this.SearchCategoryListBox.Size = new System.Drawing.Size(178, 149);
+            this.SearchCategoryListBox.Size = new System.Drawing.Size(191, 149);
             this.SearchCategoryListBox.TabIndex = 2;
             this.SearchCategoryListBox.SelectedIndexChanged += new System.EventHandler(this.SearchCategoryListBox_SelectedIndexChanged);
             // 
@@ -911,11 +915,11 @@ namespace AvManager
             this.SearchActressListBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.SearchActressListBox.FormattingEnabled = true;
             this.SearchActressListBox.ItemHeight = 17;
-            this.SearchActressListBox.Location = new System.Drawing.Point(184, 2);
+            this.SearchActressListBox.Location = new System.Drawing.Point(197, 2);
             this.SearchActressListBox.Margin = new System.Windows.Forms.Padding(2);
             this.SearchActressListBox.Name = "SearchActressListBox";
             this.SearchActressListBox.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-            this.SearchActressListBox.Size = new System.Drawing.Size(178, 149);
+            this.SearchActressListBox.Size = new System.Drawing.Size(191, 149);
             this.SearchActressListBox.TabIndex = 1;
             this.SearchActressListBox.SelectedIndexChanged += new System.EventHandler(this.SearchActressListBox_SelectedIndexChanged);
             // 
@@ -928,7 +932,7 @@ namespace AvManager
             this.SearchPageListBox.Margin = new System.Windows.Forms.Padding(2);
             this.SearchPageListBox.Name = "SearchPageListBox";
             this.SearchPageListBox.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-            this.SearchPageListBox.Size = new System.Drawing.Size(178, 149);
+            this.SearchPageListBox.Size = new System.Drawing.Size(191, 149);
             this.SearchPageListBox.TabIndex = 0;
             this.SearchPageListBox.SelectedIndexChanged += new System.EventHandler(this.SearchPageListBox_SelectedIndexChanged);
             // 
@@ -1050,7 +1054,7 @@ namespace AvManager
             this.PlayFolderTab.Location = new System.Drawing.Point(4, 26);
             this.PlayFolderTab.Margin = new System.Windows.Forms.Padding(2);
             this.PlayFolderTab.Name = "PlayFolderTab";
-            this.PlayFolderTab.Size = new System.Drawing.Size(902, 420);
+            this.PlayFolderTab.Size = new System.Drawing.Size(954, 420);
             this.PlayFolderTab.TabIndex = 5;
             this.PlayFolderTab.Text = "播放文件夹";
             this.PlayFolderTab.UseVisualStyleBackColor = true;
@@ -1068,7 +1072,7 @@ namespace AvManager
             this.PlayFolderListView.Location = new System.Drawing.Point(0, 36);
             this.PlayFolderListView.Margin = new System.Windows.Forms.Padding(2);
             this.PlayFolderListView.Name = "PlayFolderListView";
-            this.PlayFolderListView.Size = new System.Drawing.Size(902, 384);
+            this.PlayFolderListView.Size = new System.Drawing.Size(954, 384);
             this.PlayFolderListView.TabIndex = 1;
             this.PlayFolderListView.UseCompatibleStateImageBehavior = false;
             this.PlayFolderListView.View = System.Windows.Forms.View.Details;
@@ -1104,14 +1108,14 @@ namespace AvManager
             this.PlayFolderUpperPanel.Location = new System.Drawing.Point(0, 0);
             this.PlayFolderUpperPanel.Margin = new System.Windows.Forms.Padding(2);
             this.PlayFolderUpperPanel.Name = "PlayFolderUpperPanel";
-            this.PlayFolderUpperPanel.Size = new System.Drawing.Size(902, 36);
+            this.PlayFolderUpperPanel.Size = new System.Drawing.Size(954, 36);
             this.PlayFolderUpperPanel.TabIndex = 0;
             // 
             // PlayFolderMoveBtn
             // 
             this.PlayFolderMoveBtn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.PlayFolderMoveBtn.Location = new System.Drawing.Point(827, 3);
+            this.PlayFolderMoveBtn.Location = new System.Drawing.Point(879, 3);
             this.PlayFolderMoveBtn.Margin = new System.Windows.Forms.Padding(2);
             this.PlayFolderMoveBtn.Name = "PlayFolderMoveBtn";
             this.PlayFolderMoveBtn.Size = new System.Drawing.Size(71, 30);
@@ -1124,7 +1128,7 @@ namespace AvManager
             // 
             this.PlayFolderBtn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.PlayFolderBtn.Location = new System.Drawing.Point(753, 3);
+            this.PlayFolderBtn.Location = new System.Drawing.Point(805, 3);
             this.PlayFolderBtn.Margin = new System.Windows.Forms.Padding(2);
             this.PlayFolderBtn.Name = "PlayFolderBtn";
             this.PlayFolderBtn.Size = new System.Drawing.Size(71, 30);
@@ -1141,7 +1145,7 @@ namespace AvManager
             this.PlayFolderTxt.Location = new System.Drawing.Point(4, 7);
             this.PlayFolderTxt.Margin = new System.Windows.Forms.Padding(2);
             this.PlayFolderTxt.Name = "PlayFolderTxt";
-            this.PlayFolderTxt.Size = new System.Drawing.Size(748, 23);
+            this.PlayFolderTxt.Size = new System.Drawing.Size(800, 23);
             this.PlayFolderTxt.TabIndex = 0;
             this.PlayFolderTxt.MouseClick += new System.Windows.Forms.MouseEventHandler(this.PlayFolderTxt_MouseClick);
             // 
@@ -1150,7 +1154,7 @@ namespace AvManager
             this.OneOneFive.Location = new System.Drawing.Point(4, 26);
             this.OneOneFive.Margin = new System.Windows.Forms.Padding(2);
             this.OneOneFive.Name = "OneOneFive";
-            this.OneOneFive.Size = new System.Drawing.Size(902, 420);
+            this.OneOneFive.Size = new System.Drawing.Size(954, 420);
             this.OneOneFive.TabIndex = 6;
             this.OneOneFive.Text = "115相关";
             this.OneOneFive.UseVisualStyleBackColor = true;
@@ -1188,6 +1192,8 @@ namespace AvManager
             this.VideoListView.TabIndex = 0;
             this.VideoListView.UseCompatibleStateImageBehavior = false;
             this.VideoListView.SelectedIndexChanged += new System.EventHandler(this.VideoListView_SelectedIndexChanged);
+            this.VideoListView.MouseClick += new System.Windows.Forms.MouseEventHandler(this.VideoListView_MouseClick);
+            this.VideoListView.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.VideoListView_MouseDoubleClick);
             // 
             // ImageList
             // 
@@ -1311,6 +1317,8 @@ namespace AvManager
             // 
             // VideoUpperPanel
             // 
+            this.VideoUpperPanel.Controls.Add(this.VideoPageSizeLable);
+            this.VideoUpperPanel.Controls.Add(this.VideoPageSizeUpDown);
             this.VideoUpperPanel.Controls.Add(this.VideoDirectorLabel);
             this.VideoUpperPanel.Controls.Add(this.VideoPrefixLabel);
             this.VideoUpperPanel.Controls.Add(this.VideoDirectorCombo);
@@ -1326,10 +1334,33 @@ namespace AvManager
             this.VideoUpperPanel.Size = new System.Drawing.Size(954, 40);
             this.VideoUpperPanel.TabIndex = 0;
             // 
+            // VideoPageSizeLable
+            // 
+            this.VideoPageSizeLable.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.VideoPageSizeLable.AutoSize = true;
+            this.VideoPageSizeLable.Location = new System.Drawing.Point(86, 11);
+            this.VideoPageSizeLable.Name = "VideoPageSizeLable";
+            this.VideoPageSizeLable.Size = new System.Drawing.Size(56, 17);
+            this.VideoPageSizeLable.TabIndex = 8;
+            this.VideoPageSizeLable.Text = "页面大小";
+            // 
+            // VideoPageSizeUpDown
+            // 
+            this.VideoPageSizeUpDown.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.VideoPageSizeUpDown.Location = new System.Drawing.Point(151, 8);
+            this.VideoPageSizeUpDown.Name = "VideoPageSizeUpDown";
+            this.VideoPageSizeUpDown.Size = new System.Drawing.Size(45, 23);
+            this.VideoPageSizeUpDown.TabIndex = 7;
+            this.VideoPageSizeUpDown.ValueChanged += new System.EventHandler(this.VideoPageSizeUpDown_ValueChanged);
+            // 
             // VideoDirectorLabel
             // 
+            this.VideoDirectorLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.VideoDirectorLabel.AutoSize = true;
-            this.VideoDirectorLabel.Location = new System.Drawing.Point(625, 11);
+            this.VideoDirectorLabel.Location = new System.Drawing.Point(786, 11);
             this.VideoDirectorLabel.Name = "VideoDirectorLabel";
             this.VideoDirectorLabel.Size = new System.Drawing.Size(32, 17);
             this.VideoDirectorLabel.TabIndex = 4;
@@ -1337,8 +1368,10 @@ namespace AvManager
             // 
             // VideoPrefixLabel
             // 
+            this.VideoPrefixLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.VideoPrefixLabel.AutoSize = true;
-            this.VideoPrefixLabel.Location = new System.Drawing.Point(445, 11);
+            this.VideoPrefixLabel.Location = new System.Drawing.Point(606, 11);
             this.VideoPrefixLabel.Name = "VideoPrefixLabel";
             this.VideoPrefixLabel.Size = new System.Drawing.Size(32, 17);
             this.VideoPrefixLabel.TabIndex = 6;
@@ -1346,11 +1379,13 @@ namespace AvManager
             // 
             // VideoDirectorCombo
             // 
+            this.VideoDirectorCombo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.VideoDirectorCombo.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
             this.VideoDirectorCombo.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             this.VideoDirectorCombo.DisplayMember = "Title";
             this.VideoDirectorCombo.FormattingEnabled = true;
-            this.VideoDirectorCombo.Location = new System.Drawing.Point(665, 8);
+            this.VideoDirectorCombo.Location = new System.Drawing.Point(826, 8);
             this.VideoDirectorCombo.Name = "VideoDirectorCombo";
             this.VideoDirectorCombo.Size = new System.Drawing.Size(121, 25);
             this.VideoDirectorCombo.TabIndex = 3;
@@ -1359,11 +1394,13 @@ namespace AvManager
             // 
             // VideoPrefixCombo
             // 
+            this.VideoPrefixCombo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.VideoPrefixCombo.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
             this.VideoPrefixCombo.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             this.VideoPrefixCombo.DisplayMember = "Title";
             this.VideoPrefixCombo.FormattingEnabled = true;
-            this.VideoPrefixCombo.Location = new System.Drawing.Point(485, 8);
+            this.VideoPrefixCombo.Location = new System.Drawing.Point(646, 8);
             this.VideoPrefixCombo.Name = "VideoPrefixCombo";
             this.VideoPrefixCombo.Size = new System.Drawing.Size(121, 25);
             this.VideoPrefixCombo.TabIndex = 5;
@@ -1372,8 +1409,10 @@ namespace AvManager
             // 
             // VideoCategoryLabel
             // 
+            this.VideoCategoryLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.VideoCategoryLabel.AutoSize = true;
-            this.VideoCategoryLabel.Location = new System.Drawing.Point(267, 11);
+            this.VideoCategoryLabel.Location = new System.Drawing.Point(428, 11);
             this.VideoCategoryLabel.Name = "VideoCategoryLabel";
             this.VideoCategoryLabel.Size = new System.Drawing.Size(32, 17);
             this.VideoCategoryLabel.TabIndex = 4;
@@ -1381,11 +1420,13 @@ namespace AvManager
             // 
             // VideoCategoryCombo
             // 
+            this.VideoCategoryCombo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.VideoCategoryCombo.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
             this.VideoCategoryCombo.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             this.VideoCategoryCombo.DisplayMember = "Title";
             this.VideoCategoryCombo.FormattingEnabled = true;
-            this.VideoCategoryCombo.Location = new System.Drawing.Point(305, 8);
+            this.VideoCategoryCombo.Location = new System.Drawing.Point(466, 8);
             this.VideoCategoryCombo.Name = "VideoCategoryCombo";
             this.VideoCategoryCombo.Size = new System.Drawing.Size(121, 25);
             this.VideoCategoryCombo.TabIndex = 3;
@@ -1394,8 +1435,10 @@ namespace AvManager
             // 
             // VideoActressLabel
             // 
+            this.VideoActressLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.VideoActressLabel.AutoSize = true;
-            this.VideoActressLabel.Location = new System.Drawing.Point(87, 11);
+            this.VideoActressLabel.Location = new System.Drawing.Point(248, 11);
             this.VideoActressLabel.Name = "VideoActressLabel";
             this.VideoActressLabel.Size = new System.Drawing.Size(32, 17);
             this.VideoActressLabel.TabIndex = 2;
@@ -1403,11 +1446,13 @@ namespace AvManager
             // 
             // VideoActressCombo
             // 
+            this.VideoActressCombo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.VideoActressCombo.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
             this.VideoActressCombo.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             this.VideoActressCombo.DisplayMember = "Title";
             this.VideoActressCombo.FormattingEnabled = true;
-            this.VideoActressCombo.Location = new System.Drawing.Point(127, 8);
+            this.VideoActressCombo.Location = new System.Drawing.Point(288, 8);
             this.VideoActressCombo.Name = "VideoActressCombo";
             this.VideoActressCombo.Size = new System.Drawing.Size(121, 25);
             this.VideoActressCombo.TabIndex = 1;
@@ -1416,6 +1461,8 @@ namespace AvManager
             // 
             // VideoOnlyExistCB
             // 
+            this.VideoOnlyExistCB.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
             this.VideoOnlyExistCB.AutoSize = true;
             this.VideoOnlyExistCB.Checked = true;
             this.VideoOnlyExistCB.CheckState = System.Windows.Forms.CheckState.Checked;
@@ -1432,7 +1479,7 @@ namespace AvManager
             this.SettingTab.Location = new System.Drawing.Point(4, 26);
             this.SettingTab.Margin = new System.Windows.Forms.Padding(2);
             this.SettingTab.Name = "SettingTab";
-            this.SettingTab.Size = new System.Drawing.Size(902, 420);
+            this.SettingTab.Size = new System.Drawing.Size(954, 420);
             this.SettingTab.TabIndex = 8;
             this.SettingTab.Text = "设置";
             this.SettingTab.UseVisualStyleBackColor = true;
@@ -1455,7 +1502,7 @@ namespace AvManager
             this.SettingMainPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.SettingMainPanel.Location = new System.Drawing.Point(0, 0);
             this.SettingMainPanel.Name = "SettingMainPanel";
-            this.SettingMainPanel.Size = new System.Drawing.Size(902, 420);
+            this.SettingMainPanel.Size = new System.Drawing.Size(954, 420);
             this.SettingMainPanel.TabIndex = 0;
             // 
             // SettingSaveBarkBtn
@@ -1598,6 +1645,11 @@ namespace AvManager
             this.截图ToolStripMenuItem.Text = "截图";
             this.截图ToolStripMenuItem.Click += new System.EventHandler(this.截图ToolStripMenuItem_Click);
             // 
+            // VideoMenu
+            // 
+            this.VideoMenu.Name = "VideoMenu";
+            this.VideoMenu.Size = new System.Drawing.Size(61, 4);
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
@@ -1661,6 +1713,7 @@ namespace AvManager
             this.VideoBottomPanel.PerformLayout();
             this.VideoUpperPanel.ResumeLayout(false);
             this.VideoUpperPanel.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.VideoPageSizeUpDown)).EndInit();
             this.SettingTab.ResumeLayout(false);
             this.SettingMainPanel.ResumeLayout(false);
             this.SettingMainPanel.PerformLayout();
@@ -1800,6 +1853,9 @@ namespace AvManager
         private System.Windows.Forms.TextBox VideoTotalText;
         private System.Windows.Forms.Label VideoInfoLabel;
         private System.Windows.Forms.Button VideoClearRedisBtn;
+        private System.Windows.Forms.Label VideoPageSizeLable;
+        private System.Windows.Forms.NumericUpDown VideoPageSizeUpDown;
+        private System.Windows.Forms.ContextMenuStrip VideoMenu;
     }
 }
 

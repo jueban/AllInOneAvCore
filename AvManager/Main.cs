@@ -138,6 +138,39 @@ namespace AvManager
                     }
                 }
             }
+
+            //影片库相关
+            if (TabControl.SelectedIndex == 8)
+            {
+                if (VideoListView.SelectedItems.Count > 0 && e.KeyCode == Keys.Space)
+                {
+                    List<MyFileInfo> files = new();
+
+                    foreach (ListViewItem lvi in VideoListView.SelectedItems)
+                    {
+                        var model = ((VideoModel)lvi.Tag);
+
+                        var first = model.FileInfo.FirstOrDefault();
+                        if (first != null && first.IsRemote == false)
+                        {
+                            files.Add(first);
+                        }
+                    }
+
+                    Process.Start(Setting.POTPLAYEREXEFILELOCATION, @"" + LocalService.GeneratePotPlayerPlayList(files.Select(x => x.FullName).ToList(), Setting.POTPLAYERPLAYLISTLOCATION));
+
+                    foreach (var fi in files)
+                    {
+                        SettingService.InsertPlayHistory(new PlayHistory
+                        {
+                            FileName = fi.Name,
+                            LastPlay = DateTime.Now,
+                            PlayTimes = 1,
+                            SetNotPlayed = false
+                        });
+                    }
+                }
+            }
         }
 
         private void TabControl_SelectedIndexChanged(object sender, EventArgs e)
@@ -1425,94 +1458,7 @@ namespace AvManager
         }
         #endregion
 
-        #region 设置
-        private async void SettingCookieCombo_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            Progress<string> progress = new();
-            var setting = await SettingService.GetSetting();
-
-            var enumValue = (JavLibraryGetCookieMode)Enum.Parse(typeof(JavLibraryGetCookieMode), SettingCookieCombo.Text);
-            setting.JavLibrarySettings.CookieMode = enumValue;
-
-            await SettingService.SaveSetting(setting, progress);
-
-            InitSetting();
-        }
-
-        private async void SettingMagnetSiteCombo_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            Progress<string> progress = new();
-            var setting = await SettingService.GetSetting();
-
-            var enumValue = (SearchSeedSiteEnum)Enum.Parse(typeof(SearchSeedSiteEnum), SettingMagnetSiteCombo.Text);
-            setting.MagSearchSite = enumValue;
-
-            await SettingService.SaveSetting(setting, progress);
-
-            InitSetting();
-        }
-
-        private async void SettingSaveFaviBtn_Click(object sender, EventArgs e)
-        {
-            if (!string.IsNullOrEmpty(SettingPreText.Text))
-            {
-                var res = await MagnetUrlService.GetFaviUrl(SettingPreText.Text);
-
-                await MagnetUrlService.SaveFaviUrl(res);
-
-                InitSetting();
-            }
-        }
-
-        private async void SettingSavePrefixBtn_Click(object sender, EventArgs e)
-        {
-            if (!string.IsNullOrEmpty(SettingPreText.Text))
-            {
-                Progress<string> progress = new();
-                var setting = await SettingService.GetSetting();
-
-                setting.Prefix += "," + SettingPreText.Text;
-
-                await SettingService.SaveSetting(setting, progress);
-
-                InitSetting();
-            }
-        }
-
-        private async void SettingSaveBarkBtn_Click(object sender, EventArgs e)
-        {
-            if (!string.IsNullOrEmpty(SettingBarkText.Text))
-            {
-                Progress<string> progress = new();
-                var setting = await SettingService.GetSetting();
-
-                setting.BarkId = SettingBarkText.Text;
-
-                await SettingService.SaveSetting(setting, progress);
-
-                InitSetting();
-            }
-        }
-
-        private async void InitSetting()
-        {
-            var setting = await SettingService.GetSetting();
-
-            SettingPreText.Text = "";
-            SettingFaviText.Text = "";
-
-            SettingCookieCombo.SelectedIndexChanged -= SettingCookieCombo_SelectedIndexChanged;
-            SettingMagnetSiteCombo.SelectedIndexChanged -= SettingMagnetSiteCombo_SelectedIndexChanged;
-
-            SettingCookieCombo.Text = setting.JavLibrarySettings.CookieMode.ToString();
-            SettingMagnetSiteCombo.Text = setting.MagSearchSite.ToString();
-            SettingBarkText.Text = setting.BarkId;
-
-            SettingCookieCombo.SelectedIndexChanged += SettingCookieCombo_SelectedIndexChanged;
-            SettingMagnetSiteCombo.SelectedIndexChanged += SettingMagnetSiteCombo_SelectedIndexChanged;
-        }
-        #endregion
-
+        #region 影片库相关
         private void VideoFirstBtn_Click(object sender, EventArgs e)
         {
             if (int.TryParse(VideoCurrentText.Text, out int current) && int.TryParse(VideoTotalText.Text, out int total))
@@ -1688,6 +1634,186 @@ namespace AvManager
 
                 UpdateVideoCombo = false;
             }
+
+            VideoPageSizeUpDown.Value = VideoPage;
+        }
+
+        private void VideoListView_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right && e.Clicks == 1 && VideoListView.SelectedItems.Count > 0)
+            {
+                GenerateVideoMenu(MousePosition);
+            }
+        }
+
+        private void GenerateVideoMenu(Point mousePosition)
+        {
+            VideoMenu = new ContextMenuStrip();
+
+            if (VideoListView.SelectedItems.Count > 0)
+            {
+                var model = (VideoModel)VideoListView.SelectedItems[0].Tag;
+
+                if (model != null)
+                {
+                    ToolStripItem actressItem = new ToolStripMenuItem("看演员");
+                    ToolStripItem categoryItem = new ToolStripMenuItem("看类型");
+                    ToolStripItem prefixItem = new ToolStripMenuItem("看前缀");
+                    ToolStripItem directorItem = new ToolStripMenuItem("看导演");
+                    ToolStripItem seedItem = new ToolStripMenuItem("搜种子");
+                    //ToolStripItem faviitem = new ToolStripMenuItem("添加收藏");
+                    ToolStripItem openitem = new ToolStripMenuItem("打开网页");
+
+                    var actress = model.AvModel.InfoObj.Where(x => x.Type == CommonModelType.Actress).ToList();
+                    var category = model.AvModel.InfoObj.Where(x => x.Type == CommonModelType.Category).ToList();
+                    var prefix = model.AvModel.Name.Split('-')[0].ToUpper();
+                    var director = model.AvModel.InfoObj.Where(x => x.Type == CommonModelType.Director).ToList();
+
+                    if (actress != null)
+                    {
+                        VideoMenu.Items.Add(actressItem);
+
+                        if (actress.Count > 1)
+                        {
+                            foreach (var act in actress)
+                            {
+                                ToolStripItem temp = new ToolStripMenuItem(act.Name)
+                                {
+                                    Tag = actress.FirstOrDefault()
+                                };
+                                temp.Click += new EventHandler(ChangeActressCombo);
+
+                                ((ToolStripDropDownItem)actressItem).DropDownItems.Add(temp);
+                            }
+                        }
+                        else
+                        {
+                            actressItem.Tag = actress.FirstOrDefault();
+                            actressItem.Click += new EventHandler(ChangeActressCombo);
+                        }
+                    }
+
+                    if (category != null)
+                    {
+                        VideoMenu.Items.Add(categoryItem);
+
+                        if (category.Count > 1)
+                        {
+                            foreach (var act in category)
+                            {
+                                ToolStripItem temp = new ToolStripMenuItem(act.Name)
+                                {
+                                    Tag = category.FirstOrDefault()
+                                };
+                                temp.Click += new EventHandler(ChangeCategoryCombo);
+
+                                ((ToolStripDropDownItem)categoryItem).DropDownItems.Add(temp);
+                            }
+                        }
+                        else
+                        {
+                            categoryItem.Tag = category.FirstOrDefault();
+                            categoryItem.Click += new EventHandler(ChangeCategoryCombo);
+                        }
+                    }
+
+                    if (director != null)
+                    {
+                        VideoMenu.Items.Add(directorItem);
+
+                        if (director.Count > 1)
+                        {
+                            foreach (var act in director)
+                            {
+                                ToolStripItem temp = new ToolStripMenuItem(act.Name)
+                                {
+                                    Tag = director.FirstOrDefault()
+                                };
+                                temp.Click += new EventHandler(ChangeDirectorCombo);
+
+                                ((ToolStripDropDownItem)directorItem).DropDownItems.Add(temp);
+                            }
+                        }
+                        else
+                        {
+                            directorItem.Tag = director.FirstOrDefault();
+                            directorItem.Click += new EventHandler(ChangeDirectorCombo);
+                        }
+                    }
+
+                    if (!string.IsNullOrEmpty(prefix))
+                    {
+                        VideoMenu.Items.Add(prefixItem);
+                        prefixItem.Tag = model.AvModel.AvId.Split('-')[0].ToUpper();
+                        prefixItem.Click += new EventHandler(ChangePrefixCombo);
+                    }
+
+                    VideoMenu.Items.Add(seedItem);
+                    seedItem.Tag = model.AvModel.AvId.ToUpper();
+                    seedItem.Click += new EventHandler(SearchSeedMenu);
+
+                    VideoMenu.Items.Add(openitem);
+                    openitem.Tag = model.AvModel.Url;
+                    openitem.Click += new EventHandler(OpenItemMenu);
+                }
+            }
+
+            VideoMenu.Show(mousePosition.X, mousePosition.Y);
+        }
+
+        private void ChangeActressCombo(object sender, EventArgs e)
+        {
+            var model = (CommonModel)((ToolStripDropDownItem)sender).Tag;
+
+            if (model != null)
+            {
+                VideoActressCombo.SelectedIndex = VideoActressCombo.Items.IndexOf(model.Name);
+            }
+        }
+
+        private void ChangeCategoryCombo(object sender, EventArgs e)
+        {
+            var model = (CommonModel)((ToolStripDropDownItem)sender).Tag;
+
+            if (model != null)
+            {
+                VideoCategoryCombo.SelectedIndex = VideoCategoryCombo.Items.IndexOf(model.Name);
+            }
+        }
+
+        private void ChangePrefixCombo(object sender, EventArgs e)
+        {
+            var model = (CommonModel)((ToolStripDropDownItem)sender).Tag;
+
+            if (model != null)
+            {
+                VideoPrefixCombo.SelectedIndex = VideoPrefixCombo.Items.IndexOf(model.Name);
+            }
+        }
+
+        private void ChangeDirectorCombo(object sender, EventArgs e)
+        {
+            var model = (CommonModel)((ToolStripDropDownItem)sender).Tag;
+
+            if (model != null)
+            {
+                VideoDirectorCombo.SelectedIndex = VideoDirectorCombo.Items.IndexOf(model.Name);
+            }
+        }
+
+        private void SearchSeedMenu(object sender, EventArgs e)
+        {
+
+        }
+
+        private void OpenItemMenu(object sender, EventArgs e)
+        {
+            var model = (string)((ToolStripDropDownItem)sender).Tag;
+
+            if (!string.IsNullOrEmpty(model))
+            {
+                Process.Start(Win32Helper.GetExeLocation("Chrome.exe"), model);
+            }
         }
 
         private async Task<List<VideoModel>> GetVideoModels(int page, int size, bool onlyExists)
@@ -1768,12 +1894,132 @@ namespace AvManager
 
         private void VideoClearRedisBtn_Click(object sender, EventArgs e)
         {
-            if (RedisService.HExists("video", "all"))
-            {
-                RedisService.DeleteHash("video", "all");
-            }
+            var ret = MessageBox.Show("是否要清理Redis缓存，会导致下次加载变慢?", "警告", MessageBoxButtons.YesNo);
 
-            UpdateVideoCombo = true;
+            if (ret == DialogResult.Yes)
+            {
+                if (RedisService.HExists("video", "all"))
+                {
+                    RedisService.DeleteHash("video", "all");
+                }
+
+                UpdateVideoCombo = true;
+            }
         }
+
+        private void VideoPageSizeUpDown_ValueChanged(object sender, EventArgs e)
+        {
+            VideoPage = (int)VideoPageSizeUpDown.Value;
+        }
+
+        private void VideoListView_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            if (VideoListView.SelectedItems.Count > 0)
+            {
+                var file = ((VideoModel)VideoListView.SelectedItems[0].Tag).FileInfo.FirstOrDefault();
+
+                if (file.IsRemote == false)
+                {
+                    Process.Start(Setting.POTPLAYEREXEFILELOCATION, file.FullName);
+
+                    SettingService.InsertPlayHistory(new PlayHistory()
+                    {
+                        FileName = file.Name,
+                        LastPlay = DateTime.Now,
+                        PlayTimes = 1,
+                        SetNotPlayed = false
+                    });
+                }
+            }
+        }
+        #endregion
+
+        #region 设置
+        private async void SettingCookieCombo_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            Progress<string> progress = new();
+            var setting = await SettingService.GetSetting();
+
+            var enumValue = (JavLibraryGetCookieMode)Enum.Parse(typeof(JavLibraryGetCookieMode), SettingCookieCombo.Text);
+            setting.JavLibrarySettings.CookieMode = enumValue;
+
+            await SettingService.SaveSetting(setting, progress);
+
+            InitSetting();
+        }
+
+        private async void SettingMagnetSiteCombo_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            Progress<string> progress = new();
+            var setting = await SettingService.GetSetting();
+
+            var enumValue = (SearchSeedSiteEnum)Enum.Parse(typeof(SearchSeedSiteEnum), SettingMagnetSiteCombo.Text);
+            setting.MagSearchSite = enumValue;
+
+            await SettingService.SaveSetting(setting, progress);
+
+            InitSetting();
+        }
+
+        private async void SettingSaveFaviBtn_Click(object sender, EventArgs e)
+        {
+            if (!string.IsNullOrEmpty(SettingPreText.Text))
+            {
+                var res = await MagnetUrlService.GetFaviUrl(SettingPreText.Text);
+
+                await MagnetUrlService.SaveFaviUrl(res);
+
+                InitSetting();
+            }
+        }
+
+        private async void SettingSavePrefixBtn_Click(object sender, EventArgs e)
+        {
+            if (!string.IsNullOrEmpty(SettingPreText.Text))
+            {
+                Progress<string> progress = new();
+                var setting = await SettingService.GetSetting();
+
+                setting.Prefix += "," + SettingPreText.Text;
+
+                await SettingService.SaveSetting(setting, progress);
+
+                InitSetting();
+            }
+        }
+
+        private async void SettingSaveBarkBtn_Click(object sender, EventArgs e)
+        {
+            if (!string.IsNullOrEmpty(SettingBarkText.Text))
+            {
+                Progress<string> progress = new();
+                var setting = await SettingService.GetSetting();
+
+                setting.BarkId = SettingBarkText.Text;
+
+                await SettingService.SaveSetting(setting, progress);
+
+                InitSetting();
+            }
+        }
+
+        private async void InitSetting()
+        {
+            var setting = await SettingService.GetSetting();
+
+            SettingPreText.Text = "";
+            SettingFaviText.Text = "";
+
+            SettingCookieCombo.SelectedIndexChanged -= SettingCookieCombo_SelectedIndexChanged;
+            SettingMagnetSiteCombo.SelectedIndexChanged -= SettingMagnetSiteCombo_SelectedIndexChanged;
+
+            SettingCookieCombo.Text = setting.JavLibrarySettings.CookieMode.ToString();
+            SettingMagnetSiteCombo.Text = setting.MagSearchSite.ToString();
+            SettingBarkText.Text = setting.BarkId;
+
+            SettingCookieCombo.SelectedIndexChanged += SettingCookieCombo_SelectedIndexChanged;
+            SettingMagnetSiteCombo.SelectedIndexChanged += SettingMagnetSiteCombo_SelectedIndexChanged;
+        }
+        #endregion
     }
 }
