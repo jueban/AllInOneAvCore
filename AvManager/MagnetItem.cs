@@ -36,18 +36,24 @@ namespace AvManager
             MagnetItemListBox.ValueMember = "Tag";
 
             MagnetItemPicBox.SizeMode = PictureBoxSizeMode.StretchImage;
-            //MagnetItemPicBox.Image = Image.FromFile(model.AvModel.LocalPic);
 
-            using (HttpClient c = new HttpClient())
+            if (File.Exists(model.AvModel.LocalPic))
             {
-                try
+                MagnetItemPicBox.Image = Image.FromFile(model.AvModel.LocalPic);
+            }
+            else
+            {
+                using (HttpClient c = new HttpClient())
                 {
-                    using Stream s = await c.GetStreamAsync(model.AvModel.PicUrl);
-                    MagnetItemPicBox.Image = Image.FromStream(s);
-                }
-                catch
-                { 
-                    
+                    try
+                    {
+                        using Stream s = await c.GetStreamAsync(model.AvModel.PicUrl);
+                        MagnetItemPicBox.Image = Image.FromStream(s);
+                    }
+                    catch
+                    {
+
+                    }
                 }
             }
 
@@ -86,8 +92,8 @@ namespace AvManager
             {
                 ListBoxItem item = new ListBoxItem
                 {
-                    Title = res.MagSizeStr + " " + res.Title,
-                    Tag = res
+                    Title = $"[{res.MagSizeStr}]  {res.Title}",
+                    Tag = res,
                 };
 
                 MagnetItemListBox.Items.Add(item);

@@ -41,7 +41,7 @@ namespace AvManager
             InitializeComponent();
         }
 
-        private void Main_KeyDown(object sender, KeyEventArgs e)
+        private async void Main_KeyDown(object sender, KeyEventArgs e)
         {
             //准备合并页面
             if (TabControl.SelectedIndex == 2)
@@ -145,19 +145,39 @@ namespace AvManager
                 if (VideoListView.SelectedItems.Count > 0 && e.KeyCode == Keys.Space)
                 {
                     List<MyFileInfo> files = new();
+                    StringBuilder sb = new();
 
                     foreach (ListViewItem lvi in VideoListView.SelectedItems)
                     {
                         var model = ((VideoModel)lvi.Tag);
 
                         var first = model.FileInfo.FirstOrDefault();
-                        if (first != null && first.IsRemote == false)
+                        if (first != null && VideoOnlyExistCB.Checked)
                         {
                             files.Add(first);
                         }
+
+                        if (first != null && !VideoOnlyExistCB.Checked)
+                        {
+                            try
+                            {
+                                sb.AppendLine(await OneOneFiveService.GetM3U8(first.FullName));
+                            }
+                            catch
+                            { 
+                                
+                            }
+                        }
                     }
 
-                    Process.Start(Setting.POTPLAYEREXEFILELOCATION, @"" + LocalService.GeneratePotPlayerPlayList(files.Select(x => x.FullName).ToList(), Setting.POTPLAYERPLAYLISTLOCATION));
+                    if (VideoOnlyExistCB.Checked)
+                    {
+                        Process.Start(Setting.POTPLAYEREXEFILELOCATION, @"" + LocalService.GeneratePotPlayerPlayList(files.Select(x => x.FullName).ToList(), Setting.POTPLAYERPLAYLISTLOCATION));
+                    }
+                    else
+                    {
+                        Process.Start(Setting.POTPLAYEREXEFILELOCATION, sb.ToString());
+                    }
 
                     foreach (var fi in files)
                     {
@@ -1831,40 +1851,38 @@ namespace AvManager
             progress.ProgressChanged += VideoPbUpdate;
 
             List<VideoModel> ret = new();
-            if (onlyExists)
+
+            CommonModelType modelType = CommonModelType.None;
+            var modelName = "";
+
+            if (VideoActressCombo.SelectedIndex > 0)
             {
-                CommonModelType modelType = CommonModelType.None;
-                var modelName = "";
-
-                if (VideoActressCombo.SelectedIndex > 0)
-                {
-                    modelType = CommonModelType.Actress;
-                    modelName = (string)VideoActressCombo.SelectedItem;
-                }
-
-                if (VideoCategoryCombo.SelectedIndex > 0)
-                {
-                    modelType = CommonModelType.Category;
-                    modelName = (string)VideoCategoryCombo.SelectedItem;
-                }
-
-                if (VideoPrefixCombo.SelectedIndex > 0)
-                {
-                    modelType = CommonModelType.Prefix;
-                    modelName = (string)VideoPrefixCombo.SelectedItem;
-                }
-
-                if (VideoDirectorCombo.SelectedIndex > 0)
-                {
-                    modelType = CommonModelType.Director;
-                    modelName = (string)VideoDirectorCombo.SelectedItem;
-                }
-
-                var res = await LocalService.GetVideoModel(onlyExists, page, size, modelType, modelName, progress);
-                ret = res.Item1;
-
-                UpdateVideoUINumber(page, res.Item2);
+                modelType = CommonModelType.Actress;
+                modelName = (string)VideoActressCombo.SelectedItem;
             }
+
+            if (VideoCategoryCombo.SelectedIndex > 0)
+            {
+                modelType = CommonModelType.Category;
+                modelName = (string)VideoCategoryCombo.SelectedItem;
+            }
+
+            if (VideoPrefixCombo.SelectedIndex > 0)
+            {
+                modelType = CommonModelType.Prefix;
+                modelName = (string)VideoPrefixCombo.SelectedItem;
+            }
+
+            if (VideoDirectorCombo.SelectedIndex > 0)
+            {
+                modelType = CommonModelType.Director;
+                modelName = (string)VideoDirectorCombo.SelectedItem;
+            }
+
+            var res = await LocalService.GetVideoModel(onlyExists, page, size, modelType, modelName, progress);
+            ret = res.Item1;
+
+            UpdateVideoUINumber(page, res.Item2);
 
             return ret;
         }
@@ -1886,9 +1904,24 @@ namespace AvManager
                 {
                     ImageList.Images.Add(video.AvModel.Id + "", Image.FromFile(img));
                 }
+                else
+                {
+                    using (HttpClient c = new HttpClient())
+                    {
+                        try
+                        {
+                            using Stream s = await c.GetStreamAsync(video.AvModel.PicUrl);
+                            ImageList.Images.Add(Image.FromStream(s));
+                        }
+                        catch
+                        {
+
+                        }
+                    }
+                }
 
                 var sizeStr = (video.FileInfo != null && video.FileInfo.Any()) ? $"[{video.FileInfo[0].LengthStr}] " : "";
-                ListViewItem lvi = new(sizeStr + video.AvModel.Name);
+                ListViewItem lvi = new(sizeStr + video.AvModel.AvId + "-" + video.AvModel.Name);
                 lvi.Tag = video;
                 lvi.ImageIndex = ImageList.Images.IndexOfKey(video.AvModel.Id + "");
 
@@ -1910,9 +1943,14 @@ namespace AvManager
 
             if (ret == DialogResult.Yes)
             {
-                if (RedisService.HExists("video", "all"))
+                if (RedisService.HExists("video", "alllocal"))
                 {
-                    RedisService.DeleteHash("video", "all");
+                    RedisService.DeleteHash("video", "alllocal");
+                }
+
+                if (RedisService.HExists("video", "allremote"))
+                {
+                    RedisService.DeleteHash("video", "allremote");
                 }
 
                 UpdateVideoCombo = true;
@@ -1924,7 +1962,7 @@ namespace AvManager
             VideoPage = (int)VideoPageSizeUpDown.Value;
         }
 
-        private void VideoListView_MouseDoubleClick(object sender, MouseEventArgs e)
+        private async void VideoListView_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             if (VideoListView.SelectedItems.Count > 0)
             {
@@ -1941,6 +1979,19 @@ namespace AvManager
                         PlayTimes = 1,
                         SetNotPlayed = false
                     });
+                }
+                else
+                {
+                    try
+                    {
+                        var m3u8 = await OneOneFiveService.GetM3U8(file.FullName);
+
+                        Process.Start(Setting.POTPLAYEREXEFILELOCATION, m3u8);
+                    }
+                    catch
+                    { 
+                        
+                    }
                 }
             }
         }
