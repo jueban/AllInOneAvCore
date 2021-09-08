@@ -26,12 +26,14 @@ public class CommonModel
 
 public enum CommonModelType
 {
+    None = 0,
     Category = 1,
     Actress = 2,
     Director = 3,
     Publisher = 4,
     Company = 5,
     Series = 6,
+    Prefix = 7
 }
 
 public class AvModel

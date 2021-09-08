@@ -11,6 +11,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -29,6 +30,8 @@ namespace AvManager
         private CancellationTokenSource CombinePrepareCts = new();
         private bool OnlyCancelCurrentCombineTask = false;
         private bool IsManualChangeSearchListBox = true;
+        private bool UpdateVideoCombo = true;
+        public int VideoPage = 50;
         #endregion
 
         #region 全局
@@ -155,6 +158,12 @@ namespace AvManager
             if (TabControl.SelectedIndex == 9)
             {
                 InitSetting();
+            }
+
+            //影片库相关
+            if (TabControl.SelectedIndex == 8)
+            {
+                InitVideo();
             }
         }
 
@@ -1503,5 +1512,268 @@ namespace AvManager
             SettingMagnetSiteCombo.SelectedIndexChanged += SettingMagnetSiteCombo_SelectedIndexChanged;
         }
         #endregion
+
+        private void VideoFirstBtn_Click(object sender, EventArgs e)
+        {
+            if (int.TryParse(VideoCurrentText.Text, out int current) && int.TryParse(VideoTotalText.Text, out int total))
+            {
+                if (total > 0)
+                {
+                    VideoCurrentText.Text = 1 + "";
+                }
+            }
+        }
+
+        private void VideoPreBtn_Click(object sender, EventArgs e)
+        {
+            if (int.TryParse(VideoCurrentText.Text, out int current) && int.TryParse(VideoTotalText.Text, out int total))
+            {
+                if (current - 1 >= 1)
+                {
+                    VideoCurrentText.Text = (current - 1) + "";
+                }
+            }
+        }
+
+        private async void VideoCurrentText_TextChanged(object sender, EventArgs e)
+        {
+            if (int.TryParse(VideoCurrentText.Text, out int current) && int.TryParse(VideoTotalText.Text, out int total))
+            {
+                if (current >= 1 && current <= total)
+                {
+                    ShowVideos(await GetVideoModels(current, VideoPage, VideoOnlyExistCB.Checked));
+                }
+            }
+        }
+
+        private void VideoNextBtn_Click(object sender, EventArgs e)
+        {
+            if (int.TryParse(VideoCurrentText.Text, out int current) && int.TryParse(VideoTotalText.Text, out int total))
+            {
+                if (current + 1 <= total)
+                {
+                    VideoCurrentText.Text = (current + 1) + "";
+                }
+            }
+        }
+
+        private void VideoLastBtn_Click(object sender, EventArgs e)
+        {
+            if (int.TryParse(VideoCurrentText.Text, out int current) && int.TryParse(VideoTotalText.Text, out int total))
+            {
+                if (total > 0)
+                {
+                    VideoCurrentText.Text = total + "";
+                }
+            }
+        }
+
+        private async void VideoActressCombo_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            VideoCategoryCombo.SelectedIndexChanged -= VideoCategoryCombo_SelectedIndexChanged;
+            VideoPrefixCombo.SelectedIndexChanged -= VideoPrefixCombo_SelectedIndexChanged;
+            VideoDirectorCombo.SelectedIndexChanged -= VideoDirectorCombo_SelectedIndexChanged;
+
+            VideoCategoryCombo.SelectedIndex = 0;
+            VideoPrefixCombo.SelectedIndex = 0;
+            VideoDirectorCombo.SelectedIndex = 0;
+
+            ShowVideos(await GetVideoModels(1, VideoPage, VideoOnlyExistCB.Checked));
+
+            VideoCategoryCombo.SelectedIndexChanged += VideoCategoryCombo_SelectedIndexChanged;
+            VideoPrefixCombo.SelectedIndexChanged += VideoPrefixCombo_SelectedIndexChanged;
+            VideoDirectorCombo.SelectedIndexChanged += VideoDirectorCombo_SelectedIndexChanged;
+        }
+
+        private async void VideoCategoryCombo_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            VideoActressCombo.SelectedIndexChanged -= VideoActressCombo_SelectedIndexChanged;
+            VideoPrefixCombo.SelectedIndexChanged -= VideoPrefixCombo_SelectedIndexChanged;
+            VideoDirectorCombo.SelectedIndexChanged -= VideoDirectorCombo_SelectedIndexChanged;
+
+            VideoActressCombo.SelectedIndex = 0;
+            VideoPrefixCombo.SelectedIndex = 0;
+            VideoDirectorCombo.SelectedIndex = 0;
+
+            ShowVideos(await GetVideoModels(1, VideoPage, VideoOnlyExistCB.Checked));
+
+            VideoActressCombo.SelectedIndexChanged += VideoActressCombo_SelectedIndexChanged;
+            VideoPrefixCombo.SelectedIndexChanged += VideoPrefixCombo_SelectedIndexChanged;
+            VideoDirectorCombo.SelectedIndexChanged += VideoDirectorCombo_SelectedIndexChanged;
+        }
+
+        private async void VideoPrefixCombo_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            VideoCategoryCombo.SelectedIndexChanged -= VideoCategoryCombo_SelectedIndexChanged;
+            VideoActressCombo.SelectedIndexChanged -= VideoActressCombo_SelectedIndexChanged;
+            VideoDirectorCombo.SelectedIndexChanged -= VideoDirectorCombo_SelectedIndexChanged;
+
+            VideoCategoryCombo.SelectedIndex = 0;
+            VideoActressCombo.SelectedIndex = 0;
+            VideoDirectorCombo.SelectedIndex = 0;
+
+            ShowVideos(await GetVideoModels(1, VideoPage, VideoOnlyExistCB.Checked));
+
+            VideoCategoryCombo.SelectedIndexChanged += VideoCategoryCombo_SelectedIndexChanged;
+            VideoActressCombo.SelectedIndexChanged += VideoActressCombo_SelectedIndexChanged;
+            VideoDirectorCombo.SelectedIndexChanged += VideoDirectorCombo_SelectedIndexChanged;
+        }
+
+        private async void VideoDirectorCombo_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            VideoCategoryCombo.SelectedIndexChanged -= VideoCategoryCombo_SelectedIndexChanged;
+            VideoPrefixCombo.SelectedIndexChanged -= VideoPrefixCombo_SelectedIndexChanged;
+            VideoActressCombo.SelectedIndexChanged -= VideoActressCombo_SelectedIndexChanged;
+
+            VideoCategoryCombo.SelectedIndex = 0;
+            VideoPrefixCombo.SelectedIndex = 0;
+            VideoActressCombo.SelectedIndex = 0;
+
+            ShowVideos(await GetVideoModels(1, VideoPage, VideoOnlyExistCB.Checked));
+
+            VideoCategoryCombo.SelectedIndexChanged += VideoCategoryCombo_SelectedIndexChanged;
+            VideoPrefixCombo.SelectedIndexChanged += VideoPrefixCombo_SelectedIndexChanged;
+            VideoActressCombo.SelectedIndexChanged += VideoActressCombo_SelectedIndexChanged;
+        }
+
+        private void VideoListView_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private async void InitVideo()
+        {
+            if (UpdateVideoCombo)
+            {
+                var business = new JavLibraryDAL();
+                var setting = await SettingService.GetSetting();
+
+                VideoListView.Items.Clear();
+                VideoInfoLabel.Text = "";
+                VideoTotalText.Text = 0 + "";
+                VideoCurrentText.Text = 0 + "";
+                VideoOnlyExistCB.Checked = true;
+
+                var actress = await business.GetCommonJavLibraryModelByType(CommonModelType.Actress);
+                var category = await business.GetCommonJavLibraryModelByType(CommonModelType.Category);
+                var prefix = setting.Prefix.Split(',').ToList();
+                var director = await business.GetCommonJavLibraryModelByType(CommonModelType.Director);
+
+                var actressDS = actress.Select(x => x.Name).ToList();
+                actressDS.Insert(0, "全部");
+
+                var categoryDS = category.Select(x => x.Name).ToList();
+                categoryDS.Insert(0, "全部");
+
+                var prefixDS = prefix;
+                prefixDS.Insert(0, "全部");
+
+                var directorDS = director.Select(x => x.Name).ToList();
+                directorDS.Insert(0, "全部");
+
+                VideoActressCombo.SelectedIndexChanged -= VideoActressCombo_SelectedIndexChanged;
+                VideoCategoryCombo.SelectedIndexChanged -= VideoCategoryCombo_SelectedIndexChanged;
+                VideoPrefixCombo.SelectedIndexChanged -= VideoPrefixCombo_SelectedIndexChanged;
+                VideoDirectorCombo.SelectedIndexChanged -= VideoDirectorCombo_SelectedIndexChanged;
+
+                VideoActressCombo.DataSource = actressDS;
+                VideoCategoryCombo.DataSource = categoryDS;
+                VideoPrefixCombo.DataSource = prefixDS;
+                VideoDirectorCombo.DataSource = directorDS;
+
+                VideoActressCombo.SelectedIndexChanged += VideoActressCombo_SelectedIndexChanged;
+                VideoCategoryCombo.SelectedIndexChanged += VideoCategoryCombo_SelectedIndexChanged;
+                VideoPrefixCombo.SelectedIndexChanged += VideoPrefixCombo_SelectedIndexChanged;
+                VideoDirectorCombo.SelectedIndexChanged += VideoDirectorCombo_SelectedIndexChanged;
+
+                UpdateVideoCombo = false;
+            }
+        }
+
+        private async Task<List<VideoModel>> GetVideoModels(int page, int size, bool onlyExists)
+        {
+            List<VideoModel> ret = new();
+            if (onlyExists)
+            {
+                CommonModelType modelType = CommonModelType.None;
+                var modelName = "";
+
+                if (VideoActressCombo.SelectedIndex > 0)
+                {
+                    modelType = CommonModelType.Actress;
+                    modelName = (string)VideoActressCombo.SelectedItem;
+                }
+
+                if (VideoCategoryCombo.SelectedIndex > 0)
+                {
+                    modelType = CommonModelType.Category;
+                    modelName = (string)VideoCategoryCombo.SelectedItem;
+                }
+
+                if (VideoPrefixCombo.SelectedIndex > 0)
+                {
+                    modelType = CommonModelType.Prefix;
+                    modelName = (string)VideoPrefixCombo.SelectedItem;
+                }
+
+                if (VideoDirectorCombo.SelectedIndex > 0)
+                {
+                    modelType = CommonModelType.Director;
+                    modelName = (string)VideoDirectorCombo.SelectedItem;
+                }
+
+                var res = await LocalService.GetVideoModel(onlyExists, page, size, modelType, modelName);
+                ret = res.Item1;
+
+                UpdateVideoUINumber(page, res.Item2);
+            }
+
+            return ret;
+        }
+
+        private async void ShowVideos(List<VideoModel> videos)
+        {
+            ImageList.Images.Clear();
+            VideoListView.Items.Clear();
+
+            VideoListView.BeginUpdate();
+
+            var setting = await SettingService.GetSetting();
+
+            foreach (var video in videos)
+            {
+                var img = setting.JavLibraryImageFolder + video.AvModel.AvId + "-" + video.AvModel.Name + ".jpg";
+
+                if (File.Exists(img))
+                {
+                    ImageList.Images.Add(video.AvModel.Id + "", Image.FromFile(img));
+                }
+
+                var sizeStr = (video.FileInfo != null && video.FileInfo.Any()) ? $"[{video.FileInfo[0].LengthStr}] " : "";
+                ListViewItem lvi = new(sizeStr + video.AvModel.Name);
+                lvi.Tag = video;
+                lvi.ImageIndex = ImageList.Images.IndexOfKey(video.AvModel.Id + "");
+
+                VideoListView.Items.Add(lvi);
+            }
+
+            VideoListView.EndUpdate();
+        }
+
+        private void UpdateVideoUINumber(int current, int total)
+        {
+            VideoCurrentText.Text = current + "";
+            VideoTotalText.Text = total + "";
+        }
+
+        private void VideoClearRedisBtn_Click(object sender, EventArgs e)
+        {
+            if (RedisService.HExists("video", "all"))
+            {
+                RedisService.DeleteHash("video", "all");
+            }
+
+            UpdateVideoCombo = true;
+        }
     }
 }

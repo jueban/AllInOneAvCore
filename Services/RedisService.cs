@@ -132,5 +132,33 @@ namespace Services
                 return result;
             }
         }
+
+        public static bool HExists(string key, string field)
+        {
+            bool result = false;
+            try
+            {
+                result = GetClient().HExists(key, field);
+                return result;
+            }
+            catch (Exception e)
+            {
+                return result;
+            }
+        }
+
+        public static bool SetExpire(string key, int seconds)
+        {
+            bool result = false;
+            try
+            {
+                result = GetClient().Expire(key, seconds);
+                return result;
+            }
+            catch (Exception e)
+            {
+                return result;
+            }
+        }
     }
 }

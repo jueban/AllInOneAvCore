@@ -41,6 +41,7 @@ namespace Models
         public string NewFullName { get; set; }
         public bool ChangeName { get; set; }
         public bool IsDelete { get; set; }
+        public bool IsRemote { get; set; }
     }
 
     public class MyDirectoryInfo

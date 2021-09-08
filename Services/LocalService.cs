@@ -1,5 +1,6 @@
 ﻿using DAL;
 using Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -1196,6 +1197,78 @@ namespace Services
             }
 
             return folder + fileName;
+        }
+
+        public static async Task<List<VideoModel>> GetVideoModelAllFromRedis()
+        {
+            List<VideoModel> ret = new List<VideoModel>();
+
+            if (RedisService.HExists("video", "all"))
+            {
+                ret = JsonConvert.DeserializeObject<List<VideoModel>>(RedisService.GetHash("video", "all"));
+            }
+            else
+            {
+                var files = await GetAllLocalMyFile();
+                var avs = await new JavLibraryDAL().GetAvModelByWhere("");
+
+                foreach (var file in files)
+                {
+                    VideoModel temp = new();
+                    temp.FileInfo = new List<MyFileInfo>() { file };
+
+                    if (file.Name.Split('-').Length >= 3)
+                    {
+                        var avid = file.Name.Split('-')[0] + "-" + file.Name.Split('-')[1];
+                        var name = file.Name.Replace(avid + "-", "").Replace("-C", "").Replace(file.Extension, "");
+
+                        var model = avs.FirstOrDefault(x => x.AvId.Equals(avid, StringComparison.OrdinalIgnoreCase) && x.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+
+                        if (model != null)
+                        {
+                            temp.AvModel = model;
+
+                            ret.Add(temp);
+                        }
+                    }
+                }
+
+                RedisService.SetHash("video", "all", JsonConvert.SerializeObject(ret));
+                RedisService.SetExpire("video", 60 * 30);
+            }
+
+            return ret;
+        }
+
+        public static async Task<(List<VideoModel>, int)> GetVideoModel(bool onlyExists, int page, int size, CommonModelType type, string modelName)
+        {
+            (List<VideoModel>, int) ret = new();
+            List<VideoModel> list = new();
+            int count = 0;
+
+            if (onlyExists)
+            {
+                var files = await GetVideoModelAllFromRedis();
+
+                if (files != null && files.Any())
+                {
+                    files = files.OrderByDescending(x => x.FileInfo.FirstOrDefault().CreateDate).ToList();
+
+                    if (type != CommonModelType.None)
+                    {
+                        files = files.Where(x => x.AvModel.InfoObj.Exists(y => y.Type == type && y.Name == modelName)).ToList();
+                    }
+
+                    count = files.Count;
+
+                    list = files = files.Skip((page - 1) * size).Take(size).ToList();
+                }
+            }
+
+            ret.Item1 = list;
+            ret.Item2 = count % size == 0 ? count / size : count / size + 1;
+
+            return ret;
         }
     }
 }
