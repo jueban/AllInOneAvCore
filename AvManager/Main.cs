@@ -1595,7 +1595,6 @@ namespace AvManager
                 var setting = await SettingService.GetSetting();
 
                 VideoListView.Items.Clear();
-                VideoInfoLabel.Text = "";
                 VideoTotalText.Text = 0 + "";
                 VideoCurrentText.Text = 0 + "";
                 VideoOnlyExistCB.Checked = true;
@@ -1622,10 +1621,20 @@ namespace AvManager
                 VideoPrefixCombo.SelectedIndexChanged -= VideoPrefixCombo_SelectedIndexChanged;
                 VideoDirectorCombo.SelectedIndexChanged -= VideoDirectorCombo_SelectedIndexChanged;
 
+                VideoActressCombo.BeginUpdate();
+                VideoCategoryCombo.BeginUpdate();
+                VideoPrefixCombo.BeginUpdate();
+                VideoDirectorCombo.BeginUpdate();
+
                 VideoActressCombo.DataSource = actressDS;
                 VideoCategoryCombo.DataSource = categoryDS;
                 VideoPrefixCombo.DataSource = prefixDS;
                 VideoDirectorCombo.DataSource = directorDS;
+
+                VideoActressCombo.EndUpdate();
+                VideoCategoryCombo.EndUpdate();
+                VideoPrefixCombo.EndUpdate();
+                VideoDirectorCombo.EndUpdate();
 
                 VideoActressCombo.SelectedIndexChanged += VideoActressCombo_SelectedIndexChanged;
                 VideoCategoryCombo.SelectedIndexChanged += VideoCategoryCombo_SelectedIndexChanged;
@@ -1818,6 +1827,9 @@ namespace AvManager
 
         private async Task<List<VideoModel>> GetVideoModels(int page, int size, bool onlyExists)
         {
+            Progress<(int, int)> progress = new();
+            progress.ProgressChanged += VideoPbUpdate;
+
             List<VideoModel> ret = new();
             if (onlyExists)
             {
@@ -1848,7 +1860,7 @@ namespace AvManager
                     modelName = (string)VideoDirectorCombo.SelectedItem;
                 }
 
-                var res = await LocalService.GetVideoModel(onlyExists, page, size, modelType, modelName);
+                var res = await LocalService.GetVideoModel(onlyExists, page, size, modelType, modelName, progress);
                 ret = res.Item1;
 
                 UpdateVideoUINumber(page, res.Item2);
@@ -1931,6 +1943,12 @@ namespace AvManager
                     });
                 }
             }
+        }
+
+        private void VideoPbUpdate(object sender, (int, int) e)
+        {
+            VideoProgressBar.Maximum = e.Item2;
+            JDuBar(VideoProgressBar, e.Item1);
         }
         #endregion
 

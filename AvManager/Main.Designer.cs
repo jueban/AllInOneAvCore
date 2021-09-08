@@ -123,7 +123,6 @@ namespace AvManager
             this.ImageList = new System.Windows.Forms.ImageList(this.components);
             this.VideoBottomPanel = new System.Windows.Forms.Panel();
             this.VideoClearRedisBtn = new System.Windows.Forms.Button();
-            this.VideoInfoLabel = new System.Windows.Forms.Label();
             this.VideoTotalText = new System.Windows.Forms.TextBox();
             this.VideoPageSep = new System.Windows.Forms.Label();
             this.VideoCurrentText = new System.Windows.Forms.TextBox();
@@ -163,6 +162,7 @@ namespace AvManager
             this.CombinePrepareTreeNodeMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.截图ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.VideoMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.VideoProgressBar = new System.Windows.Forms.ProgressBar();
             this.NotifyIconExitMenu.SuspendLayout();
             this.MainPanel.SuspendLayout();
             this.TabControl.SuspendLayout();
@@ -1203,8 +1203,8 @@ namespace AvManager
             // 
             // VideoBottomPanel
             // 
+            this.VideoBottomPanel.Controls.Add(this.VideoProgressBar);
             this.VideoBottomPanel.Controls.Add(this.VideoClearRedisBtn);
-            this.VideoBottomPanel.Controls.Add(this.VideoInfoLabel);
             this.VideoBottomPanel.Controls.Add(this.VideoTotalText);
             this.VideoBottomPanel.Controls.Add(this.VideoPageSep);
             this.VideoBottomPanel.Controls.Add(this.VideoCurrentText);
@@ -1227,14 +1227,6 @@ namespace AvManager
             this.VideoClearRedisBtn.Text = "清缓存";
             this.VideoClearRedisBtn.UseVisualStyleBackColor = true;
             this.VideoClearRedisBtn.Click += new System.EventHandler(this.VideoClearRedisBtn_Click);
-            // 
-            // VideoInfoLabel
-            // 
-            this.VideoInfoLabel.AutoSize = true;
-            this.VideoInfoLabel.Location = new System.Drawing.Point(9, 9);
-            this.VideoInfoLabel.Name = "VideoInfoLabel";
-            this.VideoInfoLabel.Size = new System.Drawing.Size(0, 17);
-            this.VideoInfoLabel.TabIndex = 7;
             // 
             // VideoTotalText
             // 
@@ -1650,6 +1642,16 @@ namespace AvManager
             this.VideoMenu.Name = "VideoMenu";
             this.VideoMenu.Size = new System.Drawing.Size(61, 4);
             // 
+            // VideoProgressBar
+            // 
+            this.VideoProgressBar.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.VideoProgressBar.Location = new System.Drawing.Point(5, 6);
+            this.VideoProgressBar.Name = "VideoProgressBar";
+            this.VideoProgressBar.Size = new System.Drawing.Size(614, 23);
+            this.VideoProgressBar.TabIndex = 9;
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
@@ -1851,11 +1853,11 @@ namespace AvManager
         private System.Windows.Forms.TextBox VideoCurrentText;
         private System.Windows.Forms.Label VideoPageSep;
         private System.Windows.Forms.TextBox VideoTotalText;
-        private System.Windows.Forms.Label VideoInfoLabel;
         private System.Windows.Forms.Button VideoClearRedisBtn;
         private System.Windows.Forms.Label VideoPageSizeLable;
         private System.Windows.Forms.NumericUpDown VideoPageSizeUpDown;
         private System.Windows.Forms.ContextMenuStrip VideoMenu;
+        private System.Windows.Forms.ProgressBar VideoProgressBar;
     }
 }
 

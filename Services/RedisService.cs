@@ -41,6 +41,19 @@ namespace Services
             }
         }
 
+        public async static Task<bool> SetHashAsync(string key, string field, string value)
+        {
+            try
+            {
+                await GetClient().HSetAsync(key, field, value);
+                return true;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+        }
+
         /// <summary>
         /// 设置hash值
         /// </summary>
@@ -86,6 +99,21 @@ namespace Services
             {
 
                 result = GetClient().HGet(key, field);
+                return result;
+            }
+            catch (Exception e)
+            {
+                return result;
+            }
+        }
+
+        public async static Task<string> GetHashAsync(string key, string field)
+        {
+            string result = "";
+            try
+            {
+
+                result = await GetClient().HGetAsync(key, field);
                 return result;
             }
             catch (Exception e)

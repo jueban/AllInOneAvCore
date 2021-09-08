@@ -1199,18 +1199,25 @@ namespace Services
             return folder + fileName;
         }
 
-        public static async Task<List<VideoModel>> GetVideoModelAllFromRedis()
+        public static async Task<List<VideoModel>> GetVideoModelAllFromRedis(IProgress<(int, int)> progress)
         {
             List<VideoModel> ret = new();
 
             if (RedisService.HExists("video", "all"))
             {
-                ret = JsonConvert.DeserializeObject<List<VideoModel>>(RedisService.GetHash("video", "all"));
+                ret = JsonConvert.DeserializeObject<List<VideoModel>>(await RedisService.GetHashAsync("video", "all"));
+
+                progress.Report((100, 100));
             }
             else
             {
                 var files = await GetAllLocalMyFile();
+
+                progress.Report((0, files.Count));
+
                 var avs = await new JavLibraryDAL().GetAvModelByWhere("");
+
+                int index = 1;
 
                 foreach (var file in files)
                 {
@@ -1231,16 +1238,18 @@ namespace Services
                             ret.Add(temp);
                         }
                     }
+
+                    progress.Report((index++, files.Count));
                 }
 
-                RedisService.SetHash("video", "all", JsonConvert.SerializeObject(ret));
-                RedisService.SetExpire("video", 60 * 30);
+                await RedisService.SetHashAsync("video", "all", JsonConvert.SerializeObject(ret));
+                RedisService.SetExpire("video", 60 * 300);
             }
 
             return ret;
         }
 
-        public static async Task<(List<VideoModel>, int)> GetVideoModel(bool onlyExists, int page, int size, CommonModelType type, string modelName)
+        public static async Task<(List<VideoModel>, int)> GetVideoModel(bool onlyExists, int page, int size, CommonModelType type, string modelName, IProgress<(int, int)> progress)
         {
             (List<VideoModel>, int) ret = new();
             List<VideoModel> list = new();
@@ -1248,7 +1257,7 @@ namespace Services
 
             if (onlyExists)
             {
-                var files = await GetVideoModelAllFromRedis();
+                var files = await GetVideoModelAllFromRedis(progress);
 
                 if (files != null && files.Any())
                 {
