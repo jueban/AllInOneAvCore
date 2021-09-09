@@ -17,6 +17,7 @@ using Utils;
 using Dasync.Collections;
 using Newtonsoft.Json;
 using System.Linq;
+using System.Diagnostics;
 
 namespace Services
 {
@@ -783,10 +784,12 @@ namespace Services
 
             if (File.Exists(chromeLocation))
             {
-                using(HttpClient client = new ())
-                {
-                    await client.GetAsync($"http://localhost:20002/job/openbroswer?location={chromeLocation}&url={JavLibraryIndexUrl}");
-                }
+                //using(HttpClient client = new ())
+                //{
+                //    await client.GetAsync($"http://localhost:20002/job/openbroswer?location={chromeLocation}&url={JavLibraryIndexUrl}");
+                //}
+
+                Process.Start(Win32Helper.GetExeLocation("Chrome.exe"), JavLibraryIndexUrl);
 
                 await Task.Delay(15 * 1000);
 

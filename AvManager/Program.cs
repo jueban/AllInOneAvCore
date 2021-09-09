@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using AvManager;
 using Microsoft.Extensions.Hosting;
 using AvManager.SignalR;
+using AvManager.IdentityServer;
 
 namespace AvManager
 {
@@ -22,6 +23,7 @@ namespace AvManager
             CreateApiHostBuilder(args).Build().RunAsync();
             CreateHangfireHostBuilder(args).Build().RunAsync();
             CreateSignalRHostBuilder(args).Build().RunAsync();
+            CreateIdentityServerHostBuilder(args).Build().RunAsync();
 
             Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.EnableVisualStyles();
@@ -48,6 +50,13 @@ namespace AvManager
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<SignalRStartup>().UseUrls("http://*:21004");
+                });
+
+        public static IHostBuilder CreateIdentityServerHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseStartup<IdentityServerStartup>().UseUrls("http://*:21020");
                 });
     }
 }

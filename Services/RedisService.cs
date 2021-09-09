@@ -86,6 +86,31 @@ namespace Services
             }
         }
 
+        public async static Task<bool> SetHashAndReplaceAsync(string key, string field, string value)
+        {
+            try
+            {
+                var client = GetClient();
+
+                var ret = await client.HGetAllAsync(key);
+
+                if (ret != null && ret.Any())
+                {
+                    foreach (var r in ret)
+                    {
+                        client.HDel(key, r.Key);
+                    }
+                }
+
+                await client.HSetAsync(key, field, value);
+                return true;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+        }
+
         /// <summary>
         /// 根据表名，键名，获取hash值
         /// </summary>

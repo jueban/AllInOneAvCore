@@ -84,7 +84,7 @@ namespace WebMVC
                 options.AddPolicy("CustomCorsPolicy", policy =>
                 {
                     // 设定允许跨域的来源，有多个可以用','隔开
-                    policy.WithOrigins("http://localhost:20004", setting.JobHubSite)
+                    policy.WithOrigins("http://localhost:21004", setting.JobHubSite)
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .AllowCredentials();

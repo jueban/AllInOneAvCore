@@ -177,35 +177,43 @@ namespace Services
         private async static Task<Dictionary<int, List<MyFileInfo>>> GenerateExistingAVs(List<AvModel> avs)
         {
             Dictionary<int, List<MyFileInfo>> fileContainer = new Dictionary<int, List<MyFileInfo>>();
-            var oneOneFiveFiles = JsonConvert.DeserializeObject<List<OneOneFiveFileItemModel>>(RedisService.GetHash("115", "allfiles"));
+            List<OneOneFiveFileItemModel> oneOneFiveFiles = new();
 
-            foreach (var file in oneOneFiveFiles)
-            {
-                Console.WriteLine(file.n);
+            oneOneFiveFiles = await OneOneFiveService.Get115AllFilesModel(OneOneFiveFolder.Fin);
+            await RedisService.SetHashAndReplaceAsync("115", "allfiles", JsonConvert.SerializeObject(oneOneFiveFiles));
 
-                var match = avs.FirstOrDefault(x => x.Name == file.AvName);
+            var dic = avs.GroupBy(x => x.Name.ToUpper()).ToDictionary(x => x.Key, x => x.ToList());
 
-                if (match != null)
+            foreach(var file in oneOneFiveFiles)
+            {               
+                var key = file.AvName.ToUpper();
+                if (dic.ContainsKey(key))
                 {
-                    if (fileContainer.ContainsKey(match.Id))
+                    var match = dic[key].FirstOrDefault();
+
+                    if (match != null)
                     {
-                        fileContainer[match.Id].Add(new MyFileInfo()
+                        if (fileContainer.ContainsKey(match.Id))
                         {
-                            Extension = "." + file.ico,
-                            FullName = file.n,
-                            Length = file.s,
-                            Name = file.n
-                        });
-                    }
-                    else
-                    {
-                        fileContainer.Add(match.Id, new List<MyFileInfo> { new MyFileInfo() {
+                            fileContainer[match.Id].Add(new MyFileInfo()
+                            {
                                 Extension = "." + file.ico,
                                 FullName = file.n,
                                 Length = file.s,
                                 Name = file.n
-                            }
-                        });
+                            });
+                        }
+                        else
+                        {
+                            fileContainer.Add(match.Id, new List<MyFileInfo> { 
+                                new MyFileInfo() {
+                                    Extension = "." + file.ico,
+                                    FullName = file.n,
+                                    Length = file.s,
+                                    Name = file.n
+                                }
+                            });
+                        }
                     }
                 }
             }

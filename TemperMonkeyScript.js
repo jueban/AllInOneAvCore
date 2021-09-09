@@ -15,32 +15,32 @@
     'use strict';
 
     GM_xmlhttpRequest({
-        url: "http://www.cainqs.com:20001/api/OneOneFive/SaveOneOneFiveCookie?cookie=" + document.cookie + "&userAgent=" + navigator.userAgent,
+        url: "http://www.cainqs.com:21001/api/OneOneFive/SaveOneOneFiveCookie?cookie=" + document.cookie + "&userAgent=" + navigator.userAgent,
         method: "POST",
         synchronous: true,
         headers: {
             "Content-type": "application/x-www-form-urlencoded"
         },
         onload: function (xhr) {
-            console.log("Core =====> " + xhr.responseText);
+            console.log("115 Core =====> " + xhr.responseText);
         },
         onerror: function (data) {
-            console.log("Core =====> " + data);
+            console.log("115 Core =====> " + data);
         }
     });
 
     GM_xmlhttpRequest({
-        url: "http://www.cainqs.com:20001/api/JavLibraryApi/SaveJavlibraryCookie?cookie=" + document.cookie + "&userAgent=" + navigator.userAgent,
+        url: "http://www.cainqs.com:21001/api/JavLibraryApi/SaveJavlibraryCookie?cookie=" + document.cookie + "&userAgent=" + navigator.userAgent,
         method: "POST",
         synchronous: true,
         headers: {
             "Content-type": "application/x-www-form-urlencoded"
         },
         onload: function (xhr) {
-            console.log("Core =====> " + xhr.responseText);
+            console.log("jav Core =====> " + xhr.responseText);
         },
         onerror: function (data) {
-            console.log("Core =====> " + data);
+            console.log("jav Core =====> " + data);
         }
     });
 })();

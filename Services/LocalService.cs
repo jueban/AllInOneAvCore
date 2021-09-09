@@ -1217,6 +1217,8 @@ namespace Services
 
                 var avs = await new JavLibraryDAL().GetAvModelByWhere("");
 
+                var dic = avs.GroupBy(x => x.AvId.ToUpper() + "-" + x.Name.ToUpper()).ToDictionary(x => x.Key, x => x.ToList());
+
                 int index = 1;
 
                 foreach (var file in files)
@@ -1226,16 +1228,23 @@ namespace Services
 
                     if (file.Name.Split('-').Length >= 3)
                     {
-                        var avid = file.Name.Split('-')[0] + "-" + file.Name.Split('-')[1];
-                        var name = file.Name.Replace(avid + "-", "").Replace("-C", "").Replace(file.Extension, "");
+                        var key = file.Name.Replace("-C", "").Replace(file.Extension, "").ToUpper();
 
-                        var model = avs.FirstOrDefault(x => x.AvId.Equals(avid, StringComparison.OrdinalIgnoreCase) && x.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
-
-                        if (model != null)
+                        if (dic.ContainsKey(key))
                         {
-                            temp.AvModel = model;
+                            var dicItem = dic[key];
 
-                            ret.Add(temp);
+                            if (dicItem != null && dicItem.Any())
+                            {
+                                var model = dicItem.FirstOrDefault();
+
+                                if (model != null)
+                                {
+                                    temp.AvModel = model;
+
+                                    ret.Add(temp);
+                                }
+                            }
                         }
                     }
 
@@ -1261,11 +1270,13 @@ namespace Services
             {
                 var files = await OneOneFiveService.Get115AllFilesModel(OneOneFiveFolder.Fin);
 
-                //var avs = await new JavLibraryDAL().GetAvModelByWhere("");
+                var avs = await new JavLibraryDAL().GetAvModelByWhere("");
+
+                var dic = avs.GroupBy(x => x.AvId.ToUpper() + x.Name.ToUpper()).ToDictionary(x => x.Key, x => x.ToList());
 
                 var business = new JavLibraryDAL();
 
-                Parallel.ForEach(files, new ParallelOptions { MaxDegreeOfParallelism = 5 }, async file =>
+                Parallel.ForEach(files, new ParallelOptions { MaxDegreeOfParallelism = 5 }, file =>
                 {
                     VideoModel temp = new();
 
@@ -1283,16 +1294,23 @@ namespace Services
 
                     if (file.n.Split('-').Length >= 3)
                     {
-                        //var model = avs.FirstOrDefault(x => x.AvId.Equals(file.AvId, StringComparison.OrdinalIgnoreCase) && x.Name.Equals(file.AvName, StringComparison.OrdinalIgnoreCase));
+                        var key = file.AvId.ToUpper() + file.AvName.ToUpper();
 
-                        var modelList = await business.GetAvModelByWhere($" AND Avid = '{file.AvId}' AND Name = '{file.AvName}'");
-                        var model = modelList.FirstOrDefault();
-
-                        if (model != null)
+                        if (dic.ContainsKey(key))
                         {
-                            temp.AvModel = model;
+                            var dicItem = dic[key];
 
-                            ret.Add(temp);
+                            if (dicItem != null && dicItem.Any())
+                            {
+                                var model = dicItem.FirstOrDefault();
+
+                                if (model != null)
+                                {
+                                    temp.AvModel = model;
+
+                                    ret.Add(temp);
+                                }
+                            }
                         }
                     }
                 });

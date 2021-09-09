@@ -58,6 +58,7 @@ namespace Models
                 }
             }
         }
+
         [JsonIgnore]
         public string AvId 
         {
@@ -66,12 +67,22 @@ namespace Models
                 return this.n.Split('-')[0] + "-" + this.n.Split('-')[1];
             }
         }
+
         [JsonIgnore]
         public string AvName 
         {
             get
-            { 
-                return this.n.Replace(this.AvId, "").Substring(1).Replace("." + this.ico, "").Replace("-C", "");
+            {
+                var withOutAvId = this.n.Replace(this.AvId, "");
+
+                if (!string.IsNullOrWhiteSpace(withOutAvId))
+                {
+                    return withOutAvId.Substring(1).Replace("." + this.ico, "").Replace("-C", "");
+                }
+                else
+                {
+                    return this.n;
+                }
             }
         }
     }

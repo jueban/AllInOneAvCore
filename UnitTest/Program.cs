@@ -41,7 +41,7 @@ namespace UnitTest
 
             //RedisService.SetHashAndReplace("play", "", "");
 
-            NoticeService.SendBarkNotice( $"开始扫描JavLibrary");
+            ReportService.GenerateReport().Wait();
 
             Console.ReadKey();
         }

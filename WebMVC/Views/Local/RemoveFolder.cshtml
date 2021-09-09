@@ -52,7 +52,7 @@
     </div>
     <script>
         var connection = new signalR.HubConnectionBuilder()
-            .withUrl("http://localhost:20004/jobs")
+            .withUrl("http://localhost:21004/jobs")
             .build();
 
         connection.on("RemoveFolder", function (message) {
