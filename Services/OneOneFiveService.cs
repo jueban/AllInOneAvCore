@@ -274,7 +274,7 @@ namespace Services
 
         public async static Task<List<OneOneFiveFileItemModel>> RefreshOneOneFiveFinFilesCache()
         {
-            NoticeService.SendBarkNotice(SettingService.GetSetting().Result.BarkId, $"开始更新115文件缓存");
+            NoticeService.SendBarkNotice( $"开始更新115文件缓存");
             var startTime = DateTime.Now;
 
             var ret = await Get115AllFilesModel(OneOneFiveFolder.Fin, OneOneFiveSearchType.Video);
@@ -283,7 +283,7 @@ namespace Services
 
             RedisService.SetHash("115", "allfiles", JsonConvert.SerializeObject(ret));
 
-            NoticeService.SendBarkNotice(SettingService.GetSetting().Result.BarkId, $"更新115文件缓存结束，更新了 {ret.Count} 条，耗时 {(DateTime.Now - startTime).TotalSeconds} 秒");
+            NoticeService.SendBarkNotice( $"更新115文件缓存结束，更新了 {ret.Count} 条，耗时 {(DateTime.Now - startTime).TotalSeconds} 秒");
 
             return ret;
         }

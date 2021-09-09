@@ -640,14 +640,14 @@ namespace Services
 
         public async static Task ScanJavLibraryUpdate()
         {
-            NoticeService.SendBarkNotice(SettingService.GetSetting().Result.BarkId, $"开始更新JavLibrary的更新列表");
+            NoticeService.SendBarkNotice( $"开始更新JavLibrary的更新列表");
             var startTime = DateTime.Now;
 
             Progress<string> progress = new();
             var ret = await GetJavLibraryWebScanUrlMode(JavLibraryEntryPointType.Update, 200, "", false, JavLibrarySearchOrder.Asc, progress);
             var count = await DownloadJavLibraryDetailAndSavePictureFromWebScanUrl(ret, progress);
 
-            NoticeService.SendBarkNotice(SettingService.GetSetting().Result.BarkId, $"更新JavLibrary的更新列表结束, 更新了 {count} 条, 耗时 {(DateTime.Now - startTime).TotalSeconds} 秒");
+            NoticeService.SendBarkNotice( $"更新JavLibrary的更新列表结束, 更新了 {count} 条, 耗时 {(DateTime.Now - startTime).TotalSeconds} 秒");
         }
 
         public async static Task<List<AvModel>> RefreshJavLibraryRedis()

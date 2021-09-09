@@ -53,20 +53,19 @@ namespace AvManager
             this.MagnetItemBottomPanel.Controls.Add(this.MagnetItemMainMainPanel);
             this.MagnetItemBottomPanel.Controls.Add(this.MagnetItemMainUpperPanel);
             this.MagnetItemBottomPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.MagnetItemBottomPanel.Location = new System.Drawing.Point(0, 500);
-            this.MagnetItemBottomPanel.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.MagnetItemBottomPanel.Location = new System.Drawing.Point(0, 304);
+            this.MagnetItemBottomPanel.Margin = new System.Windows.Forms.Padding(2);
             this.MagnetItemBottomPanel.Name = "MagnetItemBottomPanel";
-            this.MagnetItemBottomPanel.Size = new System.Drawing.Size(828, 272);
+            this.MagnetItemBottomPanel.Size = new System.Drawing.Size(446, 165);
             this.MagnetItemBottomPanel.TabIndex = 0;
             // 
             // MagnetItemMainMainPanel
             // 
             this.MagnetItemMainMainPanel.Controls.Add(this.MagnetItemListBox);
             this.MagnetItemMainMainPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.MagnetItemMainMainPanel.Location = new System.Drawing.Point(0, 41);
-            this.MagnetItemMainMainPanel.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.MagnetItemMainMainPanel.Location = new System.Drawing.Point(0, 25);
             this.MagnetItemMainMainPanel.Name = "MagnetItemMainMainPanel";
-            this.MagnetItemMainMainPanel.Size = new System.Drawing.Size(828, 231);
+            this.MagnetItemMainMainPanel.Size = new System.Drawing.Size(446, 140);
             this.MagnetItemMainMainPanel.TabIndex = 2;
             // 
             // MagnetItemListBox
@@ -75,11 +74,11 @@ namespace AvManager
             this.MagnetItemListBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.MagnetItemListBox.Font = new System.Drawing.Font("Microsoft YaHei UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.MagnetItemListBox.FormattingEnabled = true;
-            this.MagnetItemListBox.ItemHeight = 28;
+            this.MagnetItemListBox.ItemHeight = 17;
             this.MagnetItemListBox.Location = new System.Drawing.Point(0, 0);
-            this.MagnetItemListBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.MagnetItemListBox.Margin = new System.Windows.Forms.Padding(2);
             this.MagnetItemListBox.Name = "MagnetItemListBox";
-            this.MagnetItemListBox.Size = new System.Drawing.Size(828, 231);
+            this.MagnetItemListBox.Size = new System.Drawing.Size(446, 140);
             this.MagnetItemListBox.TabIndex = 0;
             this.MagnetItemListBox.SelectedIndexChanged += new System.EventHandler(this.MagnetItemListBox_SelectedIndexChanged);
             // 
@@ -89,9 +88,8 @@ namespace AvManager
             this.MagnetItemMainUpperPanel.Controls.Add(this.MagnetItemMainUpperRightPanel);
             this.MagnetItemMainUpperPanel.Dock = System.Windows.Forms.DockStyle.Top;
             this.MagnetItemMainUpperPanel.Location = new System.Drawing.Point(0, 0);
-            this.MagnetItemMainUpperPanel.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.MagnetItemMainUpperPanel.Name = "MagnetItemMainUpperPanel";
-            this.MagnetItemMainUpperPanel.Size = new System.Drawing.Size(828, 41);
+            this.MagnetItemMainUpperPanel.Size = new System.Drawing.Size(446, 25);
             this.MagnetItemMainUpperPanel.TabIndex = 1;
             // 
             // MagnetItemMainUpperMainPanel
@@ -99,9 +97,8 @@ namespace AvManager
             this.MagnetItemMainUpperMainPanel.Controls.Add(this.MagnetItemTitleText);
             this.MagnetItemMainUpperMainPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.MagnetItemMainUpperMainPanel.Location = new System.Drawing.Point(0, 0);
-            this.MagnetItemMainUpperMainPanel.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.MagnetItemMainUpperMainPanel.Name = "MagnetItemMainUpperMainPanel";
-            this.MagnetItemMainUpperMainPanel.Size = new System.Drawing.Size(715, 41);
+            this.MagnetItemMainUpperMainPanel.Size = new System.Drawing.Size(385, 25);
             this.MagnetItemMainUpperMainPanel.TabIndex = 1;
             // 
             // MagnetItemTitleText
@@ -109,21 +106,19 @@ namespace AvManager
             this.MagnetItemTitleText.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.MagnetItemTitleText.Dock = System.Windows.Forms.DockStyle.Fill;
             this.MagnetItemTitleText.Location = new System.Drawing.Point(0, 0);
-            this.MagnetItemTitleText.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.MagnetItemTitleText.Multiline = true;
             this.MagnetItemTitleText.Name = "MagnetItemTitleText";
             this.MagnetItemTitleText.ReadOnly = true;
-            this.MagnetItemTitleText.Size = new System.Drawing.Size(715, 41);
+            this.MagnetItemTitleText.Size = new System.Drawing.Size(385, 25);
             this.MagnetItemTitleText.TabIndex = 0;
             // 
             // MagnetItemMainUpperRightPanel
             // 
             this.MagnetItemMainUpperRightPanel.Controls.Add(this.MagnetItemInfoLabel);
             this.MagnetItemMainUpperRightPanel.Dock = System.Windows.Forms.DockStyle.Right;
-            this.MagnetItemMainUpperRightPanel.Location = new System.Drawing.Point(715, 0);
-            this.MagnetItemMainUpperRightPanel.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.MagnetItemMainUpperRightPanel.Location = new System.Drawing.Point(385, 0);
             this.MagnetItemMainUpperRightPanel.Name = "MagnetItemMainUpperRightPanel";
-            this.MagnetItemMainUpperRightPanel.Size = new System.Drawing.Size(113, 41);
+            this.MagnetItemMainUpperRightPanel.Size = new System.Drawing.Size(61, 25);
             this.MagnetItemMainUpperRightPanel.TabIndex = 0;
             // 
             // MagnetItemInfoLabel
@@ -131,9 +126,8 @@ namespace AvManager
             this.MagnetItemInfoLabel.AutoSize = true;
             this.MagnetItemInfoLabel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.MagnetItemInfoLabel.Location = new System.Drawing.Point(0, 0);
-            this.MagnetItemInfoLabel.Margin = new System.Windows.Forms.Padding(6, 0, 6, 0);
             this.MagnetItemInfoLabel.Name = "MagnetItemInfoLabel";
-            this.MagnetItemInfoLabel.Size = new System.Drawing.Size(0, 28);
+            this.MagnetItemInfoLabel.Size = new System.Drawing.Size(0, 17);
             this.MagnetItemInfoLabel.TabIndex = 1;
             // 
             // MagnetItemMainPanel
@@ -141,31 +135,31 @@ namespace AvManager
             this.MagnetItemMainPanel.Controls.Add(this.MagnetItemPicBox);
             this.MagnetItemMainPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.MagnetItemMainPanel.Location = new System.Drawing.Point(0, 0);
-            this.MagnetItemMainPanel.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.MagnetItemMainPanel.Margin = new System.Windows.Forms.Padding(2);
             this.MagnetItemMainPanel.Name = "MagnetItemMainPanel";
-            this.MagnetItemMainPanel.Size = new System.Drawing.Size(828, 500);
+            this.MagnetItemMainPanel.Size = new System.Drawing.Size(446, 304);
             this.MagnetItemMainPanel.TabIndex = 1;
             // 
             // MagnetItemPicBox
             // 
             this.MagnetItemPicBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.MagnetItemPicBox.Location = new System.Drawing.Point(0, 0);
-            this.MagnetItemPicBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.MagnetItemPicBox.Margin = new System.Windows.Forms.Padding(2);
             this.MagnetItemPicBox.Name = "MagnetItemPicBox";
-            this.MagnetItemPicBox.Size = new System.Drawing.Size(828, 500);
+            this.MagnetItemPicBox.Size = new System.Drawing.Size(446, 304);
             this.MagnetItemPicBox.TabIndex = 0;
             this.MagnetItemPicBox.TabStop = false;
             this.MagnetItemPicBox.Click += new System.EventHandler(this.MagnetItemPicBox_Click);
             // 
             // MagnetItem
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(13F, 28F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.MagnetItemMainPanel);
             this.Controls.Add(this.MagnetItemBottomPanel);
-            this.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "MagnetItem";
-            this.Size = new System.Drawing.Size(828, 772);
+            this.Size = new System.Drawing.Size(446, 469);
             this.Load += new System.EventHandler(this.MagnetItem_Load);
             this.MagnetItemBottomPanel.ResumeLayout(false);
             this.MagnetItemMainMainPanel.ResumeLayout(false);

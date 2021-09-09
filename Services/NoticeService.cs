@@ -9,12 +9,12 @@ namespace Services
 {
     public class NoticeService
     {
-        public async static void SendBarkNotice(string barkId, string content)
+        public async static void SendBarkNotice(string content)
         {
             var setting = await SettingService.GetSetting();
             using (HttpClient client = new())
             {
-                await client.GetAsync($"{setting.BarkSite}/{barkId}/{content}");
+                await client.GetAsync($"{setting.BarkSite}/{setting.BarkId}/{content}");
             }
         }
     }

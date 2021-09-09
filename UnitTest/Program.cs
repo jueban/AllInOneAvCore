@@ -41,7 +41,7 @@ namespace UnitTest
 
             //RedisService.SetHashAndReplace("play", "", "");
 
-            var ret = CookieService.Read115Cookie(".115.com");
+            NoticeService.SendBarkNotice( $"开始扫描JavLibrary");
 
             Console.ReadKey();
         }

@@ -1,0 +1,183 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - AllInOneAv</title>
+    <link rel="stylesheet" href="~/css/bootstrap-table.min.css" />
+    <script src="~/js/bootstrap-table.min.js"></script>
+</head>
+
+<body>
+
+    <div id="toolbar">
+        <div class="btn-group" role="group" aria-label="Basic example">
+            <button type="button" class="btn btn-success" onclick="playMultiple()">播放</button>
+            <button type="button" class="btn btn-info" onclick="potplay()">PotPlayer播放</button>
+            <button type="button" class="btn btn-warning" onclick="deletePlayHistory()">删除历史</button>
+            <button type="button" class="btn btn-danger" onclick="deleteFiles()">删除</button>
+        </div>
+    </div>
+
+    <table id="avTable"></table>
+
+    <div class="modal" tabindex="-1" id="myModal" style="display:none">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">警告</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p id="deleteWarning"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-danger" onclick="realDelete()">删除</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function getQueryVariable(variable) {
+            var query = window.location.search.substring(1);
+            var vars = query.split("&");
+            for (var i = 0; i < vars.length; i++) {
+                var pair = vars[i].split("=");
+                if (pair[0] == variable) {
+                    return pair[1];
+                }
+            }
+            return (false);
+        };
+
+        $("#avTable").bootstrapTable({
+            url: '/Local/GetLocalAvs?folder=' + getQueryVariable('folder'),
+            method: 'get',
+            dataType: 'json',
+            toolbar: '#toolbar',
+            clickToSelect: true,
+            checkbox: true,
+            multipleSelectRow: true,
+            striped: true,
+            columns: [
+                {
+                    checkbox: true
+                },
+                {
+                    field: 'name',
+                    title: '名称',
+                    sortable: true,
+                },
+                {
+                    field: 'setNotPlayed',
+                    title: '播放过',
+                    formatter: function (value, row, index) {
+                        return (row.playTimes > 0 && !row.setNotPlayed) ? '播放过' : '未播放';
+                    },
+                    cellStyle: function (value, row, index) {
+                        return (row.playTimes > 0 && !row.setNotPlayed) ? { css: { 'background-color': 'rgba(23,162,184,0.7)' } } : { css: { 'background-color': 'rgba(255,255,255,0.7)' } }
+                    },
+                    sortable: true,
+                },
+                {
+                    field: 'folder',
+                    title: '文件夹',
+                },
+                {
+                    field: 'length',
+                    title: '大小',
+                    formatter: function (val, row, index) {
+                        return row.lengthStr;
+                    },
+                    sortable: true,
+                },
+                {
+                    field: 'createDate',
+                    title: '时间',
+                    formatter: function (value, row, index) {
+                        return value.substring(0, value.indexOf('T'));
+                    },
+                    sortable: true,
+                },
+                {
+                    field: 'Operation',
+                    title: '操作',
+                    formatter: function (value, row, index) {
+                        return '<a href="javascript:play(\'' + row.fullName + '\')" title="详情">播放</a>';
+                    }
+                }
+            ]
+        });
+
+        function play(av) {
+            window.open("/play/playlocal?file=" + av, "_blank");
+        }
+
+        function playMultiple() {
+            var rows = $("#avTable").bootstrapTable('getSelections');
+
+            $.ajax({ url: "/Local/PushRedis", method: "POST", async: false, contentType: "application/json", dataType: "json", data: JSON.stringify(rows) })
+                .done(function (data) {
+                    if (data.success) {
+                        window.open('/Play/PlayLocalMultiple?key=' + data.data, "_blank");
+                    }
+                });
+        }
+
+        function deletePlayHistory() {
+            var fileList = [];
+            var rows = $("#avTable").bootstrapTable('getSelections');
+
+            rows.forEach((item, index) => {
+                fileList.push(item.name);
+            });
+
+            $.ajax({ url: "/Setting/SetPlayHistoryNotPlayer", method: "POST", async: false, contentType: "application/json", dataType: "json", data: JSON.stringify(fileList) })
+                .done(function (data) {
+                    if (data.status == 0) {
+                        window.location.reload();
+                    }
+                });
+        }
+
+        function deleteFiles() {
+            var rows = $("#avTable").bootstrapTable('getSelections');
+
+            $("#deleteWarning").html("确定要删除" + rows.length + "个文件吗?");
+
+            $('#myModal').modal('show')
+        }
+
+        function realDelete() {
+            var fileList = [];
+            var rows = $("#avTable").bootstrapTable('getSelections');
+
+            rows.forEach((item, index) => {
+                fileList.push(item.fullName);
+            });
+
+            $.ajax({ url: "/Local/DeleteFile", method: "POST", async: false, contentType: "application/json", dataType: "json", data: JSON.stringify(fileList) })
+                .done(function (data) {
+                    if (data.status == 0) {
+                        window.location.reload();
+                    }
+                });
+        }
+
+        function potplay() {
+            var fileList = [];
+            var rows = $("#avTable").bootstrapTable('getSelections');
+
+            rows.forEach((item, index) => {
+                fileList.push(item.fullName);
+            });
+
+            $.ajax({ url: "/Play/PotPlayerPlay", method: "POST", async: false, contentType: "application/json", dataType: "json", data: JSON.stringify(fileList) });
+        }
+    </script>
+</body>
+</html>

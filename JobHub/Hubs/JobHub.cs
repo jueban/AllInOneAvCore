@@ -50,7 +50,7 @@ namespace JobHub.Hubs
                 Progress<string> progress = new();
                 progress.ProgressChanged += ReportScanProgress;
 
-                NoticeService.SendBarkNotice(SettingService.GetSetting().Result.BarkId, $"开始扫描JavLibrary");
+                NoticeService.SendBarkNotice( $"开始扫描JavLibrary");
 
                 var startTime = DateTime.Now;
 
@@ -60,7 +60,7 @@ namespace JobHub.Hubs
 
                 await MagnetUrlService.SearchJavLibrary(param.Url, param.Page, param.Name, param.Order, progress);
 
-                NoticeService.SendBarkNotice(SettingService.GetSetting().Result.BarkId, $"扫描JavLibrary完成，耗时 {(DateTime.Now - startTime).TotalSeconds} 秒");
+                NoticeService.SendBarkNotice( $"扫描JavLibrary完成，耗时 {(DateTime.Now - startTime).TotalSeconds} 秒");
             }
             catch (Exception ee)
             {
@@ -79,7 +79,7 @@ namespace JobHub.Hubs
         {
             try
             {
-                NoticeService.SendBarkNotice(SettingService.GetSetting().Result.BarkId, $"开始扫描JavBus");
+                NoticeService.SendBarkNotice( $"开始扫描JavBus");
 
                 var startTime = DateTime.Now;
 
@@ -91,7 +91,7 @@ namespace JobHub.Hubs
 
                 await MagnetUrlService.SearchJavBus(param.Url, param.Page, param.Name, progress);
 
-                NoticeService.SendBarkNotice(SettingService.GetSetting().Result.BarkId, $"扫描JavBus完成，耗时 {(DateTime.Now - startTime).TotalSeconds} 秒");
+                NoticeService.SendBarkNotice( $"扫描JavBus完成，耗时 {(DateTime.Now - startTime).TotalSeconds} 秒");
             }
             catch (Exception ee)
             {

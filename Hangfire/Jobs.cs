@@ -19,7 +19,7 @@ namespace Hangfire
     {
         public static void OpenBroswerJob()
         {
-            NoticeService.SendBarkNotice(SettingService.GetSetting().Result.BarkId, "开始打开浏览器获取Cookie");
+            NoticeService.SendBarkNotice("开始打开浏览器获取Cookie");
 
             ScheduleService.RunScheduler("OpenJavLibraryToGetCookie");
         }
@@ -27,13 +27,13 @@ namespace Hangfire
         public static void ScanJavLibraryAllUrlsAndSave()
         {
             DateTime startTime = DateTime.Now;
-            NoticeService.SendBarkNotice(SettingService.GetSetting().Result.BarkId, "开始处理扫描全部Urls");
+            NoticeService.SendBarkNotice("开始处理扫描全部Urls");
 
             Progress<string> progress = new();
             progress.ProgressChanged += LogInfo;
             JavLibraryService.ScanJavLibraryAllUrlsAndSave(progress).Wait();
 
-            NoticeService.SendBarkNotice(SettingService.GetSetting().Result.BarkId, $"处理扫描全部Urls完成，耗时 {(DateTime.Now - startTime).TotalSeconds} 秒");
+            NoticeService.SendBarkNotice( $"处理扫描全部Urls完成，耗时 {(DateTime.Now - startTime).TotalSeconds} 秒");
         }
 
         public static void ScanAllNotDownloadJavLibraryUrls()
@@ -41,43 +41,43 @@ namespace Hangfire
             var waitForDownload = JavLibraryService.GetJavLibraryWebScanUrlModel(true).Result;
 
             DateTime startTime = DateTime.Now;
-            NoticeService.SendBarkNotice(SettingService.GetSetting().Result.BarkId, $"开始处理扫描全部未扫描的AV，共计{waitForDownload.Count}");
+            NoticeService.SendBarkNotice( $"开始处理扫描全部未扫描的AV，共计{waitForDownload.Count}");
 
             Progress<string> progress = new();
             progress.ProgressChanged += LogInfo;
             var ret = JavLibraryService.DownloadJavLibraryDetailAndSavePictureFromWebScanUrl(waitForDownload, progress).Result;
 
-            NoticeService.SendBarkNotice(SettingService.GetSetting().Result.BarkId, $"扫描全部未扫描的AV完成，共下载{ret}, 耗时 {(DateTime.Now - startTime).TotalSeconds} 秒");
+            NoticeService.SendBarkNotice( $"扫描全部未扫描的AV完成，共下载{ret}, 耗时 {(DateTime.Now - startTime).TotalSeconds} 秒");
         }
 
         public static void ScanUrlsOccursError(string file)
         {
             DateTime startTime = DateTime.Now;
-            NoticeService.SendBarkNotice(SettingService.GetSetting().Result.BarkId, "开始处理错误丢失URL");
+            NoticeService.SendBarkNotice("开始处理错误丢失URL");
 
             Progress<string> progress = new();
             progress.ProgressChanged += LogInfo;
             JavLibraryService.ScanUrlsOccursError(file, progress);
 
-            NoticeService.SendBarkNotice(SettingService.GetSetting().Result.BarkId, $"处理错误丢失URL完成，耗时 {(DateTime.Now - startTime).TotalSeconds} 秒");
+            NoticeService.SendBarkNotice( $"处理错误丢失URL完成，耗时 {(DateTime.Now - startTime).TotalSeconds} 秒");
         }
 
         public static void GenerateReport()
         {
             DateTime startTime = DateTime.Now;
-            NoticeService.SendBarkNotice(SettingService.GetSetting().Result.BarkId, "开始生成报表");
+            NoticeService.SendBarkNotice("开始生成报表");
 
             Progress<string> progress = new();
             progress.ProgressChanged += LogInfo;
             ReportService.GenerateReport().Wait();
 
-            NoticeService.SendBarkNotice(SettingService.GetSetting().Result.BarkId, $"生成报表完成，耗时 {(DateTime.Now - startTime).TotalSeconds} 秒");
+            NoticeService.SendBarkNotice( $"生成报表完成，耗时 {(DateTime.Now - startTime).TotalSeconds} 秒");
         }
 
         public static void ScanJavLibraryUpdateUrls(JavLibraryEntryPointType entry, int pages, string url, bool useExactPassin)
         {
             DateTime startTime = DateTime.Now;
-            NoticeService.SendBarkNotice(SettingService.GetSetting().Result.BarkId, $"开始处理最新更新Urls {pages} 页");
+            NoticeService.SendBarkNotice( $"开始处理最新更新Urls {pages} 页");
 
             Progress<string> progress = new();
             progress.ProgressChanged += LogInfo;
@@ -86,7 +86,7 @@ namespace Hangfire
 
             var ret = JavLibraryService.DownloadJavLibraryDetailAndSavePictureFromWebScanUrl(scans, progress).Result;
 
-            NoticeService.SendBarkNotice(SettingService.GetSetting().Result.BarkId, $"开始处理最新更新Urls完成 {pages} 页，共下载{ret}, 耗时 {(DateTime.Now - startTime).TotalSeconds} 秒");
+            NoticeService.SendBarkNotice( $"开始处理最新更新Urls完成 {pages} 页，共下载{ret}, 耗时 {(DateTime.Now - startTime).TotalSeconds} 秒");
         }
 
         private static void LogInfo(object sender, string e)
@@ -97,7 +97,7 @@ namespace Hangfire
         public static void ScanJavUpdate(string site, int page)
         {
             DateTime startTime = DateTime.Now;
-            NoticeService.SendBarkNotice(SettingService.GetSetting().Result.BarkId, $"开始扫描 {site} 磁链");
+            NoticeService.SendBarkNotice( $"开始扫描 {site} 磁链");
             Progress<string> progress = new Progress<string>();
             progress.ProgressChanged += LogInfo;
 
@@ -111,7 +111,7 @@ namespace Hangfire
                 MagnetUrlService.SearchJavBus("https://www.javbus.com/page", page, "Siri扫描Javbus", progress).Wait();
             }
 
-            NoticeService.SendBarkNotice(SettingService.GetSetting().Result.BarkId, $"结束扫描 {site} 磁链, 用时 {(DateTime.Now - startTime).TotalSeconds} 秒");
+            NoticeService.SendBarkNotice( $"结束扫描 {site} 磁链, 用时 {(DateTime.Now - startTime).TotalSeconds} 秒");
         }
 
         public static void PingService()
