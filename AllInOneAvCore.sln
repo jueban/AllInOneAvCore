@@ -32,7 +32,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Prepare", "Prepare", "{38E5
 		TemperMonkeyScript.js = TemperMonkeyScript.js
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AvManager", "AvManager\AvManager.csproj", "{5C18027F-DB9B-4A47-B8AF-8F9F9343F823}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AvManager", "AvManager\AvManager.csproj", "{5C18027F-DB9B-4A47-B8AF-8F9F9343F823}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

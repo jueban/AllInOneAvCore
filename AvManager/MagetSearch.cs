@@ -36,11 +36,11 @@ namespace AvManager
 
         public void ShowList(List<ShowMagnetSearchResult> model)
         {
-            ManetSearchMainPanel.Controls.Clear();
+            MagnetSearchMainMainPanel.Controls.Clear();
 
             MagnetList list = new(model);
 
-            ManetSearchMainPanel.Controls.Add(list);
+            MagnetSearchMainMainPanel.Controls.Add(list);
 
             this.MagnetSearchInfoLabel.Text = $"当前共有 {model.Count} 部";
 
@@ -51,9 +51,9 @@ namespace AvManager
         {
             StringBuilder sb = new();
 
-            if (ManetSearchMainPanel.Controls.Count > 0)
+            if (MagnetSearchMainMainPanel.Controls.Count > 0)
             {
-                MagnetList ml = (MagnetList)ManetSearchMainPanel.Controls[0];
+                MagnetList ml = (MagnetList)MagnetSearchMainMainPanel.Controls[0];
 
                 foreach (MagnetItem mi in ml.tableLayout.Controls)
                 {
@@ -106,9 +106,9 @@ namespace AvManager
         {
             StringBuilder sb = new();
 
-            if (ManetSearchMainPanel.Controls.Count > 0)
+            if (MagnetSearchMainMainPanel.Controls.Count > 0)
             {
-                MagnetList ml = (MagnetList)ManetSearchMainPanel.Controls[0];
+                MagnetList ml = (MagnetList)MagnetSearchMainMainPanel.Controls[0];
 
                 foreach (MagnetItem mi in ml.tableLayout.Controls)
                 {

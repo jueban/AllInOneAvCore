@@ -11,13 +11,18 @@ namespace Services
 {
     public class ReportService
     {
-        public async static Task GenerateReport()
+        public async static Task GenerateReport(IProgress<(string, int)> progress = null)
         {
             var business = new ReportDAL();
 
             List<ReportItem> items = new List<ReportItem>();
             var allAv = await new JavLibraryDAL().GetAvModelByWhere("");
             var allMatch = await GenerateExistingAVs(allAv);
+
+            if (progress != null)
+            {
+                progress.Report(("total", allAv.Count));
+            }
 
             Report report = new();
             report.ExtensionModel = new Dictionary<string, int>();
@@ -31,6 +36,12 @@ namespace Services
             {
                 ProcessReportType(av, allMatch, report, items);
                 process++;
+
+                if (progress != null)
+                {
+                    progress.Report(("current", process));
+                }
+
                 Console.WriteLine(process + " / " + allAv.Count);
             };
 

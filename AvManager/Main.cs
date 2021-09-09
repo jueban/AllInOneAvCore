@@ -44,7 +44,7 @@ namespace AvManager
         private async void Main_KeyDown(object sender, KeyEventArgs e)
         {
             //准备合并页面
-            if (TabControl.SelectedIndex == 2)
+            if (TabControl.SelectedTab.Name == "CombinePrepareTab")
             {
                 if (e.KeyCode == Keys.Space)
                 {
@@ -58,7 +58,7 @@ namespace AvManager
             }
 
             //整理页面
-            if (TabControl.SelectedIndex == 4)
+            if (TabControl.SelectedTab.Name == "ClearTab")
             {
                 if (e.KeyCode == Keys.Space)
                 {
@@ -72,7 +72,7 @@ namespace AvManager
             }
 
             //播放文件夹
-            if (TabControl.SelectedIndex == 6)
+            if (TabControl.SelectedTab.Name == "PlayFolderTab")
             {
                 if (e.KeyCode == Keys.Back)
                 {
@@ -140,7 +140,7 @@ namespace AvManager
             }
 
             //影片库相关
-            if (TabControl.SelectedIndex == 8)
+            if (TabControl.SelectedTab.Name == "VideoTab")
             {
                 if (VideoListView.SelectedItems.Count > 0 && e.KeyCode == Keys.Space)
                 {
@@ -196,27 +196,32 @@ namespace AvManager
         private void TabControl_SelectedIndexChanged(object sender, EventArgs e)
         {
             //自动合并相关
-            if (TabControl.SelectedIndex == 3)
+            if (TabControl.SelectedTab.Name == "AutoCombineTab")
             {
                 ShowAutoCombineList();
             }
 
             //搜索相关
-            if (TabControl.SelectedIndex == 5)
+            if (TabControl.SelectedTab.Name == "MagnetTab")
             {
                 SearchSiteComboBox.SelectedIndex = 0;
             }
 
             //设置相关
-            if (TabControl.SelectedIndex == 9)
+            if (TabControl.SelectedTab.Name == "SettingTab")
             {
                 InitSetting();
             }
 
             //影片库相关
-            if (TabControl.SelectedIndex == 8)
+            if (TabControl.SelectedTab.Name == "VideoTab")
             {
                 InitVideo();
+            }
+
+            if (TabControl.SelectedTab.Name == "ReportTab")
+            {
+                BindReportCombo();
             }
         }
 
@@ -1671,8 +1676,7 @@ namespace AvManager
         {
             if (e.Button == MouseButtons.Right && e.Clicks == 1 && VideoListView.SelectedItems.Count > 0)
             {
-                GenerateVideoMenu(MousePosition);
-            }
+                GenerateVideoMenu(MousePosition);            }
         }
 
         private void GenerateVideoMenu(Point mousePosition)
@@ -2088,6 +2092,51 @@ namespace AvManager
 
             SettingCookieCombo.SelectedIndexChanged += SettingCookieCombo_SelectedIndexChanged;
             SettingMagnetSiteCombo.SelectedIndexChanged += SettingMagnetSiteCombo_SelectedIndexChanged;
+        }
+        #endregion
+
+        #region 报告
+        private void ReportCombo_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            var url = "http://localhost:20003/Report/ShowChart?id=" + ((int)((ComboBoxItem)ReportCombo.SelectedItem).Tag);
+
+            Process.Start(Win32Helper.GetExeLocation("Chrome.exe"), url);
+        }
+
+        private async void ReportBtn_Click(object sender, EventArgs e)
+        {
+            Progress<(string, int)> progress = new();
+            progress.ProgressChanged += ReportPb;
+
+            await ReportService.GenerateReport(progress);
+            BindReportCombo();
+        }
+
+        private void ReportPb(object sender, (string, int) e)
+        {
+            if (e.Item1 == "total")
+            {
+                ReportPb1.Maximum = e.Item2;
+            }
+            else
+            {
+                ReportPb1.Value = e.Item2;
+            }
+        }
+
+        private void BindReportCombo()
+        {
+            var reports = new ReportDAL().GetReports();
+
+            foreach (var r in reports)
+            {
+                ComboBoxItem cbi = new();
+
+                cbi.Title = r.ReportDate.ToString("yyyy-MM-dd HH:mm:ss") + " 报告";
+                cbi.Tag = r.ReportId;
+
+                ReportCombo.Items.Add(cbi);
+            }
         }
         #endregion
     }

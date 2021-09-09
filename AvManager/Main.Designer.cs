@@ -117,7 +117,7 @@ namespace AvManager
             this.PlayFolderBtn = new System.Windows.Forms.Button();
             this.PlayFolderTxt = new System.Windows.Forms.TextBox();
             this.OneOneFive = new System.Windows.Forms.TabPage();
-            this.MoveisTab = new System.Windows.Forms.TabPage();
+            this.VideoTab = new System.Windows.Forms.TabPage();
             this.VideoMainPanel = new System.Windows.Forms.Panel();
             this.VideoListView = new System.Windows.Forms.ListView();
             this.ImageList = new System.Windows.Forms.ImageList(this.components);
@@ -143,6 +143,12 @@ namespace AvManager
             this.VideoActressLabel = new System.Windows.Forms.Label();
             this.VideoActressCombo = new System.Windows.Forms.ComboBox();
             this.VideoOnlyExistCB = new System.Windows.Forms.CheckBox();
+            this.ReportTab = new System.Windows.Forms.TabPage();
+            this.ReportMainPanel = new System.Windows.Forms.Panel();
+            this.ReportPb1 = new System.Windows.Forms.ProgressBar();
+            this.ReportUpperPanel = new System.Windows.Forms.Panel();
+            this.ReportCombo = new System.Windows.Forms.ComboBox();
+            this.ReportBtn = new System.Windows.Forms.Button();
             this.SettingTab = new System.Windows.Forms.TabPage();
             this.SettingMainPanel = new System.Windows.Forms.Panel();
             this.SettingSaveBarkBtn = new System.Windows.Forms.Button();
@@ -194,11 +200,14 @@ namespace AvManager
             ((System.ComponentModel.ISupportInitialize)(this.SearchPageUpDown)).BeginInit();
             this.PlayFolderTab.SuspendLayout();
             this.PlayFolderUpperPanel.SuspendLayout();
-            this.MoveisTab.SuspendLayout();
+            this.VideoTab.SuspendLayout();
             this.VideoMainPanel.SuspendLayout();
             this.VideoBottomPanel.SuspendLayout();
             this.VideoUpperPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.VideoPageSizeUpDown)).BeginInit();
+            this.ReportTab.SuspendLayout();
+            this.ReportMainPanel.SuspendLayout();
+            this.ReportUpperPanel.SuspendLayout();
             this.SettingTab.SuspendLayout();
             this.SettingMainPanel.SuspendLayout();
             this.CombinePrepareTreeNodeMenu.SuspendLayout();
@@ -248,7 +257,8 @@ namespace AvManager
             this.TabControl.Controls.Add(this.MagnetTab);
             this.TabControl.Controls.Add(this.PlayFolderTab);
             this.TabControl.Controls.Add(this.OneOneFive);
-            this.TabControl.Controls.Add(this.MoveisTab);
+            this.TabControl.Controls.Add(this.VideoTab);
+            this.TabControl.Controls.Add(this.ReportTab);
             this.TabControl.Controls.Add(this.SettingTab);
             this.TabControl.Dock = System.Windows.Forms.DockStyle.Fill;
             this.TabControl.Location = new System.Drawing.Point(0, 0);
@@ -323,7 +333,7 @@ namespace AvManager
             this.RemoveFolderText.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.RemoveFolderText.Location = new System.Drawing.Point(6, 13);
+            this.RemoveFolderText.Location = new System.Drawing.Point(6, 15);
             this.RemoveFolderText.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.RemoveFolderText.Name = "RemoveFolderText";
             this.RemoveFolderText.PlaceholderText = "点击选择需要去文件夹的目录，文件会移动到所选目录下的\'movefiles\'文件夹";
@@ -407,7 +417,7 @@ namespace AvManager
             this.RenameText.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.RenameText.Location = new System.Drawing.Point(6, 12);
+            this.RenameText.Location = new System.Drawing.Point(11, 12);
             this.RenameText.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.RenameText.Name = "RenameText";
             this.RenameText.PlaceholderText = "点击选择需要重命名的目录，唯一确定的放入Fin，需要手动处理的放入TempFin";
@@ -554,7 +564,7 @@ namespace AvManager
             this.CombinePrepareText.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.CombinePrepareText.Location = new System.Drawing.Point(6, 10);
+            this.CombinePrepareText.Location = new System.Drawing.Point(6, 12);
             this.CombinePrepareText.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.CombinePrepareText.Name = "CombinePrepareText";
             this.CombinePrepareText.PlaceholderText = "点击选择合并文件所在的目录，勾选为删除，双击重命名,点击‘整理’完成重命名及删除";
@@ -732,7 +742,7 @@ namespace AvManager
             this.AutoCombineSaveText.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.AutoCombineSaveText.Location = new System.Drawing.Point(6, 13);
+            this.AutoCombineSaveText.Location = new System.Drawing.Point(6, 12);
             this.AutoCombineSaveText.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.AutoCombineSaveText.Name = "AutoCombineSaveText";
             this.AutoCombineSaveText.PlaceholderText = "点击选择合并后文件保存目录，自动读取AutoCombie目录中合并文件";
@@ -806,7 +816,7 @@ namespace AvManager
             // 
             this.ClearRefreshBtn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.ClearRefreshBtn.Location = new System.Drawing.Point(1499, 3);
+            this.ClearRefreshBtn.Location = new System.Drawing.Point(1498, 3);
             this.ClearRefreshBtn.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.ClearRefreshBtn.Name = "ClearRefreshBtn";
             this.ClearRefreshBtn.Size = new System.Drawing.Size(132, 49);
@@ -820,7 +830,7 @@ namespace AvManager
             this.ClearInteliCB.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
             this.ClearInteliCB.AutoSize = true;
-            this.ClearInteliCB.Location = new System.Drawing.Point(7, 13);
+            this.ClearInteliCB.Location = new System.Drawing.Point(7, -64);
             this.ClearInteliCB.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.ClearInteliCB.Name = "ClearInteliCB";
             this.ClearInteliCB.Size = new System.Drawing.Size(122, 32);
@@ -1183,7 +1193,7 @@ namespace AvManager
             this.PlayFolderTxt.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.PlayFolderTxt.Location = new System.Drawing.Point(7, 13);
+            this.PlayFolderTxt.Location = new System.Drawing.Point(7, 12);
             this.PlayFolderTxt.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.PlayFolderTxt.Name = "PlayFolderTxt";
             this.PlayFolderTxt.Size = new System.Drawing.Size(1489, 34);
@@ -1200,18 +1210,18 @@ namespace AvManager
             this.OneOneFive.Text = "115相关";
             this.OneOneFive.UseVisualStyleBackColor = true;
             // 
-            // MoveisTab
+            // VideoTab
             // 
-            this.MoveisTab.Controls.Add(this.VideoMainPanel);
-            this.MoveisTab.Controls.Add(this.VideoBottomPanel);
-            this.MoveisTab.Controls.Add(this.VideoUpperPanel);
-            this.MoveisTab.Location = new System.Drawing.Point(4, 37);
-            this.MoveisTab.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.MoveisTab.Name = "MoveisTab";
-            this.MoveisTab.Size = new System.Drawing.Size(1779, 700);
-            this.MoveisTab.TabIndex = 7;
-            this.MoveisTab.Text = "影片库";
-            this.MoveisTab.UseVisualStyleBackColor = true;
+            this.VideoTab.Controls.Add(this.VideoMainPanel);
+            this.VideoTab.Controls.Add(this.VideoBottomPanel);
+            this.VideoTab.Controls.Add(this.VideoUpperPanel);
+            this.VideoTab.Location = new System.Drawing.Point(4, 37);
+            this.VideoTab.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.VideoTab.Name = "VideoTab";
+            this.VideoTab.Size = new System.Drawing.Size(1779, 700);
+            this.VideoTab.TabIndex = 7;
+            this.VideoTab.Text = "影片库";
+            this.VideoTab.UseVisualStyleBackColor = true;
             // 
             // VideoMainPanel
             // 
@@ -1277,7 +1287,7 @@ namespace AvManager
             // 
             this.VideoClearRedisBtn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.VideoClearRedisBtn.Location = new System.Drawing.Point(1169, 10);
+            this.VideoClearRedisBtn.Location = new System.Drawing.Point(1168, 10);
             this.VideoClearRedisBtn.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.VideoClearRedisBtn.Name = "VideoClearRedisBtn";
             this.VideoClearRedisBtn.Size = new System.Drawing.Size(139, 38);
@@ -1290,7 +1300,7 @@ namespace AvManager
             // 
             this.VideoTotalText.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.VideoTotalText.Location = new System.Drawing.Point(1567, 11);
+            this.VideoTotalText.Location = new System.Drawing.Point(1567, 15);
             this.VideoTotalText.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.VideoTotalText.Name = "VideoTotalText";
             this.VideoTotalText.ReadOnly = true;
@@ -1313,7 +1323,7 @@ namespace AvManager
             // 
             this.VideoCurrentText.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.VideoCurrentText.Location = new System.Drawing.Point(1465, 11);
+            this.VideoCurrentText.Location = new System.Drawing.Point(1465, 15);
             this.VideoCurrentText.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.VideoCurrentText.Name = "VideoCurrentText";
             this.VideoCurrentText.Size = new System.Drawing.Size(50, 34);
@@ -1408,7 +1418,7 @@ namespace AvManager
             // 
             this.VideoPageSizeUpDown.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
-            this.VideoPageSizeUpDown.Location = new System.Drawing.Point(280, 17);
+            this.VideoPageSizeUpDown.Location = new System.Drawing.Point(280, 15);
             this.VideoPageSizeUpDown.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.VideoPageSizeUpDown.Name = "VideoPageSizeUpDown";
             this.VideoPageSizeUpDown.Size = new System.Drawing.Size(84, 34);
@@ -1447,7 +1457,7 @@ namespace AvManager
             this.VideoDirectorCombo.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             this.VideoDirectorCombo.DisplayMember = "Title";
             this.VideoDirectorCombo.FormattingEnabled = true;
-            this.VideoDirectorCombo.Location = new System.Drawing.Point(1533, 15);
+            this.VideoDirectorCombo.Location = new System.Drawing.Point(1532, 15);
             this.VideoDirectorCombo.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.VideoDirectorCombo.Name = "VideoDirectorCombo";
             this.VideoDirectorCombo.Size = new System.Drawing.Size(221, 36);
@@ -1463,7 +1473,7 @@ namespace AvManager
             this.VideoPrefixCombo.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             this.VideoPrefixCombo.DisplayMember = "Title";
             this.VideoPrefixCombo.FormattingEnabled = true;
-            this.VideoPrefixCombo.Location = new System.Drawing.Point(1198, 15);
+            this.VideoPrefixCombo.Location = new System.Drawing.Point(1197, 15);
             this.VideoPrefixCombo.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.VideoPrefixCombo.Name = "VideoPrefixCombo";
             this.VideoPrefixCombo.Size = new System.Drawing.Size(221, 36);
@@ -1491,7 +1501,7 @@ namespace AvManager
             this.VideoCategoryCombo.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             this.VideoCategoryCombo.DisplayMember = "Title";
             this.VideoCategoryCombo.FormattingEnabled = true;
-            this.VideoCategoryCombo.Location = new System.Drawing.Point(868, 15);
+            this.VideoCategoryCombo.Location = new System.Drawing.Point(867, 15);
             this.VideoCategoryCombo.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.VideoCategoryCombo.Name = "VideoCategoryCombo";
             this.VideoCategoryCombo.Size = new System.Drawing.Size(221, 36);
@@ -1534,13 +1544,81 @@ namespace AvManager
             this.VideoOnlyExistCB.AutoSize = true;
             this.VideoOnlyExistCB.Checked = true;
             this.VideoOnlyExistCB.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.VideoOnlyExistCB.Location = new System.Drawing.Point(11, 17);
+            this.VideoOnlyExistCB.Location = new System.Drawing.Point(11, 15);
             this.VideoOnlyExistCB.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.VideoOnlyExistCB.Name = "VideoOnlyExistCB";
             this.VideoOnlyExistCB.Size = new System.Drawing.Size(122, 32);
             this.VideoOnlyExistCB.TabIndex = 0;
             this.VideoOnlyExistCB.Text = "只选存在";
             this.VideoOnlyExistCB.UseVisualStyleBackColor = true;
+            // 
+            // ReportTab
+            // 
+            this.ReportTab.Controls.Add(this.ReportMainPanel);
+            this.ReportTab.Controls.Add(this.ReportUpperPanel);
+            this.ReportTab.Location = new System.Drawing.Point(4, 37);
+            this.ReportTab.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.ReportTab.Name = "ReportTab";
+            this.ReportTab.Size = new System.Drawing.Size(1779, 700);
+            this.ReportTab.TabIndex = 10;
+            this.ReportTab.Text = "报告";
+            this.ReportTab.UseVisualStyleBackColor = true;
+            // 
+            // ReportMainPanel
+            // 
+            this.ReportMainPanel.Controls.Add(this.ReportPb1);
+            this.ReportMainPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ReportMainPanel.Location = new System.Drawing.Point(0, 66);
+            this.ReportMainPanel.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.ReportMainPanel.Name = "ReportMainPanel";
+            this.ReportMainPanel.Size = new System.Drawing.Size(1779, 634);
+            this.ReportMainPanel.TabIndex = 1;
+            // 
+            // ReportPb1
+            // 
+            this.ReportPb1.Location = new System.Drawing.Point(645, 309);
+            this.ReportPb1.Name = "ReportPb1";
+            this.ReportPb1.Size = new System.Drawing.Size(175, 40);
+            this.ReportPb1.TabIndex = 0;
+            // 
+            // ReportUpperPanel
+            // 
+            this.ReportUpperPanel.Controls.Add(this.ReportCombo);
+            this.ReportUpperPanel.Controls.Add(this.ReportBtn);
+            this.ReportUpperPanel.Dock = System.Windows.Forms.DockStyle.Top;
+            this.ReportUpperPanel.Location = new System.Drawing.Point(0, 0);
+            this.ReportUpperPanel.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.ReportUpperPanel.Name = "ReportUpperPanel";
+            this.ReportUpperPanel.Size = new System.Drawing.Size(1779, 66);
+            this.ReportUpperPanel.TabIndex = 0;
+            // 
+            // ReportCombo
+            // 
+            this.ReportCombo.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.ReportCombo.DisplayMember = "Title";
+            this.ReportCombo.FormattingEnabled = true;
+            this.ReportCombo.Location = new System.Drawing.Point(179, 17);
+            this.ReportCombo.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.ReportCombo.Name = "ReportCombo";
+            this.ReportCombo.Size = new System.Drawing.Size(1588, 36);
+            this.ReportCombo.TabIndex = 1;
+            this.ReportCombo.ValueMember = "Tag";
+            this.ReportCombo.SelectedIndexChanged += new System.EventHandler(this.ReportCombo_SelectedIndexChanged);
+            // 
+            // ReportBtn
+            // 
+            this.ReportBtn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.ReportBtn.Location = new System.Drawing.Point(15, 7);
+            this.ReportBtn.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
+            this.ReportBtn.Name = "ReportBtn";
+            this.ReportBtn.Size = new System.Drawing.Size(139, 54);
+            this.ReportBtn.TabIndex = 0;
+            this.ReportBtn.Text = "生成";
+            this.ReportBtn.UseVisualStyleBackColor = true;
+            this.ReportBtn.Click += new System.EventHandler(this.ReportBtn_Click);
             // 
             // SettingTab
             // 
@@ -1792,13 +1870,16 @@ namespace AvManager
             this.PlayFolderTab.ResumeLayout(false);
             this.PlayFolderUpperPanel.ResumeLayout(false);
             this.PlayFolderUpperPanel.PerformLayout();
-            this.MoveisTab.ResumeLayout(false);
+            this.VideoTab.ResumeLayout(false);
             this.VideoMainPanel.ResumeLayout(false);
             this.VideoBottomPanel.ResumeLayout(false);
             this.VideoBottomPanel.PerformLayout();
             this.VideoUpperPanel.ResumeLayout(false);
             this.VideoUpperPanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.VideoPageSizeUpDown)).EndInit();
+            this.ReportTab.ResumeLayout(false);
+            this.ReportMainPanel.ResumeLayout(false);
+            this.ReportUpperPanel.ResumeLayout(false);
             this.SettingTab.ResumeLayout(false);
             this.SettingMainPanel.ResumeLayout(false);
             this.SettingMainPanel.PerformLayout();
@@ -1876,7 +1957,7 @@ namespace AvManager
         private System.Windows.Forms.ColumnHeader PlayFolderListViewSize;
         private System.Windows.Forms.ColumnHeader PlayFolderListViewDate;
         private System.Windows.Forms.TabPage OneOneFive;
-        private System.Windows.Forms.TabPage MoveisTab;
+        private System.Windows.Forms.TabPage VideoTab;
         private System.Windows.Forms.TabPage SettingTab;
         private System.Windows.Forms.TabPage MagnetTab;
         private System.Windows.Forms.Panel SearchUpperPanel;
@@ -1941,6 +2022,12 @@ namespace AvManager
         private System.Windows.Forms.NumericUpDown VideoPageSizeUpDown;
         private System.Windows.Forms.ContextMenuStrip VideoMenu;
         private System.Windows.Forms.ProgressBar VideoProgressBar;
+        private System.Windows.Forms.TabPage ReportTab;
+        private System.Windows.Forms.Panel ReportUpperPanel;
+        private System.Windows.Forms.Button ReportBtn;
+        private System.Windows.Forms.ComboBox ReportCombo;
+        private System.Windows.Forms.Panel ReportMainPanel;
+        private System.Windows.Forms.ProgressBar ReportPb1;
     }
 }
 

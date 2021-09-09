@@ -29,7 +29,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Services\Services.csproj" />
     <ProjectReference Include="..\Utils\Utils.csproj" />
-    <ProjectReference Include="..\WebMVC\WebMVC.csproj" />
   </ItemGroup>
 
   <ItemGroup>
