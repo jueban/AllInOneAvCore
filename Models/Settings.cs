@@ -9,7 +9,6 @@ namespace Models
     public class Settings
     {
         public JavLibrarySettings JavLibrarySettings { get; set; }
-        public CommonSettings CommonSettings { get; set; }
         public string BarkId { get; set; }
         public string JavLibraryImageFolder { get; set; }
         public string JavBusImageFolder { get; set; }
@@ -35,10 +34,5 @@ namespace Models
     public class JavLibrarySettings
     {
         public JavLibraryGetCookieMode CookieMode { get; set; }
-    }
-
-    public class CommonSettings
-    {
-        public string ChromeLocation { get; set; }
     }
 }

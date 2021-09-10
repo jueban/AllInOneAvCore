@@ -132,6 +132,7 @@ namespace AvManager
             this.VideoLastBtn = new System.Windows.Forms.Button();
             this.VideoFirstBtn = new System.Windows.Forms.Button();
             this.VideoUpperPanel = new System.Windows.Forms.Panel();
+            this.VideoChineseCB = new System.Windows.Forms.CheckBox();
             this.VideoPageSizeLable = new System.Windows.Forms.Label();
             this.VideoPageSizeUpDown = new System.Windows.Forms.NumericUpDown();
             this.VideoDirectorLabel = new System.Windows.Forms.Label();
@@ -273,7 +274,7 @@ namespace AvManager
             this.RemoveFolderTab.Controls.Add(this.RemoveFolderUpperPanel);
             this.RemoveFolderTab.Location = new System.Drawing.Point(4, 26);
             this.RemoveFolderTab.Name = "RemoveFolderTab";
-            this.RemoveFolderTab.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
+            this.RemoveFolderTab.Padding = new System.Windows.Forms.Padding(3);
             this.RemoveFolderTab.Size = new System.Drawing.Size(954, 420);
             this.RemoveFolderTab.TabIndex = 0;
             this.RemoveFolderTab.Text = "去文件夹";
@@ -416,7 +417,7 @@ namespace AvManager
             this.CombinePrepareTab.Controls.Add(this.CombinePrepareUpperPanel);
             this.CombinePrepareTab.Location = new System.Drawing.Point(4, 26);
             this.CombinePrepareTab.Name = "CombinePrepareTab";
-            this.CombinePrepareTab.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
+            this.CombinePrepareTab.Padding = new System.Windows.Forms.Padding(3);
             this.CombinePrepareTab.Size = new System.Drawing.Size(954, 420);
             this.CombinePrepareTab.TabIndex = 1;
             this.CombinePrepareTab.Text = "合并准备";
@@ -437,7 +438,7 @@ namespace AvManager
             this.CombinePrepareMainMainPanel.Controls.Add(this.CombinePrepareTree);
             this.CombinePrepareMainMainPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.CombinePrepareMainMainPanel.Location = new System.Drawing.Point(0, 0);
-            this.CombinePrepareMainMainPanel.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.CombinePrepareMainMainPanel.Margin = new System.Windows.Forms.Padding(2);
             this.CombinePrepareMainMainPanel.Name = "CombinePrepareMainMainPanel";
             this.CombinePrepareMainMainPanel.Size = new System.Drawing.Size(948, 342);
             this.CombinePrepareMainMainPanel.TabIndex = 2;
@@ -462,7 +463,7 @@ namespace AvManager
             this.CombinePrepareMainBottomPanel.Controls.Add(this.CombinePreparePB);
             this.CombinePrepareMainBottomPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.CombinePrepareMainBottomPanel.Location = new System.Drawing.Point(0, 342);
-            this.CombinePrepareMainBottomPanel.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.CombinePrepareMainBottomPanel.Margin = new System.Windows.Forms.Padding(2);
             this.CombinePrepareMainBottomPanel.Name = "CombinePrepareMainBottomPanel";
             this.CombinePrepareMainBottomPanel.Size = new System.Drawing.Size(948, 36);
             this.CombinePrepareMainBottomPanel.TabIndex = 1;
@@ -470,7 +471,7 @@ namespace AvManager
             // CombinePreparePB
             // 
             this.CombinePreparePB.Location = new System.Drawing.Point(3, 6);
-            this.CombinePreparePB.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.CombinePreparePB.Margin = new System.Windows.Forms.Padding(2);
             this.CombinePreparePB.Name = "CombinePreparePB";
             this.CombinePreparePB.Size = new System.Drawing.Size(785, 24);
             this.CombinePreparePB.TabIndex = 0;
@@ -717,7 +718,7 @@ namespace AvManager
             this.ClearTab.Controls.Add(this.ClearMainPanel);
             this.ClearTab.Controls.Add(this.ClearUpperPanel);
             this.ClearTab.Location = new System.Drawing.Point(4, 26);
-            this.ClearTab.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.ClearTab.Margin = new System.Windows.Forms.Padding(2);
             this.ClearTab.Name = "ClearTab";
             this.ClearTab.Size = new System.Drawing.Size(954, 420);
             this.ClearTab.TabIndex = 4;
@@ -729,7 +730,7 @@ namespace AvManager
             this.ClearMainPanel.Controls.Add(this.ClearTreeView);
             this.ClearMainPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ClearMainPanel.Location = new System.Drawing.Point(0, 36);
-            this.ClearMainPanel.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.ClearMainPanel.Margin = new System.Windows.Forms.Padding(2);
             this.ClearMainPanel.Name = "ClearMainPanel";
             this.ClearMainPanel.Size = new System.Drawing.Size(954, 384);
             this.ClearMainPanel.TabIndex = 1;
@@ -741,7 +742,7 @@ namespace AvManager
             this.ClearTreeView.FullRowSelect = true;
             this.ClearTreeView.LabelEdit = true;
             this.ClearTreeView.Location = new System.Drawing.Point(0, 0);
-            this.ClearTreeView.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.ClearTreeView.Margin = new System.Windows.Forms.Padding(2);
             this.ClearTreeView.Name = "ClearTreeView";
             this.ClearTreeView.Size = new System.Drawing.Size(954, 384);
             this.ClearTreeView.TabIndex = 0;
@@ -756,7 +757,7 @@ namespace AvManager
             this.ClearUpperPanel.Controls.Add(this.ClearInteliCB);
             this.ClearUpperPanel.Dock = System.Windows.Forms.DockStyle.Top;
             this.ClearUpperPanel.Location = new System.Drawing.Point(0, 0);
-            this.ClearUpperPanel.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.ClearUpperPanel.Margin = new System.Windows.Forms.Padding(2);
             this.ClearUpperPanel.Name = "ClearUpperPanel";
             this.ClearUpperPanel.Size = new System.Drawing.Size(954, 36);
             this.ClearUpperPanel.TabIndex = 0;
@@ -766,7 +767,7 @@ namespace AvManager
             this.ClearClearBtn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.ClearClearBtn.Location = new System.Drawing.Point(879, 3);
-            this.ClearClearBtn.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.ClearClearBtn.Margin = new System.Windows.Forms.Padding(2);
             this.ClearClearBtn.Name = "ClearClearBtn";
             this.ClearClearBtn.Size = new System.Drawing.Size(71, 29);
             this.ClearClearBtn.TabIndex = 2;
@@ -779,7 +780,7 @@ namespace AvManager
             this.ClearRefreshBtn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.ClearRefreshBtn.Location = new System.Drawing.Point(803, 2);
-            this.ClearRefreshBtn.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.ClearRefreshBtn.Margin = new System.Windows.Forms.Padding(2);
             this.ClearRefreshBtn.Name = "ClearRefreshBtn";
             this.ClearRefreshBtn.Size = new System.Drawing.Size(71, 30);
             this.ClearRefreshBtn.TabIndex = 1;
@@ -793,7 +794,7 @@ namespace AvManager
             | System.Windows.Forms.AnchorStyles.Left)));
             this.ClearInteliCB.AutoSize = true;
             this.ClearInteliCB.Location = new System.Drawing.Point(4, -39);
-            this.ClearInteliCB.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.ClearInteliCB.Margin = new System.Windows.Forms.Padding(2);
             this.ClearInteliCB.Name = "ClearInteliCB";
             this.ClearInteliCB.Size = new System.Drawing.Size(75, 21);
             this.ClearInteliCB.TabIndex = 0;
@@ -806,7 +807,7 @@ namespace AvManager
             this.MagnetTab.Controls.Add(this.SearchMainPanel);
             this.MagnetTab.Controls.Add(this.SearchUpperPanel);
             this.MagnetTab.Location = new System.Drawing.Point(4, 26);
-            this.MagnetTab.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.MagnetTab.Margin = new System.Windows.Forms.Padding(2);
             this.MagnetTab.Name = "MagnetTab";
             this.MagnetTab.Size = new System.Drawing.Size(954, 420);
             this.MagnetTab.TabIndex = 9;
@@ -818,7 +819,7 @@ namespace AvManager
             this.SearchMainPanel.Controls.Add(this.SearchListView);
             this.SearchMainPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.SearchMainPanel.Location = new System.Drawing.Point(0, 153);
-            this.SearchMainPanel.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.SearchMainPanel.Margin = new System.Windows.Forms.Padding(2);
             this.SearchMainPanel.Name = "SearchMainPanel";
             this.SearchMainPanel.Size = new System.Drawing.Size(954, 267);
             this.SearchMainPanel.TabIndex = 1;
@@ -834,7 +835,7 @@ namespace AvManager
             this.SearchListView.FullRowSelect = true;
             this.SearchListView.HideSelection = false;
             this.SearchListView.Location = new System.Drawing.Point(0, 0);
-            this.SearchListView.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.SearchListView.Margin = new System.Windows.Forms.Padding(2);
             this.SearchListView.Name = "SearchListView";
             this.SearchListView.Size = new System.Drawing.Size(954, 267);
             this.SearchListView.TabIndex = 0;
@@ -869,7 +870,7 @@ namespace AvManager
             this.SearchUpperPanel.Controls.Add(this.SearchUpperLeftPanel);
             this.SearchUpperPanel.Dock = System.Windows.Forms.DockStyle.Top;
             this.SearchUpperPanel.Location = new System.Drawing.Point(0, 0);
-            this.SearchUpperPanel.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.SearchUpperPanel.Margin = new System.Windows.Forms.Padding(2);
             this.SearchUpperPanel.Name = "SearchUpperPanel";
             this.SearchUpperPanel.Size = new System.Drawing.Size(954, 153);
             this.SearchUpperPanel.TabIndex = 0;
@@ -887,7 +888,7 @@ namespace AvManager
             this.SearchUpperTablePanel.Controls.Add(this.SearchPageListBox, 0, 0);
             this.SearchUpperTablePanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.SearchUpperTablePanel.Location = new System.Drawing.Point(171, 0);
-            this.SearchUpperTablePanel.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.SearchUpperTablePanel.Margin = new System.Windows.Forms.Padding(2);
             this.SearchUpperTablePanel.Name = "SearchUpperTablePanel";
             this.SearchUpperTablePanel.RowCount = 1;
             this.SearchUpperTablePanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
@@ -900,7 +901,7 @@ namespace AvManager
             this.SearchPrefixListBox.FormattingEnabled = true;
             this.SearchPrefixListBox.ItemHeight = 17;
             this.SearchPrefixListBox.Location = new System.Drawing.Point(587, 2);
-            this.SearchPrefixListBox.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.SearchPrefixListBox.Margin = new System.Windows.Forms.Padding(2);
             this.SearchPrefixListBox.Name = "SearchPrefixListBox";
             this.SearchPrefixListBox.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
             this.SearchPrefixListBox.Size = new System.Drawing.Size(194, 149);
@@ -913,7 +914,7 @@ namespace AvManager
             this.SearchCategoryListBox.FormattingEnabled = true;
             this.SearchCategoryListBox.ItemHeight = 17;
             this.SearchCategoryListBox.Location = new System.Drawing.Point(392, 2);
-            this.SearchCategoryListBox.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.SearchCategoryListBox.Margin = new System.Windows.Forms.Padding(2);
             this.SearchCategoryListBox.Name = "SearchCategoryListBox";
             this.SearchCategoryListBox.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
             this.SearchCategoryListBox.Size = new System.Drawing.Size(191, 149);
@@ -926,7 +927,7 @@ namespace AvManager
             this.SearchActressListBox.FormattingEnabled = true;
             this.SearchActressListBox.ItemHeight = 17;
             this.SearchActressListBox.Location = new System.Drawing.Point(197, 2);
-            this.SearchActressListBox.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.SearchActressListBox.Margin = new System.Windows.Forms.Padding(2);
             this.SearchActressListBox.Name = "SearchActressListBox";
             this.SearchActressListBox.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
             this.SearchActressListBox.Size = new System.Drawing.Size(191, 149);
@@ -939,7 +940,7 @@ namespace AvManager
             this.SearchPageListBox.FormattingEnabled = true;
             this.SearchPageListBox.ItemHeight = 17;
             this.SearchPageListBox.Location = new System.Drawing.Point(2, 2);
-            this.SearchPageListBox.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.SearchPageListBox.Margin = new System.Windows.Forms.Padding(2);
             this.SearchPageListBox.Name = "SearchPageListBox";
             this.SearchPageListBox.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
             this.SearchPageListBox.Size = new System.Drawing.Size(191, 149);
@@ -958,7 +959,7 @@ namespace AvManager
             this.SearchUpperLeftPanel.Controls.Add(this.SearchSiteComboBox);
             this.SearchUpperLeftPanel.Dock = System.Windows.Forms.DockStyle.Left;
             this.SearchUpperLeftPanel.Location = new System.Drawing.Point(0, 0);
-            this.SearchUpperLeftPanel.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.SearchUpperLeftPanel.Margin = new System.Windows.Forms.Padding(2);
             this.SearchUpperLeftPanel.Name = "SearchUpperLeftPanel";
             this.SearchUpperLeftPanel.Size = new System.Drawing.Size(171, 153);
             this.SearchUpperLeftPanel.TabIndex = 0;
@@ -1014,7 +1015,7 @@ namespace AvManager
             // 
             this.SearchDescRadio.AutoSize = true;
             this.SearchDescRadio.Location = new System.Drawing.Point(51, 46);
-            this.SearchDescRadio.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.SearchDescRadio.Margin = new System.Windows.Forms.Padding(2);
             this.SearchDescRadio.Name = "SearchDescRadio";
             this.SearchDescRadio.Size = new System.Drawing.Size(50, 21);
             this.SearchDescRadio.TabIndex = 5;
@@ -1026,7 +1027,7 @@ namespace AvManager
             this.SearchAscRadio.AutoSize = true;
             this.SearchAscRadio.Checked = true;
             this.SearchAscRadio.Location = new System.Drawing.Point(5, 46);
-            this.SearchAscRadio.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.SearchAscRadio.Margin = new System.Windows.Forms.Padding(2);
             this.SearchAscRadio.Name = "SearchAscRadio";
             this.SearchAscRadio.Size = new System.Drawing.Size(50, 21);
             this.SearchAscRadio.TabIndex = 4;
@@ -1051,7 +1052,7 @@ namespace AvManager
             "JavLibrary",
             "JavBus"});
             this.SearchSiteComboBox.Location = new System.Drawing.Point(47, 11);
-            this.SearchSiteComboBox.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.SearchSiteComboBox.Margin = new System.Windows.Forms.Padding(2);
             this.SearchSiteComboBox.Name = "SearchSiteComboBox";
             this.SearchSiteComboBox.Size = new System.Drawing.Size(116, 25);
             this.SearchSiteComboBox.TabIndex = 2;
@@ -1062,7 +1063,7 @@ namespace AvManager
             this.PlayFolderTab.Controls.Add(this.PlayFolderListView);
             this.PlayFolderTab.Controls.Add(this.PlayFolderUpperPanel);
             this.PlayFolderTab.Location = new System.Drawing.Point(4, 26);
-            this.PlayFolderTab.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.PlayFolderTab.Margin = new System.Windows.Forms.Padding(2);
             this.PlayFolderTab.Name = "PlayFolderTab";
             this.PlayFolderTab.Size = new System.Drawing.Size(954, 420);
             this.PlayFolderTab.TabIndex = 5;
@@ -1080,7 +1081,7 @@ namespace AvManager
             this.PlayFolderListView.FullRowSelect = true;
             this.PlayFolderListView.HideSelection = false;
             this.PlayFolderListView.Location = new System.Drawing.Point(0, 36);
-            this.PlayFolderListView.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.PlayFolderListView.Margin = new System.Windows.Forms.Padding(2);
             this.PlayFolderListView.Name = "PlayFolderListView";
             this.PlayFolderListView.Size = new System.Drawing.Size(954, 384);
             this.PlayFolderListView.TabIndex = 1;
@@ -1116,7 +1117,7 @@ namespace AvManager
             this.PlayFolderUpperPanel.Controls.Add(this.PlayFolderTxt);
             this.PlayFolderUpperPanel.Dock = System.Windows.Forms.DockStyle.Top;
             this.PlayFolderUpperPanel.Location = new System.Drawing.Point(0, 0);
-            this.PlayFolderUpperPanel.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.PlayFolderUpperPanel.Margin = new System.Windows.Forms.Padding(2);
             this.PlayFolderUpperPanel.Name = "PlayFolderUpperPanel";
             this.PlayFolderUpperPanel.Size = new System.Drawing.Size(954, 36);
             this.PlayFolderUpperPanel.TabIndex = 0;
@@ -1126,7 +1127,7 @@ namespace AvManager
             this.PlayFolderMoveBtn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.PlayFolderMoveBtn.Location = new System.Drawing.Point(879, 3);
-            this.PlayFolderMoveBtn.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.PlayFolderMoveBtn.Margin = new System.Windows.Forms.Padding(2);
             this.PlayFolderMoveBtn.Name = "PlayFolderMoveBtn";
             this.PlayFolderMoveBtn.Size = new System.Drawing.Size(71, 30);
             this.PlayFolderMoveBtn.TabIndex = 2;
@@ -1139,7 +1140,7 @@ namespace AvManager
             this.PlayFolderBtn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.PlayFolderBtn.Location = new System.Drawing.Point(805, 3);
-            this.PlayFolderBtn.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.PlayFolderBtn.Margin = new System.Windows.Forms.Padding(2);
             this.PlayFolderBtn.Name = "PlayFolderBtn";
             this.PlayFolderBtn.Size = new System.Drawing.Size(71, 30);
             this.PlayFolderBtn.TabIndex = 1;
@@ -1153,7 +1154,7 @@ namespace AvManager
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.PlayFolderTxt.Location = new System.Drawing.Point(4, 7);
-            this.PlayFolderTxt.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.PlayFolderTxt.Margin = new System.Windows.Forms.Padding(2);
             this.PlayFolderTxt.Name = "PlayFolderTxt";
             this.PlayFolderTxt.Size = new System.Drawing.Size(800, 23);
             this.PlayFolderTxt.TabIndex = 0;
@@ -1162,7 +1163,7 @@ namespace AvManager
             // OneOneFive
             // 
             this.OneOneFive.Location = new System.Drawing.Point(4, 26);
-            this.OneOneFive.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.OneOneFive.Margin = new System.Windows.Forms.Padding(2);
             this.OneOneFive.Name = "OneOneFive";
             this.OneOneFive.Size = new System.Drawing.Size(954, 420);
             this.OneOneFive.TabIndex = 6;
@@ -1175,7 +1176,7 @@ namespace AvManager
             this.VideoTab.Controls.Add(this.VideoBottomPanel);
             this.VideoTab.Controls.Add(this.VideoUpperPanel);
             this.VideoTab.Location = new System.Drawing.Point(4, 26);
-            this.VideoTab.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.VideoTab.Margin = new System.Windows.Forms.Padding(2);
             this.VideoTab.Name = "VideoTab";
             this.VideoTab.Size = new System.Drawing.Size(954, 420);
             this.VideoTab.TabIndex = 7;
@@ -1237,6 +1238,7 @@ namespace AvManager
             this.VideoProgressBar.Name = "VideoProgressBar";
             this.VideoProgressBar.Size = new System.Drawing.Size(616, 23);
             this.VideoProgressBar.TabIndex = 9;
+            this.VideoProgressBar.Click += new System.EventHandler(this.VideoProgressBar_Click);
             // 
             // VideoClearRedisBtn
             // 
@@ -1331,6 +1333,7 @@ namespace AvManager
             // 
             // VideoUpperPanel
             // 
+            this.VideoUpperPanel.Controls.Add(this.VideoChineseCB);
             this.VideoUpperPanel.Controls.Add(this.VideoPageSizeLable);
             this.VideoUpperPanel.Controls.Add(this.VideoPageSizeUpDown);
             this.VideoUpperPanel.Controls.Add(this.VideoDirectorLabel);
@@ -1348,12 +1351,24 @@ namespace AvManager
             this.VideoUpperPanel.Size = new System.Drawing.Size(954, 40);
             this.VideoUpperPanel.TabIndex = 0;
             // 
+            // VideoChineseCB
+            // 
+            this.VideoChineseCB.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.VideoChineseCB.AutoSize = true;
+            this.VideoChineseCB.Location = new System.Drawing.Point(87, 9);
+            this.VideoChineseCB.Name = "VideoChineseCB";
+            this.VideoChineseCB.Size = new System.Drawing.Size(51, 21);
+            this.VideoChineseCB.TabIndex = 9;
+            this.VideoChineseCB.Text = "中文";
+            this.VideoChineseCB.UseVisualStyleBackColor = true;
+            // 
             // VideoPageSizeLable
             // 
             this.VideoPageSizeLable.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
             this.VideoPageSizeLable.AutoSize = true;
-            this.VideoPageSizeLable.Location = new System.Drawing.Point(86, 11);
+            this.VideoPageSizeLable.Location = new System.Drawing.Point(151, 11);
             this.VideoPageSizeLable.Name = "VideoPageSizeLable";
             this.VideoPageSizeLable.Size = new System.Drawing.Size(56, 17);
             this.VideoPageSizeLable.TabIndex = 8;
@@ -1363,7 +1378,7 @@ namespace AvManager
             // 
             this.VideoPageSizeUpDown.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
-            this.VideoPageSizeUpDown.Location = new System.Drawing.Point(151, 9);
+            this.VideoPageSizeUpDown.Location = new System.Drawing.Point(209, 9);
             this.VideoPageSizeUpDown.Name = "VideoPageSizeUpDown";
             this.VideoPageSizeUpDown.Size = new System.Drawing.Size(45, 23);
             this.VideoPageSizeUpDown.TabIndex = 7;
@@ -1385,7 +1400,7 @@ namespace AvManager
             this.VideoPrefixLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.VideoPrefixLabel.AutoSize = true;
-            this.VideoPrefixLabel.Location = new System.Drawing.Point(606, 11);
+            this.VideoPrefixLabel.Location = new System.Drawing.Point(613, 11);
             this.VideoPrefixLabel.Name = "VideoPrefixLabel";
             this.VideoPrefixLabel.Size = new System.Drawing.Size(32, 17);
             this.VideoPrefixLabel.TabIndex = 6;
@@ -1414,7 +1429,7 @@ namespace AvManager
             this.VideoPrefixCombo.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             this.VideoPrefixCombo.DisplayMember = "Title";
             this.VideoPrefixCombo.FormattingEnabled = true;
-            this.VideoPrefixCombo.Location = new System.Drawing.Point(641, 7);
+            this.VideoPrefixCombo.Location = new System.Drawing.Point(648, 7);
             this.VideoPrefixCombo.Name = "VideoPrefixCombo";
             this.VideoPrefixCombo.Size = new System.Drawing.Size(121, 25);
             this.VideoPrefixCombo.TabIndex = 5;
@@ -1426,7 +1441,7 @@ namespace AvManager
             this.VideoCategoryLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.VideoCategoryLabel.AutoSize = true;
-            this.VideoCategoryLabel.Location = new System.Drawing.Point(428, 11);
+            this.VideoCategoryLabel.Location = new System.Drawing.Point(439, 11);
             this.VideoCategoryLabel.Name = "VideoCategoryLabel";
             this.VideoCategoryLabel.Size = new System.Drawing.Size(32, 17);
             this.VideoCategoryLabel.TabIndex = 4;
@@ -1440,7 +1455,7 @@ namespace AvManager
             this.VideoCategoryCombo.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             this.VideoCategoryCombo.DisplayMember = "Title";
             this.VideoCategoryCombo.FormattingEnabled = true;
-            this.VideoCategoryCombo.Location = new System.Drawing.Point(463, 7);
+            this.VideoCategoryCombo.Location = new System.Drawing.Point(474, 7);
             this.VideoCategoryCombo.Name = "VideoCategoryCombo";
             this.VideoCategoryCombo.Size = new System.Drawing.Size(121, 25);
             this.VideoCategoryCombo.TabIndex = 3;
@@ -1452,7 +1467,7 @@ namespace AvManager
             this.VideoActressLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.VideoActressLabel.AutoSize = true;
-            this.VideoActressLabel.Location = new System.Drawing.Point(248, 11);
+            this.VideoActressLabel.Location = new System.Drawing.Point(264, 11);
             this.VideoActressLabel.Name = "VideoActressLabel";
             this.VideoActressLabel.Size = new System.Drawing.Size(32, 17);
             this.VideoActressLabel.TabIndex = 2;
@@ -1466,7 +1481,7 @@ namespace AvManager
             this.VideoActressCombo.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
             this.VideoActressCombo.DisplayMember = "Title";
             this.VideoActressCombo.FormattingEnabled = true;
-            this.VideoActressCombo.Location = new System.Drawing.Point(284, 7);
+            this.VideoActressCombo.Location = new System.Drawing.Point(300, 7);
             this.VideoActressCombo.Name = "VideoActressCombo";
             this.VideoActressCombo.Size = new System.Drawing.Size(121, 25);
             this.VideoActressCombo.TabIndex = 1;
@@ -1510,7 +1525,7 @@ namespace AvManager
             // ReportProgressBar
             // 
             this.ReportProgressBar.Location = new System.Drawing.Point(4, 356);
-            this.ReportProgressBar.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.ReportProgressBar.Margin = new System.Windows.Forms.Padding(2);
             this.ReportProgressBar.Name = "ReportProgressBar";
             this.ReportProgressBar.Size = new System.Drawing.Size(949, 24);
             this.ReportProgressBar.TabIndex = 0;
@@ -1555,7 +1570,7 @@ namespace AvManager
             // 
             this.SettingTab.Controls.Add(this.SettingMainPanel);
             this.SettingTab.Location = new System.Drawing.Point(4, 26);
-            this.SettingTab.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.SettingTab.Margin = new System.Windows.Forms.Padding(2);
             this.SettingTab.Name = "SettingTab";
             this.SettingTab.Size = new System.Drawing.Size(954, 420);
             this.SettingTab.TabIndex = 8;
@@ -1944,6 +1959,7 @@ namespace AvManager
         private System.Windows.Forms.ComboBox ReportCombo;
         private System.Windows.Forms.Panel ReportMainPanel;
         private System.Windows.Forms.ProgressBar ReportProgressBar;
+        private System.Windows.Forms.CheckBox VideoChineseCB;
     }
 }
 

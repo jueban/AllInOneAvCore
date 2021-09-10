@@ -152,12 +152,13 @@ namespace AvManager
                         var model = ((VideoModel)lvi.Tag);
 
                         var first = model.FileInfo.FirstOrDefault();
-                        if (first != null && VideoOnlyExistCB.Checked)
+
+                        if (first != null && first.IsRemote == false)
                         {
                             files.Add(first);
                         }
 
-                        if (first != null && !VideoOnlyExistCB.Checked)
+                        if (first != null && first.IsRemote == true)
                         {
                             try
                             {
@@ -170,14 +171,9 @@ namespace AvManager
                         }
                     }
 
-                    if (VideoOnlyExistCB.Checked)
-                    {
-                        Process.Start(Setting.POTPLAYEREXEFILELOCATION, @"" + LocalService.GeneratePotPlayerPlayList(files.Select(x => x.FullName).ToList(), Setting.POTPLAYERPLAYLISTLOCATION));
-                    }
-                    else
-                    {
-                        Process.Start(Setting.POTPLAYEREXEFILELOCATION, sb.ToString());
-                    }
+                    Process.Start(Setting.POTPLAYEREXEFILELOCATION, @"" + LocalService.GeneratePotPlayerPlayList(files.Select(x => x.FullName).ToList(), Setting.POTPLAYERPLAYLISTLOCATION));
+                    //TODO 播放远程和本地一起
+                    //Process.Start(Setting.POTPLAYEREXEFILELOCATION, sb.ToString());
 
                     foreach (var fi in files)
                     {
@@ -1891,7 +1887,9 @@ namespace AvManager
                 modelName = (string)VideoDirectorCombo.SelectedItem;
             }
 
-            var res = await LocalService.GetVideoModel(onlyExists, page, size, modelType, modelName, progress);
+            var isChines = VideoChineseCB.Checked;
+
+            var res = await LocalService.GetVideoModel(onlyExists, isChines, page, size, modelType, modelName, progress);
             ret = res.Item1;
 
             UpdateVideoUINumber(page, res.Item2);
@@ -1955,15 +1953,7 @@ namespace AvManager
 
             if (ret == DialogResult.Yes)
             {
-                if (RedisService.HExists("video", "alllocal"))
-                {
-                    RedisService.DeleteHash("video", "alllocal");
-                }
-
-                if (RedisService.HExists("video", "allremote"))
-                {
-                    RedisService.DeleteHash("video", "allremote");
-                }
+                RedisService.DeleteAllKey("video");
 
                 UpdateVideoCombo = true;
             }
@@ -1980,7 +1970,7 @@ namespace AvManager
             {
                 var file = ((VideoModel)VideoListView.SelectedItems[0].Tag).FileInfo.FirstOrDefault();
 
-                if (file.IsRemote == false)
+                if (file != null && file.IsRemote == false)
                 {
                     Process.Start(Setting.POTPLAYEREXEFILELOCATION, file.FullName);
 
@@ -1996,9 +1986,11 @@ namespace AvManager
                 {
                     try
                     {
-                        var m3u8 = await OneOneFiveService.GetM3U8(file.FullName);
-
-                        Process.Start(Setting.POTPLAYEREXEFILELOCATION, m3u8);
+                        if (file != null)
+                        {
+                            var m3u8 = await OneOneFiveService.GetM3U8(file.FullName);
+                            Process.Start(Setting.POTPLAYEREXEFILELOCATION, m3u8);
+                        }
                     }
                     catch
                     { 
@@ -2010,14 +2002,19 @@ namespace AvManager
 
         private void VideoPbUpdate(object sender, (string, int) e)
         {
-            if (e.Item1 == "total")
-            {
-                VideoProgressBar.Maximum = e.Item2;
-            }
-            else
-            {
-                VideoProgressBar.Value = e.Item2;
-            }
+            //if (e.Item1 == "total")
+            //{
+            //    VideoProgressBar.Maximum = e.Item2;
+            //}
+            //else
+            //{
+            //    VideoProgressBar.Value = e.Item2;
+            //}
+        }
+
+        private void VideoProgressBar_Click(object sender, EventArgs e)
+        {
+
         }
         #endregion
 

@@ -28,10 +28,6 @@ namespace InitProject
             {
                 BarkId = "XM7XP3fGnKprLXe99kZSja",
                 BarkSite = "http://localhost:20005",
-                CommonSettings = new CommonSettings()
-                {
-                    ChromeLocation = Win32Helper.GetExeLocation("Chrome.exe")
-                },
                 JavLibrarySettings = new JavLibrarySettings()
                 {
                     CookieMode = JavLibraryGetCookieMode.Easy

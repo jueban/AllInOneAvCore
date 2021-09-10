@@ -778,9 +778,7 @@ namespace Services
         //打开Chrome浏览器等待油猴脚本调用API存入Cookie，并退出（有bug）
         private async static Task<(CookieContainer cc, string userAgent)> GetJavCookieChromeProcess()
         {
-            var setting = await SettingService.GetSetting();
-
-            var chromeLocation = setting.CommonSettings.ChromeLocation;
+            var chromeLocation = Win32Helper.GetExeLocation("Chrome.exe");
 
             if (File.Exists(chromeLocation))
             {
@@ -789,7 +787,7 @@ namespace Services
                 //    await client.GetAsync($"http://localhost:20002/job/openbroswer?location={chromeLocation}&url={JavLibraryIndexUrl}");
                 //}
 
-                Process.Start(Win32Helper.GetExeLocation("Chrome.exe"), JavLibraryIndexUrl);
+                Process.Start(chromeLocation, JavLibraryIndexUrl);
 
                 await Task.Delay(15 * 1000);
 

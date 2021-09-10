@@ -2,6 +2,7 @@
 using Models;
 using Newtonsoft.Json;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -1199,13 +1200,16 @@ namespace Services
             return folder + fileName;
         }
 
-        public static async Task<List<VideoModel>> GetLocalVideoModelAllFromRedis(IProgress<(string, int)> progress)
+        public static async Task<List<VideoModel>> GetLocalVideoModelAllFromRedis(List<AvModel> avs, bool onlyExist, IProgress<(string, int)> progress)
         {
             List<VideoModel> ret = new();
+            List<VideoModel> tempRet = new();
 
-            if (RedisService.HExists("video", "alllocal"))
+            var key = "alllocal" + onlyExist.ToString();
+
+            if (RedisService.HExists("video", key))
             {
-                ret = JsonConvert.DeserializeObject<List<VideoModel>>(await RedisService.GetHashAsync("video", "alllocal"));
+                tempRet = JsonConvert.DeserializeObject<List<VideoModel>>(await RedisService.GetHashAsync("video", key));
 
                 progress.Report(("total", 100));
                 progress.Report(("current", 100));
@@ -1216,14 +1220,17 @@ namespace Services
 
                 progress.Report(("total", files.Count));
 
-                var avs = await new JavLibraryDAL().GetAvModelByWhere("");
+                if (!avs.Any())
+                {
+                    avs = await new JavLibraryDAL().GetAvModelByWhere("");
+                }
 
                 var dic = avs.GroupBy(x => x.AvId.ToUpper() + "-" + x.Name.ToUpper()).ToDictionary(x => x.Key, x => x.ToList());
 
                 int index = 1;
 
                 await Task.Run(() =>
-               {
+                {
                    foreach (var file in files)
                    {
                        VideoModel temp = new();
@@ -1243,32 +1250,59 @@ namespace Services
 
                                    if (model != null)
                                    {
-                                       temp.AvModel = model;
-
-                                       ret.Add(temp);
+                                        temp.AvModel = model;
+                                        tempRet.Add(temp);
                                    }
                                }
                            }
                        }
 
                        progress.Report(("current", index++));
-                   }
-               });
-
-                await RedisService.SetHashAsync("video", "alllocal", JsonConvert.SerializeObject(ret));
-                RedisService.SetExpire("video", 60 * 300);
+                    }
+                });
             }
+
+            if (onlyExist)
+            {
+                ret = tempRet;
+            }
+            else
+            {
+                foreach (var av in avs)
+                {
+                    var hasFile = tempRet.FirstOrDefault(x => x.AvModel == av);
+
+                    if (hasFile != null)
+                    {
+                        ret.Add(hasFile);
+                    }
+                    else
+                    {
+                        ret.Add(new VideoModel()
+                        {
+                            AvModel = av,
+                            FileInfo = new List<MyFileInfo>()
+                        });
+                    }
+                }
+            }
+
+            await RedisService.SetHashAsync("video", key, JsonConvert.SerializeObject(ret));
+            RedisService.SetExpire("video", 60 * 300);
 
             return ret;
         }
 
-        public static async Task<List<VideoModel>> GetRemoteVideoModelAllFromRedis(IProgress<(string, int)> progress)
+        public static async Task<List<VideoModel>> GetRemoteVideoModelAllFromRedis(List<AvModel> avs, bool onlyExist, IProgress<(string, int)> progress)
         {
             List<VideoModel> ret = new();
+            List<VideoModel> tempRet = new();
 
-            if (RedisService.HExists("video", "allremote"))
+            var key = "allremote" + onlyExist.ToString();
+
+            if (RedisService.HExists("video", key))
             {
-                ret = JsonConvert.DeserializeObject<List<VideoModel>>(await RedisService.GetHashAsync("video", "allremote"));
+                tempRet = JsonConvert.DeserializeObject<List<VideoModel>>(await RedisService.GetHashAsync("video", key));
 
                 progress.Report(("total", 100));
                 progress.Report(("current", 100));
@@ -1279,7 +1313,10 @@ namespace Services
 
                 progress.Report(("total", files.Count));
 
-                var avs = await new JavLibraryDAL().GetAvModelByWhere("");
+                if (!avs.Any())
+                {
+                    avs = await new JavLibraryDAL().GetAvModelByWhere("");
+                }
 
                 var dic = avs.GroupBy(x => x.AvId.ToUpper() + x.Name.ToUpper()).ToDictionary(x => x.Key, x => x.ToList());
 
@@ -1323,35 +1360,98 @@ namespace Services
                                     {
                                         temp.AvModel = model;
 
-                                        ret.Add(temp);
+                                        tempRet.Add(temp);
                                     }
                                 }
                             }
                         }
                     });
                 });
-
-                await RedisService.SetHashAsync("video", "allremote", JsonConvert.SerializeObject(ret));
-                RedisService.SetExpire("video", 60 * 300);
             }
+
+            if (onlyExist)
+            {
+                ret = tempRet;
+            }
+            else
+            {
+                foreach (var av in avs)
+                {
+                    var hasFile = tempRet.FirstOrDefault(x => x.AvModel == av);
+
+                    if (hasFile != null)
+                    {
+                        ret.Add(hasFile);
+                    }
+                    else
+                    {
+                        ret.Add(new VideoModel()
+                        {
+                            AvModel = av,
+                            FileInfo = new List<MyFileInfo>()
+                        });
+                    }
+                }
+            }
+
+            await RedisService.SetHashAsync("video", key, JsonConvert.SerializeObject(ret));
+            RedisService.SetExpire("video", 60 * 300);
 
             return ret;
         }
 
-        public static async Task<(List<VideoModel>, int)> GetVideoModel(bool onlyExists, int page, int size, CommonModelType type, string modelName, IProgress<(string, int)> progress)
+        public static async Task<(List<VideoModel>, int)> GetVideoModel(bool onlyExists, bool isChines, int page, int size, CommonModelType type, string modelName, IProgress<(string, int)> progress)
         {
             (List<VideoModel>, int) ret = new();
             List<VideoModel> list = new();
             List<VideoModel> files = new();
+            List<AvModel> exist = new List<AvModel>();
             int count = 0;
 
-            if (onlyExists)
+            List<AvModel> avs = new();
+
+            var localFiles = await GetLocalVideoModelAllFromRedis(avs, onlyExists, progress);
+            var remoteFiles = await GetRemoteVideoModelAllFromRedis(avs, onlyExists, progress);
+
+            //有本地就不要远程
+            foreach (var localFile in localFiles)
             {
-                files = await GetLocalVideoModelAllFromRedis(progress);
+                if (!exist.Exists(x => x == localFile.AvModel))
+                {
+                    if (onlyExists)
+                    {
+                        if (localFile.FileInfo != null && localFile.FileInfo.Any())
+                        {
+                            files.Add(localFile);
+                        }
+                    }
+                    else
+                    {
+                        files.Add(localFile);
+                    }
+
+                    exist.Add(localFile.AvModel);
+                }
             }
-            else
+
+            foreach (var remoteFile in remoteFiles)
             {
-                files = await GetRemoteVideoModelAllFromRedis(progress);
+                if (!exist.Exists(x => x == remoteFile.AvModel))
+                {
+                    if (onlyExists)
+                    {
+                        if (remoteFile.FileInfo != null && remoteFile.FileInfo.Any())
+                        {
+                            files.Add(remoteFile);
+                        }
+                    }
+                    else
+                    {
+                        files.Add(remoteFile);
+                    }
+
+                    exist.Add(remoteFile.AvModel);
+                }
             }
 
             if (files != null && files.Any())
@@ -1366,6 +1466,11 @@ namespace Services
                 if (type == CommonModelType.Prefix)
                 {
                     files = files.Where(x => x.AvModel.AvId.Split('-')[0].Equals(modelName, StringComparison.OrdinalIgnoreCase)).ToList();
+                }
+
+                if (isChines)
+                {
+                    files = files.Where(x => x.FileInfo.Exists(y => y.IsChinese == true)).ToList();
                 }
 
                 count = files.Count;

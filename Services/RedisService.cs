@@ -213,5 +213,30 @@ namespace Services
                 return result;
             }
         }
+
+        public static bool DeleteAllKey(string key)
+        {
+            bool result = false;
+            var client = GetClient();
+
+            try
+            {
+                var allField = client.HGetAll(key);
+
+                if (allField != null && allField.Any())
+                {
+                    foreach (var r in allField)
+                    {
+                        client.HDel(key, r.Key);
+                    }
+                }
+
+                return true;
+            }
+            catch
+            {
+                return result;
+            }
+        }
     }
 }

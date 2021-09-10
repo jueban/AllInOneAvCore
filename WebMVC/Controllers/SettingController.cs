@@ -36,10 +36,6 @@ namespace WebMVC.Controllers
             Settings settings = new()
             {
                 BarkId = "4z4uANLXpe8BXT3wAZVe9F",
-                CommonSettings = new CommonSettings()
-                {
-                    ChromeLocation = Win32Helper.GetExeLocation("Chrome.exe")
-                },
                 JavLibrarySettings = new JavLibrarySettings()
                 {
                     CookieMode = JavLibraryGetCookieMode.Easy
