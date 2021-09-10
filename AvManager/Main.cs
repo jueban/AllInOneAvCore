@@ -81,7 +81,7 @@ namespace AvManager
                         foreach (ListViewItem lvi in PlayFolderListView.SelectedItems)
                         {
                             var file = (FileInfo)lvi.Tag;
-    
+
                             SettingService.SetPlayHistoryNotPlayed(file.Name);
 
                             lvi.BackColor = Color.White;
@@ -165,8 +165,8 @@ namespace AvManager
                                 sb.AppendLine(await OneOneFiveService.GetM3U8(first.FullName));
                             }
                             catch
-                            { 
-                                
+                            {
+
                             }
                         }
                     }
@@ -488,7 +488,7 @@ namespace AvManager
         /// <param name="e"></param>
         private void CombinePrepareTree_AfterCheck(object sender, TreeViewEventArgs e)
         {
-            if (e.Action == TreeViewAction.ByMouse && e.Node.Parent == null) 
+            if (e.Action == TreeViewAction.ByMouse && e.Node.Parent == null)
             {
                 e.Node.Checked = false;
                 return;
@@ -584,11 +584,13 @@ namespace AvManager
             {
                 foreach (var i in d.Value)
                 {
-                    if (i.ChangeName) {
+                    if (i.ChangeName)
+                    {
                         renameCount++;
                     }
 
-                    if (i.IsDelete) {
+                    if (i.IsDelete)
+                    {
                         deleteCount++;
                         deleteSize += i.Length;
                     }
@@ -641,7 +643,8 @@ namespace AvManager
             if (!string.IsNullOrEmpty(LocalService.RealGenerateAutoCombineFile(data, Setting.AUTOCOMBINEFILELOCATION)))
             {
                 MessageBox.Show("操作失败", "警告");
-            } else
+            }
+            else
             {
                 MessageBox.Show("操作成功", "提示");
             }
@@ -691,7 +694,8 @@ namespace AvManager
 
                 sr.Close();
 
-                lvi.SubItems.Add(new ListViewItem.ListViewSubItem() { 
+                lvi.SubItems.Add(new ListViewItem.ListViewSubItem()
+                {
                     Text = FileUtility.GetAutoSizeString(list.Sum(x => x.Length), 1)
                 });
 
@@ -745,7 +749,7 @@ namespace AvManager
                     deleteFiles.Add(lvi.SubItems[0].Text, tempList);
                 }
 
-                var ret = MessageBox.Show($"确定要删除 {deleteFiles.Values.Sum(x => x.Count)} 个文件，总大小 {FileUtility.GetAutoSizeString(deleteFiles.Values.Sum(x => x.ToList().Sum(y => y.Length)),1 )} ?", "警告", MessageBoxButtons.YesNo);
+                var ret = MessageBox.Show($"确定要删除 {deleteFiles.Values.Sum(x => x.Count)} 个文件，总大小 {FileUtility.GetAutoSizeString(deleteFiles.Values.Sum(x => x.ToList().Sum(y => y.Length)), 1)} ?", "警告", MessageBoxButtons.YesNo);
 
                 if (ret == DialogResult.Yes)
                 {
@@ -762,7 +766,7 @@ namespace AvManager
             }
         }
 
-        private async void StartAutoCombine(Dictionary<string, List<FileInfo>> autoCombine) 
+        private async void StartAutoCombine(Dictionary<string, List<FileInfo>> autoCombine)
         {
             Progress<int> progress = new();
 
@@ -1227,7 +1231,7 @@ namespace AvManager
             intProgress.ProgressChanged += SearchProgressChanged;
 
             param.Page = (int)SearchPageUpDown.Value;
-            param.Order = SearchAscRadio.Checked ? "ASC" : "DESC";           
+            param.Order = SearchAscRadio.Checked ? "ASC" : "DESC";
 
             foreach (ListBox lb in SearchUpperTablePanel.Controls)
             {
@@ -1412,7 +1416,7 @@ namespace AvManager
             {
                 foreach (var sub in drop.Items)
                 {
-                    SearchPageListBox.Items.Add(new ListBoxItem{ Title = sub.Text, Tag = sub.Value });
+                    SearchPageListBox.Items.Add(new ListBoxItem { Title = sub.Text, Tag = sub.Value });
                 }
             }
 
@@ -1672,7 +1676,8 @@ namespace AvManager
         {
             if (e.Button == MouseButtons.Right && e.Clicks == 1 && VideoListView.SelectedItems.Count > 0)
             {
-                GenerateVideoMenu(MousePosition);            }
+                GenerateVideoMenu(MousePosition);
+            }
         }
 
         private void GenerateVideoMenu(Point mousePosition)
@@ -1933,8 +1938,23 @@ namespace AvManager
                 var sizeStr = (video.FileInfo != null && video.FileInfo.Any()) ? $"[{video.FileInfo[0].LengthStr}] " : "";
                 ListViewItem lvi = new(sizeStr + video.AvModel.AvId + "-" + video.AvModel.Name);
                 lvi.Tag = video;
-                lvi.ImageIndex = ImageList.Images.IndexOfKey(video.AvModel.Id + "");
 
+                Color back = Color.White;
+
+                if (video.FileInfo.Any())
+                {
+                    if (video.FileInfo[0].IsRemote)
+                    {
+                        back = Color.Yellow;
+                    }
+                    else
+                    {
+                        back = Color.Green;
+                    }
+                }
+
+                lvi.BackColor = back;
+                lvi.ImageIndex = ImageList.Images.IndexOfKey(video.AvModel.Id + "");
                 VideoListView.Items.Add(lvi);
             }
 
@@ -1993,8 +2013,8 @@ namespace AvManager
                         }
                     }
                     catch
-                    { 
-                        
+                    {
+
                     }
                 }
             }

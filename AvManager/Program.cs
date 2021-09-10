@@ -22,7 +22,7 @@ namespace AvManager
         {
             if (args.Length > 0)
             {
-                if (args.Contains("withserver"))
+                if (args.Contains("-withserver"))
                 {
                     CreateApiHostBuilder(args).Build().RunAsync();
                     CreateHangfireHostBuilder(args).Build().RunAsync();

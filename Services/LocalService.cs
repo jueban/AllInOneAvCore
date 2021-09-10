@@ -1410,50 +1410,62 @@ namespace Services
 
             List<AvModel> avs = new();
 
-            //TODO Redis只缓存上次结果，便于翻页使用
+            //TODO Redis缓存多次结果，删除旧的，便于翻页
+            var key = onlyExists.ToString() + type.ToString() + modelName.ToString();
 
-            var localFiles = await GetLocalVideoModelAllFromRedis(avs, onlyExists, progress);
-            var remoteFiles = await GetRemoteVideoModelAllFromRedis(avs, onlyExists, progress);
-
-            //有本地就不要远程
-            foreach (var localFile in localFiles)
+            if (RedisService.HExists("videoTemp", key))
             {
-                if (!exist.Exists(x => x == localFile.AvModel))
+                files = JsonConvert.DeserializeObject<List<VideoModel>>(await RedisService.GetHashAsync("videoTemp", key));
+            }
+            else
+            {
+                RedisService.DeleteAllKey("videoTemp");
+
+                var localFiles = await GetLocalVideoModelAllFromRedis(avs, onlyExists, progress);
+                var remoteFiles = await GetRemoteVideoModelAllFromRedis(avs, onlyExists, progress);
+
+                //有本地就不要远程
+                foreach (var localFile in localFiles)
                 {
-                    if (onlyExists)
+                    if (!exist.Exists(x => x == localFile.AvModel))
                     {
-                        if (localFile.FileInfo != null && localFile.FileInfo.Any())
+                        if (onlyExists)
+                        {
+                            if (localFile.FileInfo != null && localFile.FileInfo.Any())
+                            {
+                                files.Add(localFile);
+                            }
+                        }
+                        else
                         {
                             files.Add(localFile);
                         }
-                    }
-                    else
-                    {
-                        files.Add(localFile);
-                    }
 
-                    exist.Add(localFile.AvModel);
+                        exist.Add(localFile.AvModel);
+                    }
                 }
-            }
 
-            foreach (var remoteFile in remoteFiles)
-            {
-                if (!exist.Exists(x => x == remoteFile.AvModel))
+                foreach (var remoteFile in remoteFiles)
                 {
-                    if (onlyExists)
+                    if (!exist.Exists(x => x == remoteFile.AvModel))
                     {
-                        if (remoteFile.FileInfo != null && remoteFile.FileInfo.Any())
+                        if (onlyExists)
+                        {
+                            if (remoteFile.FileInfo != null && remoteFile.FileInfo.Any())
+                            {
+                                files.Add(remoteFile);
+                            }
+                        }
+                        else
                         {
                             files.Add(remoteFile);
                         }
-                    }
-                    else
-                    {
-                        files.Add(remoteFile);
-                    }
 
-                    exist.Add(remoteFile.AvModel);
+                        exist.Add(remoteFile.AvModel);
+                    }
                 }
+
+                await RedisService.SetHashAsync("videoTemp", key, JsonConvert.SerializeObject(files));
             }
 
             if (files != null && files.Any())
