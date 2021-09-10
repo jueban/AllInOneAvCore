@@ -41,7 +41,7 @@ namespace UnitTest
 
             //RedisService.SetHashAndReplace("play", "", "");
 
-            ReportService.GenerateReport().Wait();
+            //Process.Start(@"‪C:\Users\cleus\AppData\Local\115Chrome\Application\115chrome.exe");
 
             Console.ReadKey();
         }

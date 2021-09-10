@@ -14,6 +14,8 @@ namespace Services
 {
     public class CookieService
     {
+        private static readonly string userName = "cleus";
+
         public static List<CookieItem> ReadChromeCookie(string hostName)
         {
             return ReadCookies(hostName, @"Google\chrome");
@@ -30,8 +32,8 @@ namespace Services
 
             List<CookieItem> ret = new List<CookieItem>();
 
-            var oriCookieFile = $@"C:\Users\cleus\AppData\Local\{program}\User Data\Default\Cookies";
-            var copyCookieFile = $@"C:\Users\cleus\AppData\Local\{program}\User Data\Default\CookiesCopy";
+            var oriCookieFile = $@"C:\Users\{userName}\AppData\Local\{program}\User Data\Default\Cookies";
+            var copyCookieFile = $@"C:\Users\{userName}\AppData\Local\{program}\User Data\Default\CookiesCopy";
 
             if (File.Exists(oriCookieFile))
             {
@@ -65,7 +67,7 @@ namespace Services
                         var name = reader[0].ToString();
                         var encryptedData = (byte[])reader[1];
 
-                        string encKey = File.ReadAllText($@"C:\Users\cleus\AppData\Local\{program}\User Data\Local State");
+                        string encKey = File.ReadAllText($@"C:\Users\{userName}\AppData\Local\{program}\User Data\Local State");
                         encKey = JObject.Parse(encKey)["os_crypt"]["encrypted_key"].ToString();
                         var decodedKey = System.Security.Cryptography.ProtectedData.Unprotect(Convert.FromBase64String(encKey).Skip(5).ToArray(), null, System.Security.Cryptography.DataProtectionScope.LocalMachine);
                         var _cookie = _decryptWithKey(encryptedData, decodedKey, 3);
