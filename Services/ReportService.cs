@@ -34,15 +34,16 @@ namespace Services
 
             foreach (var av in allAv)
             {
-                ProcessReportType(av, allMatch, report, items);
-                process++;
-
-                if (progress != null)
+                await Task.Run(() =>
                 {
-                    progress.Report(("current", process));
-                }
+                    ProcessReportType(av, allMatch, report, items);
+                    process++;
 
-                Console.WriteLine(process + " / " + allAv.Count);
+                    if (progress != null)
+                    {
+                        progress.Report(("current", process));
+                    }
+                });
             };
 
             business.BatchInserReportItem(items);

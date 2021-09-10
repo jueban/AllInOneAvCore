@@ -164,7 +164,8 @@ namespace Services
         public async static Task<List<SeedMagnetSearchModel>> SearchSukebeiMag(string id, string fromUrl)
         {
             List<SeedMagnetSearchModel> ret = new List<SeedMagnetSearchModel>();
-            var site = SettingService.GetSetting().Result.MagSearchSite;
+            var setting = await SettingService.GetSetting();
+            var site = setting.MagSearchSite;
 
             try
             {

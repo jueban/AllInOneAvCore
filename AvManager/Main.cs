@@ -1782,7 +1782,7 @@ namespace AvManager
                     }
 
                     VideoMenu.Items.Add(seedItem);
-                    seedItem.Tag = model.AvModel.AvId.ToUpper();
+                    seedItem.Tag = model.AvModel;
                     seedItem.Click += new EventHandler(SearchSeedMenu);
 
                     VideoMenu.Items.Add(openitem);
@@ -1834,9 +1834,17 @@ namespace AvManager
             }
         }
 
-        private void SearchSeedMenu(object sender, EventArgs e)
+        private async void SearchSeedMenu(object sender, EventArgs e)
         {
+            var model = (AvModel)((ToolStripDropDownItem)sender).Tag;
 
+            var seeds = await MagnetUrlService.SearchSukebeiMag(model.AvId, model.Url);
+
+            if (seeds != null && seeds.Any())
+            {
+                SingleMagnetList sml = new SingleMagnetList(seeds);
+                sml.ShowDialog();
+            }
         }
 
         private void OpenItemMenu(object sender, EventArgs e)
@@ -1851,7 +1859,7 @@ namespace AvManager
 
         private async Task<List<VideoModel>> GetVideoModels(int page, int size, bool onlyExists)
         {
-            Progress<(int, int)> progress = new();
+            Progress<(string, int)> progress = new();
             progress.ProgressChanged += VideoPbUpdate;
 
             List<VideoModel> ret = new();
@@ -2000,10 +2008,16 @@ namespace AvManager
             }
         }
 
-        private void VideoPbUpdate(object sender, (int, int) e)
+        private void VideoPbUpdate(object sender, (string, int) e)
         {
-            VideoProgressBar.Maximum = e.Item2;
-            JDuBar(VideoProgressBar, e.Item1);
+            if (e.Item1 == "total")
+            {
+                VideoProgressBar.Maximum = e.Item2;
+            }
+            else
+            {
+                VideoProgressBar.Value = e.Item2;
+            }
         }
         #endregion
 
@@ -2116,11 +2130,11 @@ namespace AvManager
         {
             if (e.Item1 == "total")
             {
-                ReportPb1.Maximum = e.Item2;
+                ReportProgressBar.Maximum = e.Item2;
             }
             else
             {
-                ReportPb1.Value = e.Item2;
+                ReportProgressBar.Value = e.Item2;
             }
         }
 

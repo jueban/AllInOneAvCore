@@ -20,10 +20,16 @@ namespace AvManager
         [STAThread]
         static void Main(string[] args)
         {
-            CreateApiHostBuilder(args).Build().RunAsync();
-            CreateHangfireHostBuilder(args).Build().RunAsync();
-            CreateSignalRHostBuilder(args).Build().RunAsync();
-            CreateIdentityServerHostBuilder(args).Build().RunAsync();
+            if (args.Length > 0)
+            {
+                if (args.Contains("withserver"))
+                {
+                    CreateApiHostBuilder(args).Build().RunAsync();
+                    CreateHangfireHostBuilder(args).Build().RunAsync();
+                    CreateSignalRHostBuilder(args).Build().RunAsync();
+                    CreateIdentityServerHostBuilder(args).Build().RunAsync();
+                }
+            }
 
             Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.EnableVisualStyles();
