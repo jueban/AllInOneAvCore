@@ -1410,6 +1410,8 @@ namespace Services
 
             List<AvModel> avs = new();
 
+            //TODO Redis只缓存上次结果，便于翻页使用
+
             var localFiles = await GetLocalVideoModelAllFromRedis(avs, onlyExists, progress);
             var remoteFiles = await GetRemoteVideoModelAllFromRedis(avs, onlyExists, progress);
 
@@ -1475,7 +1477,7 @@ namespace Services
 
                 count = files.Count;
 
-                list = files = files.Skip((page - 1) * size).Take(size).ToList();
+                list = files.OrderByDescending(x => x.AvModel.CreateTime).Skip((page - 1) * size).Take(size).ToList();
             }          
 
             ret.Item1 = list;
