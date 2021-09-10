@@ -35,7 +35,7 @@ namespace Services
                 GetClient().HSet(key, field, value);
                 return true;
             }
-            catch (Exception e)
+            catch
             {
                 return false;
             }
@@ -48,7 +48,7 @@ namespace Services
                 await GetClient().HSetAsync(key, field, value);
                 return true;
             }
-            catch (Exception e)
+            catch
             {
                 return false;
             }
@@ -80,7 +80,7 @@ namespace Services
                 client.HSet(key, field, value);
                 return true;
             }
-            catch (Exception e)
+            catch
             {
                 return false;
             }
@@ -105,7 +105,7 @@ namespace Services
                 await client.HSetAsync(key, field, value);
                 return true;
             }
-            catch (Exception e)
+            catch
             {
                 return false;
             }
@@ -126,7 +126,7 @@ namespace Services
                 result = GetClient().HGet(key, field);
                 return result;
             }
-            catch (Exception e)
+            catch
             {
                 return result;
             }
@@ -141,7 +141,7 @@ namespace Services
                 result = await GetClient().HGetAsync(key, field);
                 return result;
             }
-            catch (Exception e)
+            catch
             {
                 return result;
             }
@@ -160,7 +160,7 @@ namespace Services
                 var result = GetClient().HGetAll(key);
                 return result;
             }
-            catch (Exception e)
+            catch
             {
                 return new Dictionary<string, string>();
             }
@@ -180,7 +180,7 @@ namespace Services
                 result = GetClient().HDel(key, field);
                 return result;
             }
-            catch (Exception e)
+            catch
             {
                 return result;
             }
@@ -194,7 +194,7 @@ namespace Services
                 result = GetClient().HExists(key, field);
                 return result;
             }
-            catch (Exception e)
+            catch
             {
                 return result;
             }
@@ -208,7 +208,7 @@ namespace Services
                 result = GetClient().Expire(key, seconds);
                 return result;
             }
-            catch (Exception e)
+            catch
             {
                 return result;
             }
@@ -236,6 +236,57 @@ namespace Services
             catch
             {
                 return result;
+            }
+        }
+
+        public async static Task<bool> DeleteAllKeyAsync(string key)
+        {
+            bool result = false;
+            var client = GetClient();
+
+            try
+            {
+                var allField = await client.HKeysAsync(key);
+
+                if (allField != null && allField.Any())
+                {
+                    foreach (var r in allField)
+                    {
+                        await client.HDelAsync(key, r);
+                    }
+                }
+
+                return true;
+            }
+            catch
+            {
+                return result;
+            }
+        }
+
+        public async static Task<int> PushHashWithLimitAsync(string key, string field, string value, int count)
+        {
+            var client = GetClient();
+
+            try
+            {
+                var allField = await client.HKeysAsync(key);
+
+                if (allField.Length < count)
+                {
+                    await client.HSetAsync(key, field, value);
+                    return allField.Length + 1;
+                }
+                else
+                {
+                    await client.HDelAsync(key, allField.FirstOrDefault(x => x != field));
+                    await client.HSetAsync(key, field, value);
+                    return allField.Length;
+                }
+            }
+            catch
+            {
+                return 0;
             }
         }
     }

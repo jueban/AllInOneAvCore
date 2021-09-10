@@ -48,7 +48,7 @@
 
 //Jav老司机添加以下
 function getLocalAnd115Check(avId, div) {
-    let promise1 = request(`http://localhost:20001/api/Everything/EverythingSearch?content=${avId}`);
+    let promise1 = request(`http://localhost:21001/api/Everything/EverythingSearch?content=${avId}`);
     promise1.then((result) => {
         let resultJson = JSON.parse(result.responseText);
         if (resultJson.results.length > 0) {

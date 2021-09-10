@@ -24,6 +24,7 @@
     <PackageReference Include="Hangfire.AspNetCore" Version="1.7.22" />
     <PackageReference Include="Hangfire.SqlServer" Version="1.7.22" />
     <PackageReference Include="IdentityServer4" Version="4.1.2" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.961.33" />
   </ItemGroup>
 
   <ItemGroup>

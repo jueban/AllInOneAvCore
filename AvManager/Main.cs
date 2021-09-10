@@ -1,5 +1,6 @@
 ﻿using AvManager.Helper;
 using DAL;
+using Microsoft.Web.WebView2.Core;
 using Models;
 using Newtonsoft.Json;
 using Services;
@@ -41,7 +42,15 @@ namespace AvManager
             InitializeComponent();
         }
 
-        private async void Main_KeyDown(object sender, KeyEventArgs e)
+        public Main(string mode)
+        {
+            Control.CheckForIllegalCrossThreadCalls = false;
+            InitializeComponent();
+
+            this.Text = "AvManager " + mode;
+        }
+
+        private void Main_KeyDown(object sender, KeyEventArgs e)
         {
             //准备合并页面
             if (TabControl.SelectedTab.Name == "CombinePrepareTab")
@@ -151,23 +160,17 @@ namespace AvManager
                     {
                         var model = ((VideoModel)lvi.Tag);
 
-                        var first = model.FileInfo.FirstOrDefault();
-
-                        if (first != null && first.IsRemote == false)
+                        if (model.FileInfo.Any())
                         {
-                            files.Add(first);
-                        }
+                            var biggestLocal = model.FileInfo.Where(x=>x.IsRemote == false).OrderByDescending(x=>x.Length).FirstOrDefault();
+                            var biggestRemote = model.FileInfo.Where(x => x.IsRemote == true).OrderByDescending(x => x.Length).FirstOrDefault();
 
-                        if (first != null && first.IsRemote == true)
-                        {
-                            try
+                            if (biggestLocal != null)
                             {
-                                sb.AppendLine(await OneOneFiveService.GetM3U8(first.FullName));
+                                files.Add(biggestLocal);
                             }
-                            catch
-                            {
-
-                            }
+                            
+                            //TODO处理远程文件
                         }
                     }
 
@@ -1698,6 +1701,17 @@ namespace AvManager
                     //ToolStripItem faviitem = new ToolStripMenuItem("添加收藏");
                     ToolStripItem openitem = new ToolStripMenuItem("打开网页");
 
+                    if (model.FileInfo.Any())
+                    {
+                        if (model.FileInfo[0].IsRemote)
+                        {
+                            ToolStripItem moveToLocal = new ToolStripMenuItem("移回本地");
+                            moveToLocal.Tag = model.FileInfo[0].FullName;
+
+                            moveToLocal.Click += new EventHandler(MoveToLocal);
+                        }
+                    }
+
                     var actress = model.AvModel.InfoObj.Where(x => x.Type == CommonModelType.Actress).ToList();
                     var category = model.AvModel.InfoObj.Where(x => x.Type == CommonModelType.Category).ToList();
                     var prefix = model.AvModel.Name.Split('-')[0].ToUpper();
@@ -1793,6 +1807,18 @@ namespace AvManager
             }
 
             VideoMenu.Show(mousePosition.X, mousePosition.Y);
+        }
+
+        private async void MoveToLocal(object sender, EventArgs e)
+        {
+            var fid = (string)((ToolStripDropDownItem)sender).Tag;
+
+            var res = await OneOneFiveService.Copy(new List<string> { fid }, OneOneFiveFolder.MoveBackToLocal);
+
+            if (res.state == true)
+            {
+                MessageBox.Show("移动成功", "提醒", MessageBoxButtons.OK);
+            }
         }
 
         private void ChangeActressCombo(object sender, EventArgs e)
@@ -1935,7 +1961,7 @@ namespace AvManager
                     }
                 }
 
-                var sizeStr = (video.FileInfo != null && video.FileInfo.Any()) ? $"[{video.FileInfo[0].LengthStr}] " : "";
+                var sizeStr = (video.FileInfo != null && video.FileInfo.Any()) ? $"[{video.FileInfo.OrderByDescending(x => x.Length).FirstOrDefault().LengthStr}] " : "";
                 ListViewItem lvi = new(sizeStr + video.AvModel.AvId + "-" + video.AvModel.Name);
                 lvi.Tag = video;
 
@@ -1943,7 +1969,7 @@ namespace AvManager
 
                 if (video.FileInfo.Any())
                 {
-                    if (video.FileInfo[0].IsRemote)
+                    if (video.FileInfo.Count > 1)
                     {
                         back = Color.Yellow;
                     }
@@ -1967,13 +1993,15 @@ namespace AvManager
             VideoTotalText.Text = total + "";
         }
 
-        private void VideoClearRedisBtn_Click(object sender, EventArgs e)
+        private async void VideoClearRedisBtn_Click(object sender, EventArgs e)
         {
             var ret = MessageBox.Show("是否要清理Redis缓存，会导致下次加载变慢?", "警告", MessageBoxButtons.YesNo);
 
             if (ret == DialogResult.Yes)
             {
-                RedisService.DeleteAllKey("video");
+                await RedisService.DeleteAllKeyAsync("video");
+                await RedisService.DeleteAllKeyAsync("videoTemp");
+                await RedisService.DeleteAllKeyAsync("videoFiles");
 
                 UpdateVideoCombo = true;
             }
@@ -1984,38 +2012,71 @@ namespace AvManager
             VideoPage = (int)VideoPageSizeUpDown.Value;
         }
 
-        private async void VideoListView_MouseDoubleClick(object sender, MouseEventArgs e)
+        //如果没有远程文件，播放最大的，如果有比较远程文件与本地文件，本地文件大的话直接播放，远程大的话弹框选择
+        private void VideoListView_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             if (VideoListView.SelectedItems.Count > 0)
             {
-                var file = ((VideoModel)VideoListView.SelectedItems[0].Tag).FileInfo.FirstOrDefault();
-
-                if (file != null && file.IsRemote == false)
+                var files = ((VideoModel)VideoListView.SelectedItems[0].Tag).FileInfo;
+                //一个文件直接播放
+                if (files.Count == 1)
                 {
-                    Process.Start(Setting.POTPLAYEREXEFILELOCATION, file.FullName);
+                    var file = ((VideoModel)VideoListView.SelectedItems[0].Tag).FileInfo.FirstOrDefault();
 
-                    SettingService.InsertPlayHistory(new PlayHistory()
-                    {
-                        FileName = file.Name,
-                        LastPlay = DateTime.Now,
-                        PlayTimes = 1,
-                        SetNotPlayed = false
-                    });
+                    PlaySingleFile(file);
                 }
-                else
+                else if(files.Count > 1)
                 {
-                    try
+                    if (files.Exists(x => x.IsRemote))
                     {
-                        if (file != null)
+                        var biggestRemote = files.Where(x => x.IsRemote).OrderByDescending(x => x.Length).FirstOrDefault();
+                        var biggestLocal = files.Where(x => !x.IsRemote).OrderByDescending(x => x.Length).FirstOrDefault();
+
+                        if (biggestLocal.Length >= biggestRemote.Length)
                         {
-                            var m3u8 = await OneOneFiveService.GetM3U8(file.FullName);
-                            Process.Start(Setting.POTPLAYEREXEFILELOCATION, m3u8);
+                            PlaySingleFile(biggestLocal);
+                        }
+                        else
+                        {
+                            //TODO 提供下载会本地功能
+                            PlaySingleFile(biggestRemote);
                         }
                     }
-                    catch
+                    else
                     {
-
+                        PlaySingleFile(files.OrderByDescending(x => x.Length).FirstOrDefault());
                     }
+                }
+            }
+        }
+
+        private async void PlaySingleFile(MyFileInfo file)
+        {
+            if (file != null && file.IsRemote == false)
+            {
+                Process.Start(Setting.POTPLAYEREXEFILELOCATION, file.FullName);
+
+                SettingService.InsertPlayHistory(new PlayHistory()
+                {
+                    FileName = file.Name,
+                    LastPlay = DateTime.Now,
+                    PlayTimes = 1,
+                    SetNotPlayed = false
+                });
+            }
+            else
+            {
+                try
+                {
+                    if (file != null)
+                    {
+                        var m3u8 = await OneOneFiveService.GetM3U8(file.FullName);
+                        Process.Start(Setting.POTPLAYEREXEFILELOCATION, m3u8);
+                    }
+                }
+                catch
+                {
+
                 }
             }
         }

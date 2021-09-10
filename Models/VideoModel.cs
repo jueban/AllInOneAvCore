@@ -8,6 +8,7 @@ namespace Models
 {
     public class VideoModel
     {
+        public string FileKey { get; set; }
         public AvModel AvModel { get; set; }
         public List<MyFileInfo> FileInfo { get; set; }
     }

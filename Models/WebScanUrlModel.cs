@@ -60,6 +60,43 @@ public class AvModel
         }
     }
 
+    //public bool Equals(AvModel model)
+    //{
+    //    if (ReferenceEquals(null, model)) return false;
+
+    //    if (ReferenceEquals(this, model)) return true;
+
+    //    if (!(this.AvId + this.Name).Equals(model.AvId + model.Name)) return false;
+
+    //    return true;
+    //}
+
+    //public override bool Equals(object obj)
+    //{
+    //    if (ReferenceEquals(null, obj)) return false;
+
+    //    if (ReferenceEquals(this, obj)) return true;
+
+    //    if (this.GetType() != obj.GetType()) return false;
+
+    //    return Equals((AvModel)obj);
+    //}
+
+    //public override int GetHashCode()
+    //{
+    //    return (this.AvId + this.Name).GetHashCode();
+    //}
+
+    //public static bool operator ==(AvModel left, AvModel right)
+    //{
+    //    return Equals(left, right);
+    //}
+
+    //public static bool operator !=(AvModel left, AvModel right)
+    //{
+    //    return !Equals(left, right);
+    //}
+
     public override string ToString()
     {
         return $"∑¨∫≈:{this.AvId}, √˚≥∆:{this.Name}, –≈œ¢:{this.Infos}, Õ¯÷∑:{this.Url}, Õº∆¨µÿ÷∑:{this.PicUrl}";
