@@ -289,5 +289,12 @@ namespace Services
                 return 0;
             }
         }
+
+        public static long[] GetInfo(string key)
+        {
+            long[] ret = new long[3];
+
+            return ret;
+        }
     }
 }

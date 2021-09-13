@@ -220,7 +220,8 @@ namespace Services
 
                             int.TryParse(date, out int seconds);
 
-                            DateTime startTime = TimeZone.CurrentTimeZone.ToLocalTime(new System.DateTime(1970, 1, 1)); // 当地时区
+                            TimeZoneInfo.ClearCachedData();
+                            DateTime startTime = new DateTime(1970, 1, 1) + TimeZoneInfo.Local.BaseUtcOffset; // 当地时区
                             DateTime dt = startTime.AddSeconds(seconds);
 
                             SeedMagnetSearchModel temp = new SeedMagnetSearchModel

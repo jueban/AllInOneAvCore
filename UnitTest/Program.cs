@@ -43,6 +43,8 @@ namespace UnitTest
 
             //Process.Start(@"‪C:\Users\cleus\AppData\Local\115Chrome\Application\115chrome.exe");
 
+            var ret = RedisService.GetInfo("videoTemp");
+
             Console.ReadKey();
         }
 

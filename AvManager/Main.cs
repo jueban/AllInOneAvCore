@@ -1320,6 +1320,8 @@ namespace AvManager
                 if (result != null)
                 {
                     await new ScanDAL().DeleteSeedMagnetSearchModelById(result.Id);
+
+                    InitSearchUI();
                 }
             }
         }
@@ -1633,16 +1635,16 @@ namespace AvManager
                 var director = await business.GetCommonJavLibraryModelByType(CommonModelType.Director);
 
                 var actressDS = actress.Select(x => x.Name).ToList();
-                actressDS.Insert(0, "全部");
+                actressDS.Insert(0, "全部演员");
 
                 var categoryDS = category.Select(x => x.Name).ToList();
-                categoryDS.Insert(0, "全部");
+                categoryDS.Insert(0, "全部分类");
 
                 var prefixDS = prefix;
-                prefixDS.Insert(0, "全部");
+                prefixDS.Insert(0, "全部前缀");
 
                 var directorDS = director.Select(x => x.Name).ToList();
-                directorDS.Insert(0, "全部");
+                directorDS.Insert(0, "全部导演");
 
                 VideoActressCombo.SelectedIndexChanged -= VideoActressCombo_SelectedIndexChanged;
                 VideoCategoryCombo.SelectedIndexChanged -= VideoCategoryCombo_SelectedIndexChanged;
@@ -2128,9 +2130,9 @@ namespace AvManager
 
         private async void SettingSaveFaviBtn_Click(object sender, EventArgs e)
         {
-            if (!string.IsNullOrEmpty(SettingPreText.Text))
+            if (!string.IsNullOrEmpty(SettingFaviText.Text))
             {
-                var res = await MagnetUrlService.GetFaviUrl(SettingPreText.Text);
+                var res = await MagnetUrlService.GetFaviUrl(SettingFaviText.Text);
 
                 await MagnetUrlService.SaveFaviUrl(res);
 
@@ -2231,5 +2233,10 @@ namespace AvManager
             }
         }
         #endregion
+
+        private void RenameInfoText_TextChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }

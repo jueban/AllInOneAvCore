@@ -15,7 +15,7 @@ namespace Utils
             return JsonSerializer.Serialize(obj, new JsonSerializerOptions { Encoder = System.Text.Encodings.Web.JavaScriptEncoder.Create(UnicodeRanges.All) });
         }
 
-        public static TValue? Deserialize<TValue>(string jsonStr)
+        public static TValue Deserialize<TValue>(string jsonStr)
         {
             return JsonSerializer.Deserialize<TValue>(jsonStr);
         }

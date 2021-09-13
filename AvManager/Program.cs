@@ -19,7 +19,6 @@ namespace AvManager
         /// <summary>
         /// 是否退出应用程序
         /// </summary>
-        static bool glExitApp = false;
         [DllImport("user32.dll")]
         private static extern bool ShowWindow(IntPtr hwnd, int nCmdShow);
 
