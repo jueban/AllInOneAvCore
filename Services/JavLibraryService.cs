@@ -530,13 +530,13 @@ namespace Services
                 Directory.CreateDirectory(imageFolder);
             }
 
+            var result = 0;
             await waitForDownload.ParallelForEachAsync(async toBeDownload =>
             {
                 var avModelScan = await GetJavLibraryDetailPageInfo(toBeDownload.URL);
 
                 if (avModelScan.exception == null && avModelScan.avModel != null)
                 {
-                    var result = 0;
                     try
                     {
                         result = await SaveJavLibraryAvModel(avModelScan.avModel);

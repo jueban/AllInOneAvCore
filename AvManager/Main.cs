@@ -32,7 +32,7 @@ namespace AvManager
         private bool OnlyCancelCurrentCombineTask = false;
         private bool IsManualChangeSearchListBox = true;
         private bool UpdateVideoCombo = true;
-        public int VideoPage = 50;
+        public int VideoPage = 80;
         #endregion
 
         #region 全局
@@ -1236,6 +1236,8 @@ namespace AvManager
             param.Page = (int)SearchPageUpDown.Value;
             param.Order = SearchAscRadio.Checked ? "ASC" : "DESC";
 
+            param.Name = SearchSiteComboBox.Text + " ";
+
             foreach (ListBox lb in SearchUpperTablePanel.Controls)
             {
                 if (lb.SelectedItems.Count > 0)
@@ -1888,7 +1890,7 @@ namespace AvManager
 
         private async Task<List<VideoModel>> GetVideoModels(int page, int size, bool onlyExists)
         {
-            Progress<(string, int)> progress = new();
+            Progress<(string, string, int)> progress = new();
             progress.ProgressChanged += VideoPbUpdate;
 
             List<VideoModel> ret = new();
@@ -2083,16 +2085,30 @@ namespace AvManager
             }
         }
 
-        private void VideoPbUpdate(object sender, (string, int) e)
+        private void VideoPbUpdate(object sender, (string, string, int) e)
         {
-            //if (e.Item1 == "total")
-            //{
-            //    VideoProgressBar.Maximum = e.Item2;
-            //}
-            //else
-            //{
-            //    VideoProgressBar.Value = e.Item2;
-            //}
+            if (e.Item1 == "total")
+            {
+                if (e.Item2 == "total")
+                {
+                    VideoTotalPB.Maximum = e.Item3;
+                }
+                else
+                {
+                    VideoTotalPB.Value = e.Item3;
+                }
+            }
+            else
+            {
+                if (e.Item2 == "total")
+                {
+                    VideoCurrentPB.Maximum = e.Item3;
+                }
+                else
+                {
+                    VideoCurrentPB.Value = e.Item3;
+                }
+            }
         }
 
         private void VideoProgressBar_Click(object sender, EventArgs e)
@@ -2233,10 +2249,5 @@ namespace AvManager
             }
         }
         #endregion
-
-        private void RenameInfoText_TextChanged(object sender, EventArgs e)
-        {
-
-        }
     }
 }

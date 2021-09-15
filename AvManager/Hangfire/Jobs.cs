@@ -111,9 +111,9 @@ namespace AvManager.Hangfire
             NoticeService.SendBarkNotice( $"结束扫描 {site} 磁链, 用时 {(DateTime.Now - startTime).TotalSeconds} 秒");
         }
 
-        public static void PingService()
+        public async static void PingService()
         {
-            var setting = SettingService.GetSetting().Result;
+            var setting = await SettingService.GetSetting();
 
             var sites = setting.PingServiceSite.Split(',').ToList();
 
@@ -121,7 +121,7 @@ namespace AvManager.Hangfire
             {
                 using (HttpClient hc = new HttpClient())
                 {
-                    var result = hc.GetStringAsync(site + "/ping/ping").Result;
+                    var result = await hc.GetStringAsync(site + "/ping/ping");
                 }
             }
         }

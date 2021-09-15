@@ -20,7 +20,7 @@ namespace WebMVC
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<Startup>().UseUrls("http://*:20003");
+                    webBuilder.UseStartup<Startup>().UseUrls("http://*:21003");
                 });
     }
 }

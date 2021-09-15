@@ -294,6 +294,8 @@ namespace Services
         {
             long[] ret = new long[3];
 
+            //GetClient().call
+
             return ret;
         }
     }

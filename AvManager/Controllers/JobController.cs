@@ -73,7 +73,7 @@ namespace AvManager.Controllers
         [HttpGet]
         public string RegJavlibraryDailyUpdate()
         {
-            RecurringJob.AddOrUpdate(() => Jobs.ScanJavLibraryUpdateUrls(JavLibraryEntryPointType.Update, 200, "", false), Cron.HourInterval(4));
+            RecurringJob.AddOrUpdate(() => Jobs.ScanJavLibraryUpdateUrls(JavLibraryEntryPointType.Update, 200, "", false), "0 */4 * * *");
 
             return "success";
         }
@@ -81,7 +81,7 @@ namespace AvManager.Controllers
         [HttpGet]
         public string PingService()
         {
-            RecurringJob.AddOrUpdate(() => Jobs.PingService(), Cron.MinuteInterval(30));
+            RecurringJob.AddOrUpdate(() => Jobs.PingService(), "*/30 * * * *");
 
             return "success";
         }

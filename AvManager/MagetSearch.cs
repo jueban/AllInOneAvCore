@@ -88,7 +88,7 @@ namespace AvManager
         {
             if (MagnetSearchGreaterRadio.Checked)
             {
-                var tempModel = this.model.Where(x => x.HasGreaterSize && x.MatchFiles != null && x.MatchFiles.Any()).ToList();
+                var tempModel = this.model.Where(x => x.HasGreaterSize && x.MatchFiles != null && x.MatchFiles.Any()).OrderBy(x => long.Parse(x.MatchFiles.FirstOrDefault().size)).ToList();
                 ShowList(tempModel);
             }
         }

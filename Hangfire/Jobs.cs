@@ -74,7 +74,7 @@ namespace Hangfire
             NoticeService.SendBarkNotice( $"生成报表完成，耗时 {(DateTime.Now - startTime).TotalSeconds} 秒");
         }
 
-        public static void ScanJavLibraryUpdateUrls(JavLibraryEntryPointType entry, int pages, string url, bool useExactPassin)
+        public async static void ScanJavLibraryUpdateUrls(JavLibraryEntryPointType entry, int pages, string url, bool useExactPassin)
         {
             DateTime startTime = DateTime.Now;
             NoticeService.SendBarkNotice( $"开始处理最新更新Urls {pages} 页");
@@ -82,9 +82,9 @@ namespace Hangfire
             Progress<string> progress = new();
             progress.ProgressChanged += LogInfo;
 
-            var scans = JavLibraryService.GetJavLibraryWebScanUrlMode(entry, pages, url, useExactPassin, JavLibrarySearchOrder.Asc, progress).Result;
+            var scans = await JavLibraryService.GetJavLibraryWebScanUrlMode(entry, pages, url, useExactPassin, JavLibrarySearchOrder.Asc, progress);
 
-            var ret = JavLibraryService.DownloadJavLibraryDetailAndSavePictureFromWebScanUrl(scans, progress).Result;
+            var ret = await JavLibraryService.DownloadJavLibraryDetailAndSavePictureFromWebScanUrl(scans, progress);
 
             NoticeService.SendBarkNotice( $"开始处理最新更新Urls完成 {pages} 页，共下载{ret}, 耗时 {(DateTime.Now - startTime).TotalSeconds} 秒");
         }
