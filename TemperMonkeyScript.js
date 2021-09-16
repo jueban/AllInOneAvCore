@@ -43,6 +43,12 @@
             console.log("jav Core =====> " + data);
         }
     });
+
+    function reload() {
+        window.location.reload();
+    }
+
+    setInterval(reload, (1000 * 60 * 60));
 })();
 
 

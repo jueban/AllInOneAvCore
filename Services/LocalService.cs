@@ -1500,5 +1500,54 @@ namespace Services
 
             return ret;
         }
+
+        private string PostFiles(HttpFileCollection filelist, string folder, bool addDate, string ext)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            if (filelist != null && filelist.Count > 0)
+            {
+                for (int i = 0; i < filelist.Count; i++)
+                {
+                    HttpPostedFile file = filelist[i];
+                    string fileName = file.FileName;
+
+                    if (fileName.ToLower().Contains(ext))
+                    {
+                        if (addDate)
+                        {
+                            folder = folder + DateTime.Now.ToString("yyyy-MM-dd") + "\\";
+                        }
+
+                        DirectoryInfo di = new DirectoryInfo(folder);
+
+                        if (!di.Exists)
+                        {
+                            di.Create();
+                        }
+
+                        try
+                        {
+                            file.SaveAs(folder + fileName);
+                            sb.AppendLine("上传文件写入成功: " + (folder + fileName).Replace("\\", "/"));
+                        }
+                        catch (Exception ex)
+                        {
+                            sb.AppendLine("上传文件写入失败: " + fileName + Environment.NewLine + ex.ToString());
+                        }
+                    }
+                    else
+                    {
+                        sb.AppendLine("传入格式不正确: " + fileName);
+                    }
+                }
+            }
+            else
+            {
+                sb.AppendLine("上传的文件信息不存在！");
+            }
+
+            return sb.ToString();
+        }
     }
 }
