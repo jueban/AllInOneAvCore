@@ -2208,7 +2208,7 @@ namespace AvManager
         #region 报告
         private void ReportCombo_SelectedIndexChanged(object sender, EventArgs e)
         {
-            var url = "http://localhost:20003/Report/ShowChart?id=" + ((int)((ComboBoxItem)ReportCombo.SelectedItem).Tag);
+            var url = "http://localhost:21003/Report/ShowChart?id=" + ((int)((ComboBoxItem)ReportCombo.SelectedItem).Tag);
 
             Process.Start(Win32Helper.GetExeLocation("Chrome.exe"), url);
         }
