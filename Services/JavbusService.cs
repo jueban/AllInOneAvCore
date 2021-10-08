@@ -208,20 +208,22 @@ namespace Services
             return ret;
         }
 
-        public async static Task<(AvModel avModel, List<SeedMagnetSearchModel> mags)> GetJavBusDetail(string url, bool getMag = false)
+        public async static Task<(AvModel avModel, List<SeedMagnetSearchModel> mags)> GetJavBusDetail(string url, bool downloadPic = true, bool getMag = false)
         {
             (AvModel avModel, List<SeedMagnetSearchModel> mags) ret = new();
-            List<SeedMagnetSearchModel> magList = new List<SeedMagnetSearchModel>();
+            List<SeedMagnetSearchModel> magList = new();
             ret.mags = magList;
             AvModel avModel = new();
 
-            var imageFolder = SettingService.GetSetting().Result.JavBusImageFolder;
+            var setting = await SettingService.GetSetting();
+
+            var imageFolder = setting.JavBusImageFolder;
 
             if (!Directory.Exists(imageFolder))
             {
                 Directory.CreateDirectory(imageFolder);
             }
-
+            
             var res = await GetJavBusContent(url);
 
             if (res.exception == null && !string.IsNullOrEmpty(res.content))
@@ -232,17 +234,20 @@ namespace Services
                 await SaveJavBusAvModel(avModel);
                 await SaveCommonJavBusModel(avModel.InfoObj);
 
-                var picFile = imageFolder + "\\" + avModel.FileNameWithoutExtension + ".jpg";
-
-                if (!string.IsNullOrWhiteSpace(avModel.PicUrl) && !File.Exists(picFile))
+                if (downloadPic)
                 {
-                    try
+                    var picFile = imageFolder + "\\" + avModel.FileNameWithoutExtension + ".jpg";
+
+                    if (!string.IsNullOrWhiteSpace(avModel.PicUrl) && !File.Exists(picFile))
                     {
-                        new WebClient().DownloadFile(avModel.PicUrl, picFile);
-                    }
-                    catch (Exception)
-                    {
-                        
+                        try
+                        {
+                            new WebClient().DownloadFile(avModel.PicUrl, picFile);
+                        }
+                        catch (Exception)
+                        {
+
+                        }
                     }
                 }
             }

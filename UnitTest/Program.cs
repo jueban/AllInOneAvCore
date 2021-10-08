@@ -24,6 +24,8 @@ namespace UnitTest
             Progress<string> progress = new();
             progress.ProgressChanged += PrintLog;
 
+            var skip = long.Parse("0.8");
+
             //var rest = OneOneFiveService.GetM3U8("acjpxvomv83tlhtnb").Result;
 
             //System.Diagnostics.Process.Start("C:\\Program Files\\DAUM\\PotPlayer\\PotPlayerMini64.exe", rest);

@@ -1956,7 +1956,7 @@ namespace AvManager
                         try
                         {
                             using Stream s = await c.GetStreamAsync(video.AvModel.PicUrl);
-                            ImageList.Images.Add(Image.FromStream(s));
+                            ImageList.Images.Add(video.AvModel.Id + "", Image.FromStream(s));
                         }
                         catch
                         {

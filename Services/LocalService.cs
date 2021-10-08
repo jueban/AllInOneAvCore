@@ -1501,53 +1501,115 @@ namespace Services
             return ret;
         }
 
-        private string PostFiles(HttpFileCollection filelist, string folder, bool addDate, string ext)
+        public static async Task RenameCheck(List<MatchNameListViewModel> files, string desc, List<string> allPrefix, IProgress<MatchNameListViewModel> progress)
         {
-            StringBuilder sb = new StringBuilder();
-
-            if (filelist != null && filelist.Count > 0)
+            foreach (var f in files)
             {
-                for (int i = 0; i < filelist.Count; i++)
+                string pi = "";
+                FileInfo fi = f.OriFile;
+
+                var fileNameWithoutFormat = Path.GetFileNameWithoutExtension(fi.Name);
+
+                foreach (var prefix in allPrefix.OrderByDescending(x => x.Length))
                 {
-                    HttpPostedFile file = filelist[i];
-                    string fileName = file.FileName;
-
-                    if (fileName.ToLower().Contains(ext))
+                    if (fileNameWithoutFormat.Contains(prefix, StringComparison.OrdinalIgnoreCase))
                     {
-                        if (addDate)
+                        var pattern = prefix + "{1}-?\\d{1,7}";
+                        var possibleId = Regex.Match(fileNameWithoutFormat, pattern, RegexOptions.IgnoreCase).Value;
+
+                        if (possibleId.Contains("-"))
                         {
-                            folder = folder + DateTime.Now.ToString("yyyy-MM-dd") + "\\";
+                            pi = possibleId;
+                        }
+                        else
+                        {
+                            bool isFirst = true;
+                            StringBuilder sb = new();
+
+                            foreach (var c in possibleId)
+                            {
+                                if (c >= '0' && c <= '9')
+                                {
+                                    if (isFirst)
+                                    {
+                                        sb.Append("-");
+                                        isFirst = false;
+                                    }
+                                }
+                                sb.Append(c);
+                            }
+
+                            pi = sb.ToString();
                         }
 
-                        DirectoryInfo di = new DirectoryInfo(folder);
+                        if (!string.IsNullOrEmpty(pi))
+                        {
+                            List<AvModel> possibleAv = new();
+                            Progress<string> prog = new();
 
-                        if (!di.Exists)
-                        {
-                            di.Create();
-                        }
+                            var urls = await JavbusService.GetJavBusList(JavBusEntryPointType.Passin, $"https://www.javbus.com/search/{pi}&type=&parent=ce", 1, prog, false);
 
-                        try
-                        {
-                            file.SaveAs(folder + fileName);
-                            sb.AppendLine("上传文件写入成功: " + (folder + fileName).Replace("\\", "/"));
+                            foreach (var url in urls.success)
+                            {
+                                var avModel = await JavbusService.GetJavBusDetail(url.URL, false, false);
+
+                                if (avModel.avModel != null)
+                                {
+                                    possibleAv.Add(avModel.avModel);
+                                }
+                            }
+
+                            if (possibleAv == null || possibleAv.Count <= 0)
+                            {
+                                var prefixPart = pi.Split('-')[0];
+                                var numberPart = pi.Split('-')[1];
+
+                                if (numberPart.StartsWith("00"))
+                                {
+                                    numberPart = numberPart.Substring(2);
+
+                                    pi = prefixPart + "-" + numberPart;
+
+                                    urls = await JavbusService.GetJavBusList(JavBusEntryPointType.Passin, $"https://www.javbus.com/search/{pi}&type=&parent=ce", 1, prog, false);
+
+                                    foreach (var url in urls.success)
+                                    {
+                                        var avModel = await JavbusService.GetJavBusDetail(url.URL, false, false);
+
+                                        if (avModel.avModel != null)
+                                        {
+                                            possibleAv.Add(avModel.avModel);
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (possibleAv != null && possibleAv.Any())
+                            {
+                                if (possibleAv.Count == 1)
+                                {
+                                    var x = possibleAv.FirstOrDefault();
+                                    f.DescFile = desc + x.ReleaseDate?.ToString("yyyy-MM-dd") + " " + x.AvId + " " + x.Name + Path.DirectorySeparatorChar + x.AvId + f.OriFile.Extension;
+                                }
+                                else
+                                {
+                                    f.DescFile = "存在多个匹配，不自动处理";
+                                }
+
+                                f.PossibleFiles = possibleAv;
+                            }
+                            else
+                            {
+                                f.DescFile = "没有找到匹配，不自动处理";
+                            }
+
+                            break;
                         }
-                        catch (Exception ex)
-                        {
-                            sb.AppendLine("上传文件写入失败: " + fileName + Environment.NewLine + ex.ToString());
-                        }
-                    }
-                    else
-                    {
-                        sb.AppendLine("传入格式不正确: " + fileName);
                     }
                 }
-            }
-            else
-            {
-                sb.AppendLine("上传的文件信息不存在！");
-            }
 
-            return sb.ToString();
+                progress.Report(f);
+            }
         }
     }
 }
